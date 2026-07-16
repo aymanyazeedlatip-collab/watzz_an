@@ -3,11 +3,7 @@
   "functions": {
     "backend/server.py": {
       "maxDuration": 300,
-      "includeFiles": [
-        "backend/artifacts/municipality_v1/**",
-        "backend/data/default/**",
-        "backend/app/config/**"
-      ],
+      "includeFiles": "{backend/artifacts/municipality_v1/**,backend/data/default/**,backend/app/config/**}",
       "excludeFiles": "{frontend/**,public/**,scripts/**,backend/tests/**,backend/data/processed/**,backend/data/uploads/**,**/*.md}"
     }
   }
