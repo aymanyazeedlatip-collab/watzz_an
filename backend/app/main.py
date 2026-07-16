@@ -64,11 +64,26 @@ async def lifespan(app: FastAPI):
         app.state.database_connected = False
 
     # 2. Model artifacts: load every production model into memory once.
-    #    The SARIMA files are large, so we do this here at startup
-    #    rather than reloading them on every single request.
-    model_bundle = model_loader.load_production_bundle()
-    app.state.model_bundle = model_bundle
-    app.state.models_loaded = model_bundle.production_ready
+    #    A deployment-specific loading failure must not terminate the entire
+    #    Vercel process. Keep the API alive and expose the failure through the
+    #    health/diagnostic endpoints instead.
+    app.state.startup_errors = []
+    try:
+        model_bundle = model_loader.load_production_bundle()
+        app.state.model_bundle = model_bundle
+        app.state.models_loaded = model_bundle.production_ready
+        if not model_bundle.production_ready:
+            app.state.startup_errors.append(
+                "The municipality model bundle loaded only partially. "
+                "Open /api/deployment-diagnostics for component details."
+            )
+    except BaseException as exc:  # deployment safety net
+        logger.exception("Model initialization failed without terminating FastAPI.")
+        app.state.model_bundle = model_loader.ModelBundle()
+        app.state.models_loaded = False
+        app.state.startup_errors.append(
+            f"Model initialization failed: {type(exc).__name__}: {exc}"
+        )
 
     logger.info(
         "Startup complete. database_connected=%s models_loaded=%s",
@@ -120,6 +135,31 @@ async def unexpected_error_handler(request: Request, exc: Exception) -> JSONResp
             }
         },
     )
+
+
+@app.get("/api/deployment-diagnostics", tags=["health"])
+def deployment_diagnostics(request: Request) -> dict:
+    """Return safe startup diagnostics without exposing secrets."""
+    bundle = getattr(request.app.state, "model_bundle", None)
+    statuses = {}
+    if bundle is not None:
+        for key, component in getattr(bundle, "statuses", {}).items():
+            statuses[key] = {
+                "loaded": bool(getattr(component, "loaded", False)),
+                "artifact_file": getattr(component, "artifact_file", None),
+                "detail": getattr(component, "detail", None),
+            }
+    return {
+        "status": "ready" if getattr(request.app.state, "models_loaded", False) else "degraded",
+        "database_connected": bool(getattr(request.app.state, "database_connected", False)),
+        "models_loaded": bool(getattr(request.app.state, "models_loaded", False)),
+        "startup_errors": list(getattr(request.app.state, "startup_errors", [])),
+        "model_components": statuses,
+        "deployment_platform": settings.deployment_platform,
+        "database_backend": "postgres" if settings.database_url.startswith(("postgres://", "postgresql")) else "sqlite",
+        "artifacts_directory_exists": settings.municipality_artifacts_dir.exists(),
+        "production_directory_exists": settings.production_artifacts_dir.exists(),
+    }
 
 
 # --- API routes -----------------------------------------------------------
