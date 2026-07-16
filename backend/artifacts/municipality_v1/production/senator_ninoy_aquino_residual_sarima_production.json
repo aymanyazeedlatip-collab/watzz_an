@@ -1,0 +1,34 @@
+{
+  "municipality": "Senator Ninoy Aquino",
+  "series_type": "mlr_residual",
+  "order": [
+    2,
+    0,
+    1
+  ],
+  "seasonal_order": [
+    1,
+    0,
+    1,
+    7
+  ],
+  "log_scale": false,
+  "parameter_names": [
+    "ar.L1",
+    "ar.L2",
+    "ma.L1",
+    "ar.S.L7",
+    "ma.S.L7",
+    "sigma2"
+  ],
+  "parameters": [
+    0.24820307847837447,
+    0.07917392692631665,
+    -0.10222858809147668,
+    1.0000627833372524,
+    -0.9784723177771251,
+    5442304.261505142
+  ],
+  "last_observation_date": "2024-12-31",
+  "statsmodels_version_note": "Reconstruct SARIMAX with the saved history, then call model.filter(parameters)."
+}

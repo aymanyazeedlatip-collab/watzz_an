@@ -1,0 +1,83 @@
+{
+  "dataset": {
+    "rows": 21924,
+    "model_ready_rows": 21564,
+    "locations": 12,
+    "start_date": "2020-01-01",
+    "end_date": "2024-12-31",
+    "classification": "Research-grade synthetic municipality-level data"
+  },
+  "split": {
+    "model_rows_after_lag_removal": 21564,
+    "train_rows": 12792,
+    "validation_rows": 4380,
+    "test_rows": 4392,
+    "train_period": [
+      "2020-01-31",
+      "2022-12-31"
+    ],
+    "validation_period": [
+      "2023-01-01",
+      "2023-12-31"
+    ],
+    "test_period": [
+      "2024-01-01",
+      "2024-12-31"
+    ]
+  },
+  "model_architecture": {
+    "mlr": "One pooled MLR with municipality and other categories one-hot encoded.",
+    "sarima": "One direct daily SARIMA per municipality/city.",
+    "hybrid": "Pooled MLR plus a municipality-specific residual SARIMA correction.",
+    "hybrid_weights": {
+      "Bagumbayan": 1.5,
+      "Columbio": 0.9,
+      "Esperanza": 1.5,
+      "Isulan": 1.5,
+      "Kalamansig": 0.9,
+      "Lambayong": 1.0,
+      "Lebak": 1.0,
+      "Lutayan": 1.5,
+      "Palimbang": 0.7,
+      "President Quirino": 0.85,
+      "Senator Ninoy Aquino": 1.0,
+      "Tacurong City": 0.8
+    }
+  },
+  "overall_hybrid_test_metrics": {
+    "model": "Hybrid MLR-SARIMA",
+    "r2": 0.9916370290766263,
+    "rmse_kwh": 5400.525455041612,
+    "mae_kwh": 2633.4837839335964,
+    "mape_pct": 3.631884316916018,
+    "mean_error_kwh": 839.436475940621
+  },
+  "best_hybrid_location": {
+    "municipality": "Lebak",
+    "mape_pct": 2.0168768019708496
+  },
+  "worst_hybrid_location": {
+    "municipality": "Columbio",
+    "mape_pct": 7.885115031900472
+  },
+  "peak_demand_metrics": {
+    "scope": "Overall",
+    "r2": 0.9764628009484995,
+    "rmse_kw": 479.1884699035934,
+    "mae_kw": 300.0873741275202,
+    "mape_pct": 6.872743190808962,
+    "mean_error_kw": 284.8218479022823
+  },
+  "recommendation_metrics": {
+    "accuracy": 0.6930783242258652,
+    "macro_precision": 0.6474943528458761,
+    "macro_recall": 0.6635941015285706,
+    "macro_f1": 0.6145607007354839,
+    "weighted_f1": 0.7233096455816457
+  },
+  "scientific_warnings": [
+    "The municipality-level daily data are synthetic and calibrated to official anchors.",
+    "Recommendation reference labels are synthetic and require expert validation.",
+    "Test metrics represent rolling one-day-ahead operation, not an unobserved ten-year recursive forecast."
+  ]
+}

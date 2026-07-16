@@ -1,0 +1,32 @@
+{
+  "municipality": "Esperanza",
+  "series_type": "mlr_residual",
+  "order": [
+    1,
+    1,
+    1
+  ],
+  "seasonal_order": [
+    1,
+    0,
+    1,
+    7
+  ],
+  "log_scale": false,
+  "parameter_names": [
+    "ar.L1",
+    "ma.L1",
+    "ar.S.L7",
+    "ma.S.L7",
+    "sigma2"
+  ],
+  "parameters": [
+    0.29082269598323085,
+    -1.0052272551613524,
+    -0.3125142859367317,
+    0.37185679424584006,
+    2285677.7562403698
+  ],
+  "last_observation_date": "2024-12-31",
+  "statsmodels_version_note": "Reconstruct SARIMAX with the saved history, then call model.filter(parameters)."
+}

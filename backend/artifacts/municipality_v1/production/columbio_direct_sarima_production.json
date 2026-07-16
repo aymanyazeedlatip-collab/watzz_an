@@ -1,0 +1,34 @@
+{
+  "municipality": "Columbio",
+  "series_type": "direct_consumption",
+  "order": [
+    2,
+    0,
+    1
+  ],
+  "seasonal_order": [
+    1,
+    0,
+    1,
+    7
+  ],
+  "log_scale": true,
+  "parameter_names": [
+    "ar.L1",
+    "ar.L2",
+    "ma.L1",
+    "ar.S.L7",
+    "ma.S.L7",
+    "sigma2"
+  ],
+  "parameters": [
+    1.673033157882495,
+    -0.6748239919987982,
+    -1.028708949354394,
+    1.0000814342781934,
+    -1.0054197655905692,
+    0.0012423851597739442
+  ],
+  "last_observation_date": "2024-12-31",
+  "statsmodels_version_note": "Reconstruct SARIMAX with the saved history, then call model.filter(parameters)."
+}

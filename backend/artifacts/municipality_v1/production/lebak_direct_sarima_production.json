@@ -1,0 +1,34 @@
+{
+  "municipality": "Lebak",
+  "series_type": "direct_consumption",
+  "order": [
+    2,
+    0,
+    1
+  ],
+  "seasonal_order": [
+    1,
+    0,
+    1,
+    7
+  ],
+  "log_scale": true,
+  "parameter_names": [
+    "ar.L1",
+    "ar.L2",
+    "ma.L1",
+    "ar.S.L7",
+    "ma.S.L7",
+    "sigma2"
+  ],
+  "parameters": [
+    1.5138294230919946,
+    -0.5190140940672159,
+    -0.9466780276578892,
+    1.000082693824006,
+    -0.9890230748695424,
+    0.001039273422921394
+  ],
+  "last_observation_date": "2024-12-31",
+  "statsmodels_version_note": "Reconstruct SARIMAX with the saved history, then call model.filter(parameters)."
+}

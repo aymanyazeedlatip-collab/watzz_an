@@ -1,0 +1,32 @@
+{
+  "municipality": "President Quirino",
+  "series_type": "mlr_residual",
+  "order": [
+    1,
+    1,
+    1
+  ],
+  "seasonal_order": [
+    1,
+    0,
+    1,
+    7
+  ],
+  "log_scale": false,
+  "parameter_names": [
+    "ar.L1",
+    "ma.L1",
+    "ar.S.L7",
+    "ma.S.L7",
+    "sigma2"
+  ],
+  "parameters": [
+    0.24162945365781496,
+    -0.9873069324660873,
+    0.9953367220827485,
+    -0.986621749535964,
+    2412758.138451227
+  ],
+  "last_observation_date": "2024-12-31",
+  "statsmodels_version_note": "Reconstruct SARIMAX with the saved history, then call model.filter(parameters)."
+}

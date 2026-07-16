@@ -1,0 +1,36 @@
+{
+  "municipality": "Esperanza",
+  "series_type": "direct_consumption",
+  "order": [
+    2,
+    0,
+    2
+  ],
+  "seasonal_order": [
+    1,
+    0,
+    1,
+    7
+  ],
+  "log_scale": true,
+  "parameter_names": [
+    "ar.L1",
+    "ar.L2",
+    "ma.L1",
+    "ma.L2",
+    "ar.S.L7",
+    "ma.S.L7",
+    "sigma2"
+  ],
+  "parameters": [
+    1.1152668490078268,
+    -0.19069143355872706,
+    -0.5169757079524238,
+    -0.10534402195169613,
+    1.0000809933037995,
+    -1.0077178715075246,
+    0.0020264346401091277
+  ],
+  "last_observation_date": "2024-12-31",
+  "statsmodels_version_note": "Reconstruct SARIMAX with the saved history, then call model.filter(parameters)."
+}

@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="WATTZAN electricity forecasting and decision-support dashboard for Sultan Kudarat, Philippines." name="description"/>
+<title>WATTZAN Operations Dashboard</title>
+<link href="/assets/logo-placeholder.svg" rel="icon" type="image/svg+xml"/>
+<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
+<link href="/styles.css" rel="stylesheet"/>
+<script defer="" src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.2.0/dist/chartjs-plugin-zoom.min.js"></script>
+<script defer="" src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+<script defer="" src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script defer="" src="/app.js"></script>
+</head>
+<body>
+<div aria-hidden="true" class="ambient-orbits">
+  <span class="ambient-orbit orbit-one"><i></i></span>
+  <span class="ambient-orbit orbit-two"><i></i></span>
+  <span class="ambient-orbit orbit-three"><i></i></span>
+</div>
+<a class="skip-link" href="#main-content">Skip to dashboard content</a>
+<div class="app-shell">
+<aside aria-label="Primary navigation" class="sidebar" id="sidebar">
+<!-- PLACEHOLDER BRANDING: replace this block when the final logo is available. -->
+<div class="brand-block">
+<img alt="WATTZAN placeholder logo" class="brand-mark" src="/assets/logo-placeholder.svg"/>
+<div>
+<div class="brand-name">WATTZAN</div>
+</div>
+</div>
+<nav class="sidebar-nav">
+<button aria-current="page" class="nav-item active" data-page-target="overview" type="button">
+<i aria-hidden="true" data-lucide="layout-dashboard"></i>
+<span>Overview</span>
+</button>
+<div class="nav-group" data-nav-group="forecast">
+<button aria-controls="forecast-nav-submenu" aria-expanded="false" class="nav-group-toggle" data-nav-group-toggle="forecast" type="button">
+<i aria-hidden="true" data-lucide="chart-no-axes-combined"></i>
+<span>Forecast</span>
+<i aria-hidden="true" class="nav-chevron" data-lucide="chevron-down"></i>
+</button>
+<div class="nav-submenu" hidden="" id="forecast-nav-submenu">
+<button class="nav-subitem" data-page-target="forecast" type="button">
+<i aria-hidden="true" data-lucide="clock-3"></i>
+<span>Short-term Forecast</span>
+</button>
+<button class="nav-subitem" data-page-target="long-term-forecast" type="button">
+<i aria-hidden="true" data-lucide="calendar-range"></i>
+<span>Long-term Forecast</span>
+</button>
+<button class="nav-subitem" data-page-target="forecast-history" type="button">
+<i aria-hidden="true" data-lucide="history"></i>
+<span>Forecast History</span>
+</button>
+</div>
+</div>
+<button class="nav-item" data-page-target="recommendations" type="button">
+<i aria-hidden="true" data-lucide="clipboard-check"></i>
+<span>Recommendations</span>
+</button>
+<div class="nav-group" data-nav-group="system">
+<button aria-controls="system-nav-submenu" aria-expanded="false" class="nav-group-toggle" data-nav-group-toggle="system" type="button">
+<i aria-hidden="true" data-lucide="server-cog"></i>
+<span>System Information</span>
+<i aria-hidden="true" class="nav-chevron" data-lucide="chevron-down"></i>
+</button>
+<div class="nav-submenu" hidden="" id="system-nav-submenu">
+<button class="nav-subitem" data-page-target="system-information" type="button">
+<i aria-hidden="true" data-lucide="heart-pulse"></i>
+<span>System Health</span>
+</button>
+<button class="nav-subitem" data-page-target="model-performance" type="button">
+<i aria-hidden="true" data-lucide="activity"></i>
+<span>Model Performance</span>
+</button>
+<button class="nav-subitem" data-page-target="data-management" type="button">
+<i aria-hidden="true" data-lucide="database"></i>
+<span>Data Management</span>
+</button>
+</div>
+</div>
+<button class="nav-item" data-page-target="about" type="button">
+<i aria-hidden="true" data-lucide="info"></i>
+<span>About</span>
+</button>
+</nav>
+<div class="sidebar-footer">
+<a class="sidebar-link" href="/docs" rel="noreferrer" target="_blank">
+<i aria-hidden="true" data-lucide="book-open"></i>
+<span>API Documentation</span>
+</a>
+<div class="sidebar-version" id="sidebar-version">Version —</div>
+</div>
+</aside>
+<div class="workspace">
+<header class="topbar">
+<div class="topbar-primary">
+<button aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation" class="icon-button mobile-menu-button" id="mobile-menu-button" type="button">
+<i aria-hidden="true" data-lucide="menu"></i>
+</button>
+<div>
+<h1 id="page-title">Overview</h1>
+</div>
+</div>
+<div aria-label="System status" class="topbar-status">
+<div class="status-cluster" title="Model status">
+<span aria-hidden="true" class="status-dot neutral" id="model-status-dot"></span>
+<div>
+<span class="status-label">Models</span>
+<strong id="top-model-status">Checking…</strong>
+</div>
+</div>
+<div class="status-cluster" title="API connection status">
+<span aria-hidden="true" class="status-dot neutral" id="api-status-dot"></span>
+<div>
+<span class="status-label">API</span>
+<strong id="top-api-status">Connecting…</strong>
+</div>
+</div>
+<div class="status-cluster date-cluster">
+<i aria-hidden="true" data-lucide="calendar-days"></i>
+<div>
+<span class="status-label">Local date</span>
+<strong id="top-current-date">—</strong>
+</div>
+</div>
+</div>
+</header>
+<div aria-live="polite" aria-atomic="true" class="forecast-progress-shell" hidden id="forecast-progress-shell" role="status">
+  <div class="forecast-progress-copy">
+    <span class="forecast-progress-icon"><i aria-hidden="true" data-lucide="activity"></i></span>
+    <div><strong id="forecast-progress-title">Running forecast</strong><span id="forecast-progress-label">Preparing the forecast workflow…</span></div>
+  </div>
+  <div aria-hidden="true" class="forecast-progress-track"><span class="forecast-progress-bar"></span></div>
+</div>
+<main class="main-content" id="main-content" tabindex="-1">
+<div class="global-error hidden" id="global-error" role="alert">
+<i aria-hidden="true" data-lucide="circle-alert"></i>
+<div>
+<strong>Dashboard connection problem</strong>
+<p id="global-error-message">The backend could not be reached.</p>
+</div>
+<button class="button secondary small" id="retry-global-button" type="button">Retry</button>
+</div>
+<!-- OVERVIEW -->
+<section aria-labelledby="overview-heading" class="page-section active" data-page="overview">
+<div class="page-heading-row">
+<div>
+<p class="section-kicker">Operations snapshot</p>
+<h2 id="overview-heading">System overview</h2>
+<p class="page-description">Forecast readiness, recent historical demand, model accuracy, and the latest saved recommendation.</p>
+</div>
+<button class="button secondary" data-refresh-page="overview" type="button">
+<i aria-hidden="true" data-lucide="refresh-cw"></i>
+              Refresh overview
+            </button>
+</div>
+<article aria-labelledby="overview-map-title" class="panel overview-map-panel">
+<div class="panel-header overview-map-header">
+<div>
+<span class="panel-label">Province consumption map</span>
+<h3 id="overview-map-title">Electricity consumption by municipality and city</h3>
+<p class="panel-description">Select a year, then click a municipality to inspect its consumption, population, customers, supply system, and model performance.</p>
+</div>
+<div class="chart-toolbar overview-map-toolbar">
+<label class="compact-control">Year
+                  <select aria-label="Consumption map year" id="overview-map-year"></select>
+</label>
+<button aria-label="Reset 3D map camera and clear selected municipality" class="icon-button" id="overview-map-reset" type="button"><i aria-hidden="true" data-lucide="rotate-ccw"></i></button>
+</div>
+</div>
+<div class="overview-map-stage" id="overview-map-stage">
+<div aria-label="Interactive three-dimensional map of electricity consumption across Sultan Kudarat municipalities and Tacurong City" class="overview-consumption-map overview-consumption-map-3d" id="overview-consumption-map" role="application">
+<div class="overview-3d-instructions"><i aria-hidden="true" data-lucide="mouse-pointer-2"></i><span>Drag to rotate · Right-drag to pan · Scroll to zoom · Click an area for details</span></div>
+</div>
+<div aria-live="polite" class="overview-map-tooltip hidden" id="overview-map-tooltip" role="status"></div>
+<aside aria-labelledby="overview-map-popup-title" class="overview-map-popup hidden" id="overview-map-popup">
+<div class="overview-map-popup-header">
+<div>
+<span class="panel-label" id="overview-map-popup-type">Municipality</span>
+<h4 id="overview-map-popup-title">Selected location</h4>
+</div>
+<button aria-label="Close municipality details" class="icon-button small" id="overview-map-popup-close" type="button"><i aria-hidden="true" data-lucide="x"></i></button>
+</div>
+<div class="overview-map-popup-primary">
+<strong id="overview-map-popup-consumption">—</strong>
+<span>GWh annual consumption</span>
+</div>
+<dl class="overview-map-details">
+<div><dt>Selected year</dt><dd id="overview-map-popup-year">—</dd></div>
+<div><dt>Province share</dt><dd id="overview-map-popup-share">—</dd></div>
+<div><dt>Average per day</dt><dd id="overview-map-popup-daily">—</dd></div>
+<div><dt>2024 population</dt><dd id="overview-map-popup-population">—</dd></div>
+<div><dt>Customer connections</dt><dd id="overview-map-popup-customers">—</dd></div>
+<div><dt>Supply system</dt><dd id="overview-map-popup-supply">—</dd></div>
+<div><dt>Hybrid test MAPE</dt><dd id="overview-map-popup-mape">—</dd></div>
+<div><dt>Consumption rank</dt><dd id="overview-map-popup-rank">—</dd></div>
+</dl>
+<button class="button primary full-width" id="overview-map-open-forecast" type="button">
+<i aria-hidden="true" data-lucide="line-chart"></i>
+                  Forecast this municipality
+                </button>
+</aside>
+<div aria-label="Consumption color scale" class="overview-map-legend">
+<div class="overview-map-legend-row"><span>Lower consumption</span><span>Higher consumption</span></div>
+<div aria-hidden="true" class="overview-map-gradient"></div>
+<div class="overview-map-legend-values"><span id="overview-map-legend-min">—</span><span id="overview-map-legend-max">—</span></div>
+</div>
+<div class="panel-state hidden overview-map-empty" id="overview-map-empty">Municipality electricity data is unavailable.</div>
+</div>
+<p class="overview-map-source">Boundary geometry: 2023 PSGC-based Philippine administrative boundaries. Consumption values come from the active WATTZAN municipality dataset.</p>
+</article>
+<div aria-live="polite" class="metric-grid overview-metrics">
+<article class="metric-card key-card overview-stability-card">
+<div class="metric-header"><span>Operational stability</span><i aria-hidden="true" data-lucide="shield-check"></i></div>
+<div class="overview-stability-layout">
+<div aria-label="Operational stability score unavailable" class="stability-donut stability-donut-small" id="overview-stability-donut" role="img">
+<div class="stability-donut-center"><strong id="overview-stability-score">—</strong><span>%</span></div>
+</div>
+<div class="stability-copy"><strong id="overview-stability-label">Awaiting forecast</strong><p id="overview-stability-note">Run a forecast to calculate the dashboard stability indicator.</p></div>
+</div>
+</article>
+<article class="metric-card key-card">
+<div class="metric-header"><span>Latest forecast</span><i aria-hidden="true" data-lucide="zap"></i></div>
+<strong class="metric-value" id="overview-next-forecast">—</strong>
+<span class="metric-unit">kWh</span>
+<p class="metric-footnote" id="overview-forecast-date">No saved forecast</p>
+</article>
+<article class="metric-card">
+<div class="metric-header"><span>Estimated peak</span><i aria-hidden="true" data-lucide="gauge"></i></div>
+<strong class="metric-value" id="overview-peak-demand">—</strong>
+<span class="metric-unit">kW</span>
+<p class="metric-footnote">From latest saved forecast</p>
+</article>
+<article class="metric-card">
+<div class="metric-header"><span>Capacity utilization</span><i aria-hidden="true" data-lucide="battery-charging"></i></div>
+<strong class="metric-value" id="overview-capacity-utilization">—</strong>
+<span class="metric-unit">%</span>
+<p class="metric-footnote" id="overview-capacity-note">Capacity not yet available</p>
+</article>
+<article class="metric-card">
+<div class="metric-header"><span>Demand level</span><i aria-hidden="true" data-lucide="signal"></i></div>
+<strong class="metric-value status-text" id="overview-demand-level">—</strong>
+<span class="status-badge neutral" id="overview-demand-badge">No forecast</span>
+<p class="metric-footnote">Latest decision classification</p>
+</article>
+<article class="metric-card">
+<div class="metric-header"><span>Best model</span><i aria-hidden="true" data-lucide="badge-check"></i></div>
+<strong class="metric-value compact" id="overview-active-model">—</strong>
+<p class="metric-footnote" id="overview-model-readiness">Checking model artifacts</p>
+</article>
+<article class="metric-card">
+<div class="metric-header"><span>Hybrid MAPE</span><i aria-hidden="true" data-lucide="target"></i></div>
+<strong class="metric-value" id="overview-mape">—</strong>
+<span class="metric-unit">%</span>
+<p class="metric-footnote">Rolling one-day-ahead 2024 test</p>
+</article>
+<article class="metric-card">
+<div class="metric-header"><span>Hybrid R²</span><i aria-hidden="true" data-lucide="sigma"></i></div>
+<strong class="metric-value" id="overview-r2">—</strong>
+<p class="metric-footnote">Explained test-set variation</p>
+</article>
+<article class="metric-card">
+<div class="metric-header"><span>Active dataset</span><i aria-hidden="true" data-lucide="table-2"></i></div>
+<strong class="metric-value compact" id="overview-dataset-name">—</strong>
+<p class="metric-footnote" id="overview-dataset-period">Loading data coverage</p>
+</article>
+</div>
+<div class="dashboard-grid two-thirds-grid">
+<article class="panel chart-panel">
+<div class="panel-header">
+<div>
+<span class="panel-label">Historical demand</span>
+<h3>Monthly consumption trend</h3>
+</div>
+<div class="chart-toolbar">
+<label class="compact-control">Range
+                    <select aria-label="Historical chart range" id="overview-history-range">
+<option value="12">12 months</option>
+<option value="24">24 months</option>
+<option value="all">All</option>
+</select>
+</label>
+<label class="compact-control">View
+                    <select aria-label="Historical chart type" id="overview-history-type">
+<option value="line">Line</option>
+<option value="bar">Bar</option>
+</select>
+</label>
+<button aria-label="Reset historical chart zoom" class="icon-button" data-reset-chart="overview-history-chart" type="button"><i aria-hidden="true" data-lucide="scan"></i></button>
+</div>
+</div>
+<div class="chart-container large"><canvas aria-label="Monthly historical electricity consumption" id="overview-history-chart"></canvas></div>
+<div class="panel-state hidden" id="overview-history-empty">Historical data is unavailable.</div>
+</article>
+<article class="panel recommendation-panel">
+<div class="panel-header">
+<div>
+<span class="panel-label">Decision support</span>
+<h3>Current recommendation</h3>
+</div>
+<button class="text-button" data-page-target="recommendations" type="button">Open details</button>
+</div>
+<div class="recommendation-state" id="overview-recommendation-content">
+<div class="empty-state compact" id="overview-recommendation-empty">
+<i aria-hidden="true" data-lucide="clipboard"></i>
+<strong>No saved recommendation</strong>
+<p>Run a forecast to generate operational guidance.</p>
+</div>
+<div class="hidden" id="overview-recommendation-data">
+<div class="recommendation-level-row">
+<span class="status-badge neutral" id="overview-recommendation-level">—</span>
+<span id="overview-recommendation-basis">Latest saved forecast</span>
+</div>
+<h4>Reason codes</h4>
+<div class="tag-list" id="overview-reason-codes"></div>
+<h4>Recommended actions</h4>
+<ul class="action-list" id="overview-actions"></ul>
+</div>
+</div>
+</article>
+</div>
+<div class="dashboard-grid equal-grid">
+<article class="panel chart-panel">
+<div class="panel-header">
+<div>
+<span class="panel-label">Forecast history</span>
+<h3>Latest seven recursive forecast records</h3>
+</div>
+<div class="chart-toolbar">
+<label class="compact-control">Series
+                    <select aria-label="Forecast chart series" id="overview-forecast-series">
+<option value="all">All models</option>
+<option value="hybrid">Hybrid only</option>
+<option value="peak">Peak demand</option>
+</select>
+</label>
+<button aria-label="Reset forecast chart zoom" class="icon-button" data-reset-chart="overview-forecast-chart" type="button"><i aria-hidden="true" data-lucide="scan"></i></button>
+</div>
+</div>
+<div class="chart-container"><canvas aria-label="Latest seven-day forecast" id="overview-forecast-chart"></canvas></div>
+<div class="panel-state hidden" id="overview-forecast-empty">No seven-day recursive forecast has been saved yet.</div>
+</article>
+<article class="panel chart-panel">
+<div class="panel-header">
+<div>
+<span class="panel-label">Historical classification</span>
+<h3>Demand-level distribution</h3>
+</div>
+<button aria-label="Reset demand chart" class="icon-button" data-reset-chart="overview-demand-chart" type="button"><i aria-hidden="true" data-lucide="rotate-ccw"></i></button>
+</div>
+<div class="chart-container"><canvas aria-label="Historical demand level distribution" id="overview-demand-chart"></canvas></div>
+<div class="panel-state hidden" id="overview-demand-empty">Demand classifications are unavailable.</div>
+</article>
+</div>
+</section>
+<!-- FORECAST -->
+<section aria-labelledby="forecast-heading" class="page-section" data-page="forecast" hidden="">
+<div class="page-heading-row">
+<div>
+<p class="section-kicker">Model execution</p>
+<h2 id="forecast-heading">Short-term electricity forecast</h2>
+<p class="page-description">Select a municipality, automatically fetch date-matched weather, or review and edit the inputs before running one-day or seven-day forecasts.</p>
+</div>
+<div aria-label="Forecast form mode" class="segmented-control" role="group">
+<button class="segment active" data-forecast-mode="one-day" type="button">One day</button>
+<button class="segment" data-forecast-mode="seven-day" type="button">Seven days</button>
+</div>
+</div>
+<article aria-labelledby="shortterm-location-title" class="panel shortterm-location-panel">
+<div class="panel-header shortterm-location-header">
+<div>
+<span class="panel-label">Forecast location and weather automation</span>
+<h3 id="shortterm-location-title">Select a municipality, fetch weather, and run</h3>
+<p class="panel-description">Click the map, drag the pin, choose a municipality marker, or use browser location detection. WATTZAN will fetch date-matched Open-Meteo weather inputs before running the selected forecast mode.</p>
+</div>
+<div class="chart-toolbar">
+<button class="button secondary small" id="shortterm-locate-button" type="button"><i aria-hidden="true" data-lucide="locate-fixed"></i>Detect my location</button>
+<button aria-label="Clear short-term forecast map pin" class="icon-button" id="shortterm-reset-pin-button" type="button"><i aria-hidden="true" data-lucide="map-pin-off"></i></button>
+</div>
+</div>
+<div class="shortterm-location-grid">
+<div>
+<div aria-label="Interactive Sultan Kudarat municipality selection map" class="map-canvas shortterm-map" id="shortterm-map" role="application"></div>
+<p class="map-attribution-note">Municipality markers and draggable pin use Leaflet and OpenStreetMap. Weather data is provided by <a href="https://open-meteo.com/" rel="noreferrer" target="_blank">Open-Meteo</a>.</p>
+</div>
+<aside aria-live="polite" class="shortterm-location-summary">
+<div class="location-summary-heading">
+<span class="status-badge neutral" id="shortterm-location-method">No pin</span>
+<h4 id="shortterm-selected-municipality">Select a location</h4>
+<p id="shortterm-location-coordinates">Click inside Sultan Kudarat or detect your current location.</p>
+</div>
+<dl class="location-summary-list">
+<div><dt>Model scope</dt><dd id="shortterm-model-scope">Municipality not selected</dd></div>
+<div><dt>Weather source</dt><dd id="shortterm-weather-source">Not fetched</dd></div>
+<div><dt>Weather dates</dt><dd id="shortterm-weather-dates">—</dd></div>
+<div><dt>Population input</dt><dd id="shortterm-population-source">Loaded after selection</dd></div>
+</dl>
+<div class="weather-automation-actions">
+<button class="button secondary full-width" disabled="" id="shortterm-fetch-weather-button" type="button"><i aria-hidden="true" data-lucide="cloud-download"></i>Fetch weather inputs</button>
+<button class="button primary full-width" disabled="" id="shortterm-fetch-run-button" type="button"><i aria-hidden="true" data-lucide="cloud-lightning"></i><span>Fetch weather &amp; run one-day forecast</span></button>
+</div>
+<p class="form-status" id="shortterm-automation-status" role="status">Place a pin or select a municipality marker first.</p>
+<p class="automation-limit-note">Available capacity remains optional because it is an operational utility input and cannot be obtained from a weather service.</p>
+</aside>
+</div>
+</article>
+<div class="forecast-layout">
+<article class="panel form-panel" id="one-day-form-panel">
+<div class="panel-header">
+<div><span class="panel-label">One-day-ahead</span><h3>Forecast inputs</h3></div>
+<button class="text-button" id="reset-one-day-form" type="button">Reset form</button>
+</div>
+<form id="one-day-form" novalidate="">
+<div class="form-grid">
+<label class="field full-width">Municipality or city
+                    <select id="one-municipality" name="municipality" required=""></select>
+<span class="field-help">Choose the municipality identified by the map pin or select it manually.</span>
+</label>
+<label class="field full-width">Forecast date
+                    <input id="one-forecast-date" name="forecast_date" required="" type="date"/>
+<span class="field-help" id="one-date-help">Defaults to the current date. Missing history is bridged recursively when needed.</span>
+</label>
+<label class="field">Mean temperature (°C)
+                    <input max="55" min="-10" name="temperature_mean_c" required="" step="0.1" type="number"/>
+</label>
+<label class="field">Heat index (°C)
+                    <input max="65" min="-10" name="heat_index_mean_c" required="" step="0.1" type="number"/>
+</label>
+<label class="field">Minimum temperature (°C)
+                    <input max="55" min="-10" name="temperature_min_c" step="0.1" type="number"/>
+</label>
+<label class="field">Maximum temperature (°C)
+                    <input max="55" min="-10" name="temperature_max_c" step="0.1" type="number"/>
+</label>
+<label class="field">Mean humidity (%)
+                    <input max="100" min="0" name="humidity_mean_pct" required="" step="0.1" type="number"/>
+</label>
+<label class="field">Rainfall (mm)
+                    <input max="1000" min="0" name="rainfall_mm" required="" step="0.1" type="number"/>
+</label>
+<label class="field">Mean wind speed (km/h)
+                    <input max="300" min="0" name="wind_speed_mean_kph" step="0.1" type="number"/>
+</label>
+<label class="field">Mean cloud cover (%)
+                    <input max="100" min="0" name="cloud_cover_mean_pct" step="0.1" type="number"/>
+</label>
+<label class="field">Population
+                    <input min="1" name="population" step="1" type="number"/>
+</label>
+<label class="field">Available capacity (kW)
+                    <input min="0.01" name="available_capacity_kw" step="0.01" type="number"/>
+<span class="field-help">Optional. Without it, shortage risk is not calculated.</span>
+</label>
+<label class="field">Holiday status
+                    <select name="is_holiday" required="">
+<option value="0">Not a holiday</option>
+<option value="1">Holiday</option>
+</select>
+</label>
+<label class="field">Holiday name
+                    <input maxlength="120" name="holiday_name" placeholder="Optional" type="text"/>
+</label>
+</div>
+<div class="form-actions">
+<button class="button primary" id="run-one-day-button" type="submit"><i aria-hidden="true" data-lucide="play"></i>Run one-day forecast</button>
+<p class="form-status" id="one-day-form-status" role="status"></p>
+</div>
+</form>
+</article>
+<article class="panel form-panel hidden" id="seven-day-form-panel">
+<div class="panel-header">
+<div><span class="panel-label">Seven-day recursive</span><h3>Forecast inputs</h3></div>
+<button class="text-button" id="reset-seven-day-form" type="button">Reset form</button>
+</div>
+<form id="seven-day-form" novalidate="">
+<label class="field seven-start-date">Municipality or city
+                  <select id="seven-municipality" name="municipality" required=""></select>
+</label>
+<label class="field seven-start-date">Start date
+                  <input id="seven-start-date" name="start_date" required="" type="date"/>
+<span class="field-help">Seven consecutive dates are generated automatically.</span>
+</label>
+<div class="seven-day-table-wrapper">
+<table class="data-table input-table">
+<thead>
+<tr>
+<th>Date</th><th>Mean °C</th><th>Min °C</th><th>Max °C</th><th>Humidity %</th><th>Rain mm</th><th>Heat index °C</th><th>Wind km/h</th><th>Cloud %</th><th>Population</th><th>Holiday</th><th>Capacity kW</th>
+</tr>
+</thead>
+<tbody id="seven-day-input-body"></tbody>
+</table>
+</div>
+<div class="form-actions">
+<button class="button primary" id="run-seven-day-button" type="submit"><i aria-hidden="true" data-lucide="play"></i>Run seven-day forecast</button>
+<p class="form-status" id="seven-day-form-status" role="status"></p>
+</div>
+</form>
+</article>
+<aside class="panel forecast-guidance">
+<div class="panel-header"><div><span class="panel-label">Input guidance</span><h3>Before running</h3></div></div>
+<ul class="guidance-list">
+<li><i aria-hidden="true" data-lucide="calendar-check"></i><span>Current or later dates use a clearly labeled recursive gap-bridge scenario when observed electricity history is missing.</span></li>
+<li><i aria-hidden="true" data-lucide="cloud-sun"></i><span>Use a weather forecast available before the target date, not future observed weather.</span></li>
+<li><i aria-hidden="true" data-lucide="battery-medium"></i><span>Provide available capacity to calculate utilization and capacity-based risk.</span></li>
+<li><i aria-hidden="true" data-lucide="shield-alert"></i><span>Recommendations remain provisional until an electricity-sector expert validates the thresholds.</span></li>
+</ul>
+</aside>
+</div>
+<div class="forecast-results hidden" id="forecast-results">
+<div class="section-divider-heading">
+<div><span class="panel-label">Model output</span><h3>Forecast results</h3></div>
+<span class="status-badge neutral" id="forecast-result-level">—</span>
+</div>
+<div class="metric-grid forecast-result-metrics" id="forecast-result-metrics"></div>
+<div class="dashboard-grid two-thirds-grid">
+<article class="panel chart-panel">
+<div class="panel-header">
+<div><span class="panel-label">Prediction comparison</span><h3 id="forecast-results-chart-title">Model outputs</h3></div>
+<div class="chart-toolbar">
+<label class="compact-control">View
+                      <select id="forecast-results-chart-type"><option value="bar">Bar</option><option value="line">Line</option></select>
+</label>
+<button aria-label="Reset results chart" class="icon-button" data-reset-chart="forecast-results-chart" type="button"><i aria-hidden="true" data-lucide="scan"></i></button>
+</div>
+</div>
+<div class="chart-container large"><canvas aria-label="Forecast results chart" id="forecast-results-chart"></canvas></div>
+</article>
+<article class="panel recommendation-panel">
+<div class="panel-header"><div><span class="panel-label">Operational guidance</span><h3>Recommendation</h3></div></div>
+<h4>Reason codes</h4>
+<div class="tag-list" id="forecast-result-reasons"></div>
+<h4>Recommended actions</h4>
+<ul class="action-list" id="forecast-result-actions"></ul>
+<div class="notice-box" id="forecast-result-warning"></div>
+</article>
+</div>
+<article class="panel hidden" id="seven-day-results-table-panel">
+<div class="panel-header"><div><span class="panel-label">Daily output</span><h3>Seven-day result table</h3></div></div>
+<div class="table-wrapper"><table class="data-table"><thead><tr><th>Date</th><th>MLR kWh</th><th>SARIMA kWh</th><th>Hybrid kWh</th><th>Peak kW</th><th>Capacity %</th><th>Level</th><th>Predicted lags</th></tr></thead><tbody id="seven-day-results-body"></tbody></table></div>
+</article>
+</div>
+</section>
+<!-- LONG-TERM FORECAST -->
+<section aria-labelledby="longterm-heading" class="page-section" data-page="long-term-forecast" hidden="">
+<div class="page-heading-row">
+<div>
+<p class="section-kicker">Municipality planning scenario</p>
+<h2 id="longterm-heading">Long-term electricity forecast</h2>
+<p class="page-description">Pin a location in Sultan Kudarat, confirm the municipality, and generate a one-to-ten-year electricity planning projection with scenario ranges.</p>
+</div>
+<button class="button secondary" data-refresh-page="long-term-forecast" type="button">
+<i aria-hidden="true" data-lucide="refresh-cw"></i>
+              Refresh source data
+            </button>
+</div>
+<div class="long-term-layout">
+<article class="panel map-panel">
+<div class="panel-header">
+<div>
+<span class="panel-label">Location selection</span>
+<h3>Pin a location in Sultan Kudarat</h3>
+</div>
+<div class="chart-toolbar">
+<button class="button secondary small" id="longterm-locate-button" type="button">
+<i aria-hidden="true" data-lucide="locate-fixed"></i>
+                    Detect my location
+                  </button>
+<button class="button secondary small" id="longterm-reset-pin-button" type="button">
+<i aria-hidden="true" data-lucide="map-pin-off"></i>
+                    Clear pin
+                  </button>
+</div>
+</div>
+<div class="map-instructions">
+<i aria-hidden="true" data-lucide="mouse-pointer-click"></i>
+<span>Click anywhere on the map or drag the blue pin. Location detection requires browser permission. The municipality is resolved using OpenStreetMap, with a nearest-center fallback.</span>
+</div>
+<div aria-label="Interactive map of Sultan Kudarat" class="map-canvas" id="longterm-map"></div>
+<p class="map-attribution-note">Map tiles and reverse geocoding require an internet connection. Pin placement is used only for municipality selection.</p>
+<dl class="definition-grid location-definition-grid">
+<div><dt>Municipality / city</dt><dd id="longterm-selected-municipality">No location pinned</dd></div>
+<div><dt>Coordinates</dt><dd id="longterm-selected-coordinates">—</dd></div>
+<div><dt>2024 population</dt><dd id="longterm-selected-population">—</dd></div>
+<div><dt>Province population share</dt><dd id="longterm-selected-share">—</dd></div>
+<div><dt>Location method</dt><dd id="longterm-location-method">—</dd></div>
+<div><dt>PSGC classification</dt><dd id="longterm-location-type">—</dd></div>
+</dl>
+</article>
+<article class="panel form-panel long-term-controls-panel">
+<div class="panel-header">
+<div>
+<span class="panel-label">Projection assumptions</span>
+<h3>Configure the planning horizon</h3>
+</div>
+<button class="text-button" id="longterm-reset-form" type="button">Reset assumptions</button>
+</div>
+<form id="longterm-form" novalidate="">
+<div class="form-grid">
+<label class="field full-width">Confirmed municipality or city
+                    <select disabled="" id="longterm-municipality-select" name="municipality" required="">
+<option value="">Pin a location first</option>
+</select>
+<span class="field-help">You may correct the detected municipality after placing a pin.</span>
+</label>
+<label class="field">Forecast horizon
+                    <select id="longterm-horizon" name="horizon_years" required="">
+<option value="1">1 year</option>
+<option value="2">2 years</option>
+<option value="3">3 years</option>
+<option value="4">4 years</option>
+<option value="5">5 years</option>
+<option value="6">6 years</option>
+<option value="7">7 years</option>
+<option value="8">8 years</option>
+<option value="9">9 years</option>
+<option selected="" value="10">10 years</option>
+</select>
+</label>
+<label class="field">Underlying annual demand growth (%)
+                    <input id="longterm-demand-growth" max="15" min="-5" name="demand_growth_pct" required="" step="0.01" type="number"/>
+<span class="field-help" id="longterm-growth-help">Calculated from active annual consumption when available.</span>
+</label>
+<label class="field">Climate-demand uplift (%/year)
+                    <input max="5" min="-2" name="climate_uplift_pct" required="" step="0.01" type="number" value="0.50"/>
+</label>
+<label class="field">Efficiency reduction (%/year)
+                    <input max="8" min="0" name="efficiency_reduction_pct" required="" step="0.01" type="number" value="0.75"/>
+</label>
+<label class="field">Municipality population growth (%/year)
+                    <input max="8" min="-3" name="municipality_population_growth_pct" required="" step="0.01" type="number" value="0.28"/>
+</label>
+<label class="field">Planning load factor
+                    <input max="0.98" min="0.30" name="load_factor" required="" step="0.01" type="number" value="0.75"/>
+<span class="field-help">Assumption used to convert annual energy into estimated peak demand.</span>
+</label>
+<label class="field">Reserve margin (%)
+                    <input max="100" min="0" name="reserve_margin_pct" required="" step="0.1" type="number" value="15"/>
+</label>
+<label class="field">Selected-area available capacity (kW)
+                    <input min="0" name="available_capacity_kw" placeholder="Optional" step="0.01" type="number"/>
+<span class="field-help">Optional comparison line. No shortage claim is made when omitted.</span>
+</label>
+</div>
+<div class="projection-method-box">
+<strong>How location affects this projection</strong>
+<p>The projection begins from the selected municipality’s own 2020–2024 synthetic electricity history. Population share remains a planning context indicator, while future energy scenarios use the municipality’s latest annual load as their base.</p>
+</div>
+<div class="form-actions">
+<button class="button primary" disabled="" id="run-longterm-button" type="submit">
+<i aria-hidden="true" data-lucide="play"></i>
+                    Run long-term projection
+                  </button>
+<p class="form-status" id="longterm-form-status" role="status">Place a pin to enable the projection.</p>
+</div>
+</form>
+</article>
+</div>
+<div class="long-term-results hidden" id="longterm-results">
+<div class="section-divider-heading">
+<div>
+<span class="panel-label">Planning output</span>
+<h3 id="longterm-results-title">Long-term projection results</h3>
+</div>
+<span class="status-badge elevated">Scenario projection</span>
+</div>
+<div class="metric-grid long-term-metrics">
+<article class="metric-card key-card"><div class="metric-header"><span>Base-year municipal energy</span><i aria-hidden="true" data-lucide="zap"></i></div><strong class="metric-value" id="longterm-base-energy">—</strong><span class="metric-unit">GWh/year</span><p class="metric-footnote">Latest synthetic municipality history from the active dataset</p></article>
+<article class="metric-card"><div class="metric-header"><span>Final-year projected energy</span><i aria-hidden="true" data-lucide="trending-up"></i></div><strong class="metric-value" id="longterm-final-energy">—</strong><span class="metric-unit">GWh/year</span><p class="metric-footnote" id="longterm-final-year-note">—</p></article>
+<article class="metric-card"><div class="metric-header"><span>Net annual growth</span><i aria-hidden="true" data-lucide="percent"></i></div><strong class="metric-value" id="longterm-net-growth">—</strong><span class="metric-unit">%</span><p class="metric-footnote">Demand + climate − efficiency</p></article>
+<article class="metric-card"><div class="metric-header"><span>Final estimated peak</span><i aria-hidden="true" data-lucide="gauge"></i></div><strong class="metric-value" id="longterm-final-peak">—</strong><span class="metric-unit">MW</span><p class="metric-footnote">Planning estimate from annual load factor</p></article>
+<article class="metric-card"><div class="metric-header"><span>Required capacity</span><i aria-hidden="true" data-lucide="battery-charging"></i></div><strong class="metric-value" id="longterm-required-capacity">—</strong><span class="metric-unit">MW</span><p class="metric-footnote">Includes selected reserve margin</p></article>
+<article class="metric-card"><div class="metric-header"><span>Cumulative energy</span><i aria-hidden="true" data-lucide="sigma"></i></div><strong class="metric-value" id="longterm-cumulative-energy">—</strong><span class="metric-unit">GWh</span><p class="metric-footnote">Base scenario across the selected horizon</p></article>
+</div>
+<div class="dashboard-grid two-thirds-grid">
+<article class="panel chart-panel">
+<div class="panel-header">
+<div><span class="panel-label">Scenario range</span><h3>Annual energy projection</h3></div>
+<div class="chart-toolbar">
+<label class="compact-control">View
+                      <select id="longterm-energy-chart-type"><option value="line">Line</option><option value="bar">Bar</option></select>
+</label>
+<button aria-label="Reset annual energy chart" class="icon-button" data-reset-chart="longterm-energy-chart" type="button"><i aria-hidden="true" data-lucide="scan"></i></button>
+</div>
+</div>
+<div class="chart-container large"><canvas aria-label="Long-term annual energy scenario chart" id="longterm-energy-chart"></canvas></div>
+</article>
+<article class="panel chart-panel">
+<div class="panel-header">
+<div><span class="panel-label">Location allocation</span><h3>Population share</h3></div>
+<button aria-label="Reset population share chart" class="icon-button" data-reset-chart="longterm-share-chart" type="button"><i aria-hidden="true" data-lucide="rotate-ccw"></i></button>
+</div>
+<div class="chart-container large"><canvas aria-label="Selected municipality population share chart" id="longterm-share-chart"></canvas></div>
+</article>
+</div>
+<div class="dashboard-grid equal-grid">
+<article class="panel chart-panel">
+<div class="panel-header">
+<div><span class="panel-label">Capacity planning</span><h3>Peak demand and required capacity</h3></div>
+<button aria-label="Reset capacity chart" class="icon-button" data-reset-chart="longterm-capacity-chart" type="button"><i aria-hidden="true" data-lucide="scan"></i></button>
+</div>
+<div class="chart-container"><canvas aria-label="Projected peak demand and required capacity chart" id="longterm-capacity-chart"></canvas></div>
+</article>
+<article class="panel chart-panel">
+<div class="panel-header">
+<div><span class="panel-label">Seasonality</span><h3>Monthly energy profile</h3></div>
+<button aria-label="Reset monthly profile chart" class="icon-button" data-reset-chart="longterm-monthly-chart" type="button"><i aria-hidden="true" data-lucide="scan"></i></button>
+</div>
+<div class="chart-container"><canvas aria-label="Monthly energy profile chart" id="longterm-monthly-chart"></canvas></div>
+</article>
+</div>
+<article class="panel">
+<div class="panel-header">
+<div><span class="panel-label">Year-by-year output</span><h3>Projection table</h3></div>
+<button class="button secondary small" id="longterm-export-button" type="button"><i aria-hidden="true" data-lucide="download"></i>Export CSV</button>
+</div>
+<div class="table-wrapper">
+<table class="data-table">
+<thead><tr><th>Year</th><th>Municipality share</th><th>Conservative GWh</th><th>Base GWh</th><th>High GWh</th><th>Peak MW</th><th>Required capacity MW</th><th>Capacity utilization</th></tr></thead>
+<tbody id="longterm-results-body"></tbody>
+</table>
+</div>
+</article>
+<div class="notice-grid">
+<div class="notice-box">
+<strong>Reference population source</strong>
+<span>The municipality histories are research-grade synthetic records calibrated to official population and aggregate electricity anchors. Replace them with official municipal meter and weather records before operational deployment.</span>
+</div>
+</div>
+</div>
+</section>
+<!-- DATA MANAGEMENT -->
+<section aria-labelledby="data-heading" class="page-section" data-page="data-management" hidden="">
+<div class="page-heading-row">
+<div><p class="section-kicker">Dataset governance</p><h2 id="data-heading">Data management</h2><p class="page-description">Validate CSV structure before saving it, review quality issues, and inspect the active historical dataset.</p></div>
+<button class="button secondary" data-refresh-page="data-management" type="button"><i aria-hidden="true" data-lucide="refresh-cw"></i>Refresh data</button>
+</div>
+<div class="dashboard-grid equal-grid">
+<article class="panel upload-panel">
+<div class="panel-header"><div><span class="panel-label">CSV intake</span><h3>Validate and upload dataset</h3></div></div>
+<div aria-label="Select or drop a CSV file" class="drop-zone" id="csv-drop-zone" role="button" tabindex="0">
+<i aria-hidden="true" data-lucide="upload-cloud"></i>
+<strong>Drop a CSV file here</strong>
+<span>or select a file from your computer</span>
+<button class="button secondary small" id="browse-csv-button" type="button">Browse CSV</button>
+<input accept=".csv,text/csv" hidden="" id="csv-file-input" type="file"/>
+</div>
+<div class="selected-file hidden" id="selected-file-card">
+<i aria-hidden="true" data-lucide="file-spreadsheet"></i>
+<div><strong id="selected-file-name">—</strong><span id="selected-file-size">—</span></div>
+<button aria-label="Clear selected file" class="icon-button" id="clear-selected-file" type="button"><i aria-hidden="true" data-lucide="x"></i></button>
+</div>
+<div class="form-actions">
+<button class="button primary" disabled="" id="validate-csv-button" type="button"><i aria-hidden="true" data-lucide="file-check-2"></i>Validate file</button>
+<button class="button secondary" disabled="" id="upload-csv-button" type="button"><i aria-hidden="true" data-lucide="upload"></i>Upload validated file</button>
+</div>
+<p class="form-status" id="data-upload-status" role="status"></p>
+<div class="upload-result hidden" id="upload-result">
+<div><span>Dataset ID</span><strong id="uploaded-dataset-id">—</strong></div>
+<div><span>Stored rows</span><strong id="uploaded-row-count">—</strong></div>
+<button class="button primary small" id="activate-uploaded-dataset" type="button">Activate this dataset</button>
+</div>
+</article>
+<article class="panel active-dataset-panel">
+<div class="panel-header"><div><span class="panel-label">Current source</span><h3>Active dataset</h3></div></div>
+<dl class="definition-grid" id="active-dataset-details">
+<div><dt>Name</dt><dd id="data-active-name">Loading…</dd></div>
+<div><dt>Coverage</dt><dd id="data-active-coverage">—</dd></div>
+<div><dt>Date range</dt><dd id="data-active-range">—</dd></div>
+<div><dt>Rows</dt><dd id="data-active-rows">—</dd></div>
+<div><dt>Target</dt><dd id="data-active-target">—</dd></div>
+<div><dt>Synthetic</dt><dd id="data-active-synthetic">—</dd></div>
+</dl>
+<div class="notice-box" id="data-classification-notice">Loading data classification…</div>
+</article>
+</div>
+<div class="validation-results hidden" id="validation-results">
+<div class="metric-grid validation-metrics">
+<article class="metric-card"><div class="metric-header"><span>Valid</span><i aria-hidden="true" data-lucide="circle-check"></i></div><strong class="metric-value compact" id="validation-valid">—</strong></article>
+<article class="metric-card"><div class="metric-header"><span>Training ready</span><i aria-hidden="true" data-lucide="brain-circuit"></i></div><strong class="metric-value compact" id="validation-training-ready">—</strong></article>
+<article class="metric-card"><div class="metric-header"><span>Rows</span><i aria-hidden="true" data-lucide="rows-3"></i></div><strong class="metric-value" id="validation-rows">—</strong></article>
+<article class="metric-card"><div class="metric-header"><span>Date coverage</span><i aria-hidden="true" data-lucide="calendar-range"></i></div><strong class="metric-value compact" id="validation-date-range">—</strong></article>
+</div>
+<div class="dashboard-grid equal-grid">
+<article class="panel chart-panel"><div class="panel-header"><div><span class="panel-label">Continuity</span><h3>Present versus missing dates</h3></div></div><div class="chart-container"><canvas aria-label="Dataset date coverage" id="validation-coverage-chart"></canvas></div></article>
+<article class="panel chart-panel"><div class="panel-header"><div><span class="panel-label">Completeness</span><h3>Missing values by field</h3></div></div><div class="chart-container"><canvas aria-label="Missing dataset values" id="validation-missing-chart"></canvas></div><div class="panel-state hidden" id="validation-missing-empty">No missing required values were reported.</div></article>
+</div>
+<div class="dashboard-grid equal-grid">
+<article class="panel"><div class="panel-header"><div><span class="panel-label">Blocking issues</span><h3>Validation errors</h3></div><span class="count-badge" id="validation-error-count">0</span></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>Row</th><th>Column</th><th>Message</th></tr></thead><tbody id="validation-errors-body"></tbody></table></div><div class="panel-state hidden" id="validation-errors-empty">No blocking errors.</div></article>
+<article class="panel"><div class="panel-header"><div><span class="panel-label">Review items</span><h3>Warnings</h3></div><span class="count-badge" id="validation-warning-count">0</span></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>Row</th><th>Column</th><th>Message</th></tr></thead><tbody id="validation-warnings-body"></tbody></table></div><div class="panel-state hidden" id="validation-warnings-empty">No warnings.</div></article>
+</div>
+</div>
+<div class="dashboard-grid equal-grid">
+<article class="panel chart-panel"><div class="panel-header"><div><span class="panel-label">Historical totals</span><h3>Annual consumption</h3></div><div class="chart-toolbar"><label class="compact-control">View<select id="data-annual-chart-type"><option value="bar">Bar</option><option value="line">Line</option></select></label></div></div><div class="chart-container"><canvas aria-label="Annual electricity consumption" id="data-annual-chart"></canvas></div></article>
+<article class="panel chart-panel"><div class="panel-header"><div><span class="panel-label">Dataset profile</span><h3>Demand classifications</h3></div></div><div class="chart-container"><canvas aria-label="Dataset demand classifications" id="data-demand-chart"></canvas></div><div class="panel-state hidden" id="data-demand-empty">No demand-level field is available.</div></article>
+</div>
+</section>
+<!-- MODEL PERFORMANCE -->
+<section aria-labelledby="performance-heading" class="page-section" data-page="model-performance" hidden="">
+<div class="page-heading-row"><div><p class="section-kicker">Validation evidence</p><h2 id="performance-heading">Model performance</h2><p class="page-description">Untouched 2024 test results, monthly diagnostics, statistical comparisons, peak-demand estimation, and provisional recommendation metrics.</p></div><button class="button secondary" data-refresh-page="model-performance" type="button"><i aria-hidden="true" data-lucide="refresh-cw"></i>Refresh metrics</button></div>
+<div class="metric-grid performance-summary">
+<article class="metric-card key-card"><div class="metric-header"><span>Best test model</span><i aria-hidden="true" data-lucide="trophy"></i></div><strong class="metric-value compact" id="performance-best-model">—</strong><p class="metric-footnote" id="performance-test-period">—</p></article>
+<article class="metric-card"><div class="metric-header"><span>Test rows</span><i aria-hidden="true" data-lucide="list-checks"></i></div><strong class="metric-value" id="performance-test-rows">—</strong></article>
+<article class="metric-card"><div class="metric-header"><span>Peak estimator MAPE</span><i aria-hidden="true" data-lucide="gauge"></i></div><strong class="metric-value" id="performance-peak-mape">—</strong><span class="metric-unit">%</span></article>
+<article class="metric-card"><div class="metric-header"><span>Recommendation F1</span><i aria-hidden="true" data-lucide="binary"></i></div><strong class="metric-value" id="performance-recommendation-f1">—</strong><p class="metric-footnote">Macro F1, provisional labels</p></article>
+</div>
+<div class="dashboard-grid equal-grid">
+<article class="panel chart-panel">
+<div class="panel-header"><div><span class="panel-label">Cross-model comparison</span><h3>Performance metric</h3></div><div class="chart-toolbar"><label class="compact-control">Metric<select id="performance-metric-selector"><option value="mape_pct">MAPE (%)</option><option value="r2">R²</option><option value="rmse_kwh">RMSE (kWh)</option><option value="mae_kwh">MAE (kWh)</option><option value="mean_error_kwh">Mean error (kWh)</option></select></label><label class="compact-control">View<select id="performance-chart-type"><option value="bar">Bar</option><option value="line">Line</option></select></label></div></div>
+<div class="chart-container large"><canvas aria-label="Model performance comparison" id="performance-model-chart"></canvas></div>
+</article>
+<article class="panel chart-panel">
+<div class="panel-header"><div><span class="panel-label">Monthly stability</span><h3>2024 monthly metrics</h3></div><div class="chart-toolbar"><label class="compact-control">Metric<select id="monthly-metric-selector"><option value="mape_pct">MAPE (%)</option><option value="r2">R²</option><option value="rmse_kwh">RMSE</option><option value="mae_kwh">MAE</option></select></label><button aria-label="Reset monthly chart" class="icon-button" data-reset-chart="performance-monthly-chart" type="button"><i aria-hidden="true" data-lucide="scan"></i></button></div></div>
+<div class="chart-container large"><canvas aria-label="Monthly model metrics" id="performance-monthly-chart"></canvas></div>
+</article>
+</div>
+<article class="panel">
+<div class="panel-header"><div><span class="panel-label">Test-set metrics</span><h3>Model comparison table</h3></div></div>
+<div class="table-wrapper"><table class="data-table sortable-table" id="performance-model-table"><thead><tr><th>Model</th><th>R²</th><th>RMSE kWh</th><th>MAE kWh</th><th>MAPE %</th><th>Mean error kWh</th></tr></thead><tbody id="performance-model-body"></tbody></table></div>
+</article>
+<div class="dashboard-grid equal-grid">
+<article class="panel"><div class="panel-header"><div><span class="panel-label">Statistical evidence</span><h3>Significance tests</h3></div></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>Test</th><th>Model A</th><th>Model B</th><th>Difference</th><th>Statistic</th><th>p-value</th><th>Interpretation</th></tr></thead><tbody id="performance-significance-body"></tbody></table></div></article>
+<article class="panel chart-panel"><div class="panel-header"><div><span class="panel-label">Recommendation prototype</span><h3>Class F1-score</h3></div></div><div class="chart-container"><canvas aria-label="Recommendation class F1 scores" id="performance-recommendation-chart"></canvas></div><div class="notice-box" id="performance-recommendation-warning">Waiting for recommendation evaluation data.</div></article>
+</div>
+</section>
+<!-- RECOMMENDATIONS -->
+<section aria-labelledby="recommendations-heading" class="page-section" data-page="recommendations" hidden="">
+<div class="page-heading-row"><div><p class="section-kicker">Decision support</p><h2 id="recommendations-heading">Recommendations</h2><p class="page-description">Latest demand classification, explainable reason codes, recommended actions, and historical decision patterns.</p></div><button class="button secondary" data-refresh-page="recommendations" type="button"><i aria-hidden="true" data-lucide="refresh-cw"></i>Refresh recommendations</button></div>
+<div class="recommendation-highlight-grid">
+<article class="panel stability-hero-card">
+<div class="stability-hero-copy">
+<span class="panel-label">Primary recommendation indicator</span>
+<h3>Operational Stability Score</h3>
+<p>A 0–100 dashboard indicator derived from the latest demand classification, available capacity margin, and recent forecast variation.</p>
+<div class="stability-status-row"><span class="status-badge neutral" id="recommendations-stability-badge">Awaiting forecast</span><span id="recommendations-stability-note">Run a forecast to calculate stability.</span></div>
+</div>
+<div aria-label="Operational stability score unavailable" class="stability-donut stability-donut-large" id="recommendations-stability-donut" role="img">
+<div class="stability-donut-center"><strong id="recommendations-stability-score">—</strong><span>%</span></div>
+</div>
+</article>
+<div class="recommendation-hero panel recommendation-classification-card">
+<div class="recommendation-hero-main">
+<span class="panel-label">Current saved classification</span>
+<div class="recommendation-level-display"><strong id="recommendations-current-level">—</strong><span class="status-badge neutral" id="recommendations-current-badge">No forecast</span></div>
+<p id="recommendations-current-date">Run a forecast to generate a recommendation.</p>
+</div>
+<dl class="recommendation-stats">
+<div><dt>Forecast consumption</dt><dd id="recommendations-current-consumption">—</dd></div>
+<div><dt>Peak demand</dt><dd id="recommendations-current-peak">—</dd></div>
+<div><dt>Capacity utilization</dt><dd id="recommendations-current-capacity">—</dd></div>
+<div><dt>Forecast type</dt><dd id="recommendations-current-type">—</dd></div>
+</dl>
+</div>
+</div>
+<div class="dashboard-grid equal-grid">
+<article class="panel"><div class="panel-header"><div><span class="panel-label">Why this level</span><h3>Reason codes</h3></div></div><div class="tag-list spacious" id="recommendations-reasons"></div><div class="panel-state" id="recommendations-reasons-empty">No reason codes are available.</div></article>
+<article class="panel"><div class="panel-header"><div><span class="panel-label">Operator guidance</span><h3>Recommended actions</h3></div></div><ul class="action-list large" id="recommendations-actions"></ul><div class="panel-state" id="recommendations-actions-empty">No recommended actions are available.</div></article>
+</div>
+<div class="dashboard-grid equal-grid">
+<article class="panel chart-panel"><div class="panel-header"><div><span class="panel-label">Historical levels</span><h3>Recommendation history</h3></div><div class="chart-toolbar"><label class="compact-control">Range<select id="recommendations-history-range"><option value="30">Latest 30</option><option value="100">Latest 100</option><option value="all">All loaded</option></select></label><button aria-label="Reset recommendation chart" class="icon-button" data-reset-chart="recommendations-history-chart" type="button"><i aria-hidden="true" data-lucide="scan"></i></button></div></div><div class="chart-container"><canvas aria-label="Historical recommendation levels" id="recommendations-history-chart"></canvas></div><div class="panel-state hidden" id="recommendations-history-empty">No forecast history is available.</div></article>
+<article class="panel chart-panel"><div class="panel-header"><div><span class="panel-label">Operating margin</span><h3>Capacity utilization history</h3></div><button aria-label="Reset capacity chart" class="icon-button" data-reset-chart="recommendations-capacity-chart" type="button"><i aria-hidden="true" data-lucide="scan"></i></button></div><div class="chart-container"><canvas aria-label="Historical capacity utilization" id="recommendations-capacity-chart"></canvas></div><div class="panel-state hidden" id="recommendations-capacity-empty">No capacity values are available in saved forecasts.</div></article>
+</div>
+
+<article class="panel assistant-embedded-panel" id="recommendations-assistant-panel">
+<div class="panel-header assistant-panel-header">
+<div>
+<span class="panel-label">Context-aware analysis</span>
+<h3>WATTZAN Assistant</h3>
+<p class="assistant-panel-description">Ask about the latest forecast, municipality results, model performance, demand classification, or recommended actions. The assistant reads a compact snapshot of the current dashboard outputs.</p>
+</div>
+<div class="assistant-header-actions">
+<span class="status-badge neutral" id="recommendations-assistant-status">Checking assistant…</span>
+<button class="button secondary small" id="assistant-open-floating" type="button"><i aria-hidden="true" data-lucide="messages-square"></i>Open floating chat</button>
+</div>
+</div>
+<div aria-label="Suggested questions" class="assistant-quick-prompts">
+<button class="assistant-prompt-chip" data-assistant-prompt="Summarize the latest saved forecast and explain what it means." type="button">Summarize latest forecast</button>
+<button class="assistant-prompt-chip" data-assistant-prompt="Why was the current demand level assigned, and what should operators monitor?" type="button">Explain demand level</button>
+<button class="assistant-prompt-chip" data-assistant-prompt="Compare the MLR, SARIMA, and hybrid model results shown in WATTZAN." type="button">Compare models</button>
+<button class="assistant-prompt-chip" data-assistant-prompt="Explain the selected municipality's results in simple terms for a research presentation." type="button">Explain municipality results</button>
+</div>
+<div aria-live="polite" class="assistant-messages assistant-messages-embedded" id="recommendations-assistant-messages"></div>
+<form class="assistant-composer" id="recommendations-assistant-form">
+<label class="sr-only" for="recommendations-assistant-input">Ask WATTZAN Assistant</label>
+<textarea id="recommendations-assistant-input" maxlength="3000" placeholder="Ask about forecasts, recommendations, municipalities, metrics, or system limitations…" required rows="3"></textarea>
+<div class="assistant-composer-actions">
+<span class="assistant-input-hint">Enter to send · Shift+Enter for a new line</span>
+<div>
+<button class="button secondary small" data-assistant-clear type="button">Clear chat</button>
+<button class="button primary" type="submit"><i aria-hidden="true" data-lucide="send"></i>Send question</button>
+</div>
+</div>
+</form>
+<p class="assistant-privacy-note"><i aria-hidden="true" data-lucide="shield-check"></i><span>The assistant API key stays in the backend. Your question and a compact dashboard snapshot are processed securely to generate the answer.</span></p>
+</article>
+
+</section>
+<!-- FORECAST HISTORY -->
+<section aria-labelledby="history-heading" class="page-section" data-page="forecast-history" hidden="">
+<div class="page-heading-row"><div><p class="section-kicker">Saved outputs</p><h2 id="history-heading">Forecast history</h2><p class="page-description">Filter, inspect, compare, and remove saved one-day and seven-day recursive forecast records.</p></div><button class="button secondary" data-refresh-page="forecast-history" type="button"><i aria-hidden="true" data-lucide="refresh-cw"></i>Refresh history</button></div>
+<article class="panel filter-panel">
+<form class="filter-grid" id="history-filter-form">
+<label class="field">Start date<input name="start_date" type="date"/></label>
+<label class="field">End date<input name="end_date" type="date"/></label>
+<label class="field">Demand level<select name="demand_level"><option value="">All levels</option><option>NORMAL</option><option>ELEVATED</option><option>HIGH</option><option>CRITICAL</option></select></label>
+<label class="field">Forecast type<select name="forecast_type"><option value="">All types</option><option value="one_day_ahead">One day ahead</option><option value="seven_day_recursive">Seven day recursive</option></select></label>
+<label class="field">Sort by<select id="history-sort-select"><option value="created_desc">Newest created</option><option value="date_asc">Forecast date ascending</option><option value="date_desc">Forecast date descending</option><option value="prediction_desc">Highest consumption</option><option value="utilization_desc">Highest capacity utilization</option></select></label>
+<div class="filter-actions"><button class="button primary" type="submit"><i aria-hidden="true" data-lucide="filter"></i>Apply filters</button><button class="button secondary" id="reset-history-filters" type="button">Reset</button></div>
+</form>
+</article>
+<div class="dashboard-grid two-thirds-grid history-chart-grid">
+<article class="panel chart-panel"><div class="panel-header"><div><span class="panel-label">Saved predictions</span><h3>Forecast trend</h3></div><div class="chart-toolbar"><label class="compact-control">Series<select id="history-chart-series"><option value="selected">Selected prediction</option><option value="models">All consumption models</option><option value="peak">Peak demand</option><option value="capacity">Capacity utilization</option></select></label><button aria-label="Reset forecast history chart" class="icon-button" data-reset-chart="history-trend-chart" type="button"><i aria-hidden="true" data-lucide="scan"></i></button></div></div><div class="chart-container large"><canvas aria-label="Forecast history trend" id="history-trend-chart"></canvas></div><div class="panel-state hidden" id="history-chart-empty">No forecasts match the selected filters.</div></article>
+<article class="panel history-summary-panel"><div class="panel-header"><div><span class="panel-label">Filtered records</span><h3>History summary</h3></div></div><dl class="definition-grid stacked"><div><dt>Records</dt><dd id="history-record-count">—</dd></div><div><dt>Average forecast</dt><dd id="history-average-forecast">—</dd></div><div><dt>Highest forecast</dt><dd id="history-highest-forecast">—</dd></div><div><dt>Critical records</dt><dd id="history-critical-count">—</dd></div></dl></article>
+</div>
+<article class="panel">
+<div class="panel-header"><div><span class="panel-label">Database records</span><h3>Saved forecasts</h3></div><span class="count-badge" id="history-table-count">0</span></div>
+<div class="table-wrapper"><table class="data-table" id="history-table"><thead><tr><th>Date</th><th>Type</th><th>Selected kWh</th><th>Peak kW</th><th>Capacity %</th><th>Level</th><th>Model version</th><th>Created</th><th>Actions</th></tr></thead><tbody id="history-table-body"></tbody></table></div>
+<div class="empty-state hidden" id="history-table-empty"><i aria-hidden="true" data-lucide="inbox"></i><strong>No forecasts found</strong><p>Run a forecast or change the filters.</p></div>
+</article>
+</section>
+<!-- SYSTEM HEALTH -->
+<section aria-labelledby="system-heading" class="page-section" data-page="system-information" hidden="">
+<div class="page-heading-row"><div><p class="section-kicker">Technical status</p><h2 id="system-heading">System health</h2><p class="page-description">Backend availability, database connectivity, loaded production artifacts, model readiness, and scientifically important limitations.</p></div><button class="button secondary" data-refresh-page="system-information" type="button"><i aria-hidden="true" data-lucide="refresh-cw"></i>Refresh system</button></div>
+<div class="metric-grid system-metrics">
+<article class="metric-card key-card"><div class="metric-header"><span>Application</span><i aria-hidden="true" data-lucide="server"></i></div><strong class="metric-value compact" id="system-app-name">—</strong><p class="metric-footnote" id="system-app-version">—</p></article>
+<article class="metric-card"><div class="metric-header"><span>Database</span><i aria-hidden="true" data-lucide="database"></i></div><strong class="metric-value compact" id="system-database-status">—</strong></article>
+<article class="metric-card"><div class="metric-header"><span>Production ready</span><i aria-hidden="true" data-lucide="shield-check"></i></div><strong class="metric-value compact" id="system-production-ready">—</strong></article>
+<article class="metric-card"><div class="metric-header"><span>Target variable</span><i aria-hidden="true" data-lucide="crosshair"></i></div><strong class="metric-value compact" id="system-target-variable">—</strong></article>
+</div>
+<div class="dashboard-grid equal-grid">
+<article class="panel"><div class="panel-header"><div><span class="panel-label">Production components</span><h3>Artifact status</h3></div></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>Component</th><th>Loaded</th><th>Artifact</th><th>Detail</th></tr></thead><tbody id="system-artifacts-body"></tbody></table></div></article>
+<article class="panel chart-panel"><div class="panel-header"><div><span class="panel-label">Readiness</span><h3>Loaded components</h3></div></div><div class="chart-container"><canvas aria-label="Loaded model components" id="system-readiness-chart"></canvas></div></article>
+</div>
+<div class="dashboard-grid equal-grid">
+<article class="panel"><div class="panel-header"><div><span class="panel-label">Model chronology</span><h3>Training and evaluation periods</h3></div></div><dl class="timeline-list"><div><dt>Training</dt><dd id="system-training-period">—</dd></div><div><dt>Validation</dt><dd id="system-validation-period">—</dd></div><div><dt>Test</dt><dd id="system-test-period">—</dd></div></dl></article>
+<article class="panel"><div class="panel-header"><div><span class="panel-label">Loaded files</span><h3>Production artifacts</h3></div></div><ul class="artifact-list" id="system-loaded-files"></ul><div class="panel-state hidden" id="system-loaded-files-empty">No loaded artifact file names were reported.</div></article>
+</div>
+
+</section>
+<!-- ABOUT -->
+<section aria-labelledby="about-heading" class="page-section about-page" data-page="about" hidden="">
+<div class="page-heading-row about-heading-row">
+<div>
+<p class="section-kicker">Project profile</p>
+<h2 id="about-heading">About WATTZAN</h2>
+<p class="page-description">A municipality-aware electricity forecasting platform built for research, planning, and explainable demand analysis across Sultan Kudarat.</p>
+</div>
+<div class="about-heading-badge"><i aria-hidden="true" data-lucide="sparkles"></i><span>Research-built system</span></div>
+</div>
+
+<section aria-labelledby="about-project-title" class="about-hero panel">
+<div class="about-hero-copy">
+<div class="about-project-lockup">
+<div aria-hidden="true" class="about-project-mark"><img alt="" src="/assets/logo-placeholder.svg"/></div>
+<div><span class="panel-label">Electricity intelligence platform</span><h3 id="about-project-title">WATTZAN</h3></div>
+</div>
+<p>WATTZAN combines municipality-aware Multiple Linear Regression, municipality-specific SARIMA correction, hybrid forecasting, peak-demand estimation, capacity analysis, and structured recommendations in one interactive research dashboard.</p>
+<div class="about-chip-row">
+<span><i aria-hidden="true" data-lucide="map-pinned"></i>12 municipalities and city</span>
+<span><i aria-hidden="true" data-lucide="brain-circuit"></i>Hybrid MLR–SARIMA</span>
+<span><i aria-hidden="true" data-lucide="calendar-range"></i>2020–2024 baseline</span>
+</div>
+</div>
+<div aria-hidden="true" class="about-energy-visual">
+<div class="about-energy-ring ring-a"></div>
+<div class="about-energy-ring ring-b"></div>
+<div class="about-energy-ring ring-c"></div>
+<div class="about-energy-core"><i data-lucide="zap"></i><strong>W</strong></div>
+<span class="about-energy-node node-one"></span><span class="about-energy-node node-two"></span><span class="about-energy-node node-three"></span>
+</div>
+</section>
+
+<div class="about-stat-strip">
+<article><strong>12</strong><span>Local model scopes</span></article>
+<article><strong>3</strong><span>Core forecast outputs</span></article>
+<article><strong>7-day</strong><span>Recursive outlook</span></article>
+<article><strong>1</strong><span>Unified decision dashboard</span></article>
+</div>
+
+<div class="dashboard-grid equal-grid about-grid">
+<article class="panel about-card about-card-accent">
+<div class="about-card-icon"><i aria-hidden="true" data-lucide="target"></i></div>
+<div><span class="panel-label">Project purpose</span><h3>Why WATTZAN was developed</h3><p>The system helps researchers and planners interpret expected electricity demand across Sultan Kudarat through municipality-level forecasts and transparent operational indicators.</p>
+<ul class="about-list"><li>Forecast short-term daily electricity consumption.</li><li>Estimate peak demand and capacity utilization.</li><li>Classify normal, elevated, high, and critical conditions.</li><li>Produce explainable recommendations for planning and preparedness.</li></ul></div>
+</article>
+<article class="panel about-card about-profile-card">
+<div class="about-card-icon"><i aria-hidden="true" data-lucide="user-round-cog"></i></div>
+<div><span class="panel-label">Research and development</span><h3>Project identity</h3>
+<dl class="about-profile-list"><div><dt>Researcher</dt><dd>Zander Nathan Deatras</dd></div><div><dt>Role</dt><dd>Researcher and Developer</dd></div><div><dt>Institution</dt><dd>Tacurong City National High School</dd></div><div><dt>Coverage</dt><dd>Sultan Kudarat, Philippines</dd></div></dl></div>
+</article>
+</div>
+
+<article class="panel about-workflow-panel">
+<div class="panel-header"><div><span class="panel-label">System architecture</span><h3>From location selection to decision support</h3></div><span class="about-live-indicator"><i></i>Four-stage workflow</span></div>
+<ol class="about-process-list about-process-horizontal">
+<li><span>1</span><div><strong>Select location</strong><p>Choose a municipality or city through the interactive mapping controls.</p></div></li>
+<li><span>2</span><div><strong>Prepare inputs</strong><p>Combine date-matched weather, population, holiday, load, and optional capacity inputs.</p></div></li>
+<li><span>3</span><div><strong>Run models</strong><p>Generate municipality-aware MLR, SARIMA, hybrid, and peak-demand results.</p></div></li>
+<li><span>4</span><div><strong>Interpret output</strong><p>Review demand level, stability, reasons, recommendations, and planning charts.</p></div></li>
+</ol>
+</article>
+
+<div class="dashboard-grid equal-grid about-grid">
+<article class="panel about-card ownership-card">
+<div class="about-card-icon"><i aria-hidden="true" data-lucide="school"></i></div>
+<div><span class="panel-label">Institutional ownership</span><h3>Property of the school</h3><p class="ownership-statement">WATTZAN, including its software, research outputs, model artifacts, documentation, and associated project materials, is the property of <strong>Tacurong City National High School</strong>.</p></div>
+</article>
+<article class="panel about-card about-integrity-card">
+<div class="about-card-icon"><i aria-hidden="true" data-lucide="shield-check"></i></div>
+<div><span class="panel-label">Research integrity</span><h3>Responsible interpretation</h3><p>The platform supports education, research, model demonstration, and electricity-planning studies. Operational use requires official observed utility records and validation by qualified electricity-sector experts.</p><div class="about-integrity-line"><span></span><span></span><span></span><span></span></div></div>
+</article>
+</div>
+</section>
+</main>
+</div>
+</div>
+<div class="sidebar-backdrop" hidden="" id="sidebar-backdrop"></div>
+<dialog aria-labelledby="forecast-detail-title" class="modal" id="forecast-detail-modal">
+<div class="modal-header"><div><span class="panel-label">Forecast record</span><h2 id="forecast-detail-title">Forecast details</h2></div><button aria-label="Close forecast details" class="icon-button" id="close-forecast-modal" type="button"><i aria-hidden="true" data-lucide="x"></i></button></div>
+<div class="modal-body" id="forecast-detail-content"></div>
+</dialog>
+
+<button aria-controls="assistant-popover" aria-expanded="false" aria-label="Open WATTZAN Assistant" class="assistant-launcher" id="assistant-launcher" type="button">
+<i aria-hidden="true" data-lucide="bot-message-square"></i>
+<span class="assistant-launcher-label">Assistant</span>
+<span aria-hidden="true" class="assistant-launcher-dot" id="assistant-launcher-dot"></span>
+</button>
+<aside aria-label="WATTZAN Assistant chat" class="assistant-popover" hidden id="assistant-popover">
+<div class="assistant-popover-header">
+<div class="assistant-brand">
+<span class="assistant-brand-icon"><i aria-hidden="true" data-lucide="bot"></i></span>
+<div><strong>WATTZAN Assistant</strong></div>
+</div>
+<div class="assistant-popover-controls">
+<span class="status-badge neutral" id="assistant-popup-status">Checking…</span>
+<button aria-label="Open full assistant view" class="icon-button" id="assistant-open-recommendations" title="Open full view" type="button"><i aria-hidden="true" data-lucide="maximize-2"></i></button>
+<button aria-label="Close assistant" class="icon-button" id="assistant-close" type="button"><i aria-hidden="true" data-lucide="x"></i></button>
+</div>
+</div>
+<div aria-label="Suggested questions" class="assistant-quick-prompts assistant-quick-prompts-popup">
+<button class="assistant-prompt-chip" data-assistant-prompt="Summarize the latest saved forecast and explain what it means." type="button">Latest forecast</button>
+<button class="assistant-prompt-chip" data-assistant-prompt="Why was the current demand level assigned, and what should operators monitor?" type="button">Demand level</button>
+<button class="assistant-prompt-chip" data-assistant-prompt="Compare the MLR, SARIMA, and hybrid model results shown in WATTZAN." type="button">Model comparison</button>
+</div>
+<div aria-live="polite" class="assistant-messages assistant-messages-popup" id="assistant-popup-messages"></div>
+<form class="assistant-composer assistant-composer-popup" id="assistant-popup-form">
+<label class="sr-only" for="assistant-popup-input">Ask WATTZAN Assistant</label>
+<textarea id="assistant-popup-input" maxlength="3000" placeholder="Ask about the current WATTZAN outputs…" required rows="2"></textarea>
+<div class="assistant-composer-actions">
+<button class="text-button" data-assistant-clear type="button">Clear</button>
+<button aria-label="Send question" class="button primary small" type="submit"><i aria-hidden="true" data-lucide="send"></i>Send</button>
+</div>
+</form>
+<p class="assistant-privacy-note assistant-privacy-note-popup">Dashboard context is processed through the secure backend assistant service. The API key remains in FastAPI.</p>
+</aside>
+
+<div aria-atomic="true" aria-live="polite" class="toast-region" id="toast-region"></div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+{
+  "municipality": "Tacurong City",
+  "series_type": "direct_consumption",
+  "order": [
+    2,
+    0,
+    2
+  ],
+  "seasonal_order": [
+    1,
+    0,
+    1,
+    7
+  ],
+  "log_scale": true,
+  "parameter_names": [
+    "ar.L1",
+    "ar.L2",
+    "ma.L1",
+    "ma.L2",
+    "ar.S.L7",
+    "ma.S.L7",
+    "sigma2"
+  ],
+  "parameters": [
+    1.198609278758249,
+    -0.21797873832801254,
+    -0.7129797147459875,
+    -0.13581388062879268,
+    1.0001028109668606,
+    -0.9957866586172713,
+    0.003089719181338194
+  ],
+  "last_observation_date": "2024-12-31",
+  "statsmodels_version_note": "Reconstruct SARIMAX with the saved history, then call model.filter(parameters)."
+}

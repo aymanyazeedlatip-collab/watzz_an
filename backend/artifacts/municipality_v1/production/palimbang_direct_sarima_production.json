@@ -1,0 +1,36 @@
+{
+  "municipality": "Palimbang",
+  "series_type": "direct_consumption",
+  "order": [
+    2,
+    0,
+    2
+  ],
+  "seasonal_order": [
+    1,
+    0,
+    1,
+    7
+  ],
+  "log_scale": true,
+  "parameter_names": [
+    "ar.L1",
+    "ar.L2",
+    "ma.L1",
+    "ma.L2",
+    "ar.S.L7",
+    "ma.S.L7",
+    "sigma2"
+  ],
+  "parameters": [
+    1.2160431255185133,
+    -0.31602419748022514,
+    -0.5700876689837834,
+    -0.046355197428076,
+    1.0000270630416954,
+    -0.9947107770691274,
+    0.0008176696689476844
+  ],
+  "last_observation_date": "2024-12-31",
+  "statsmodels_version_note": "Reconstruct SARIMAX with the saved history, then call model.filter(parameters)."
+}

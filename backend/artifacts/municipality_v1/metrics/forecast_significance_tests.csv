@@ -1,0 +1,16 @@
+scope,comparison,mean_absolute_error_difference_kwh,dm_statistic,p_value,interpretation
+Overall,MLR versus Hybrid,234.0839520630483,14.879697418538191,0.0,Second model has significantly lower absolute error
+Overall,SARIMA versus Hybrid,226.16165947678084,5.0615274409495346,4.1591086263892407e-07,Second model has significantly lower absolute error
+Overall,Yesterday baseline versus Hybrid,1124.4181923869862,14.576527252609036,0.0,Second model has significantly lower absolute error
+Bagumbayan,MLR versus Hybrid,37.388639658714816,1.1917092466481432,0.23337527112775414,Hybrid advantage is not statistically significant
+Columbio,MLR versus Hybrid,163.88597780237083,6.008541499924739,1.8719970018565846e-09,Hybrid has significantly lower absolute error
+Esperanza,MLR versus Hybrid,175.89829091635926,3.0999628931182035,0.0019354488833185357,Hybrid has significantly lower absolute error
+Isulan,MLR versus Hybrid,270.44275881728186,3.1159605862372786,0.0018334677623002005,Hybrid has significantly lower absolute error
+Kalamansig,MLR versus Hybrid,349.4248775670932,9.860355398679307,0.0,Hybrid has significantly lower absolute error
+Lambayong,MLR versus Hybrid,92.52571333114447,1.9015439321783871,0.05723080386556911,Hybrid advantage is not statistically significant
+Lebak,MLR versus Hybrid,288.7691751009033,6.271115562272416,3.58470364503205e-10,Hybrid has significantly lower absolute error
+Lutayan,MLR versus Hybrid,110.62616091651095,1.9711142416677176,0.048710810100591306,Hybrid has significantly lower absolute error
+Palimbang,MLR versus Hybrid,483.6986322722945,12.731385773014567,0.0,Hybrid has significantly lower absolute error
+President Quirino,MLR versus Hybrid,43.21660481936061,2.2483424382051385,0.0245543625858069,Hybrid has significantly lower absolute error
+Senator Ninoy Aquino,MLR versus Hybrid,383.3785133356041,8.369823217137494,0.0,Hybrid has significantly lower absolute error
+Tacurong City,MLR versus Hybrid,409.75208021894156,5.991321808497457,2.0814230339283313e-09,Hybrid has significantly lower absolute error

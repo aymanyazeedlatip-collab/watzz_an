@@ -1,0 +1,36 @@
+{
+  "municipality": "Lambayong",
+  "series_type": "direct_consumption",
+  "order": [
+    2,
+    0,
+    2
+  ],
+  "seasonal_order": [
+    1,
+    0,
+    1,
+    7
+  ],
+  "log_scale": true,
+  "parameter_names": [
+    "ar.L1",
+    "ar.L2",
+    "ma.L1",
+    "ma.L2",
+    "ar.S.L7",
+    "ma.S.L7",
+    "sigma2"
+  ],
+  "parameters": [
+    1.0734071164626784,
+    -0.16835895948105925,
+    -0.43117314982084465,
+    -0.11118368157098911,
+    1.0000950571631961,
+    -0.992890572327947,
+    0.002195310388155282
+  ],
+  "last_observation_date": "2024-12-31",
+  "statsmodels_version_note": "Reconstruct SARIMAX with the saved history, then call model.filter(parameters)."
+}

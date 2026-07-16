@@ -1,0 +1,18 @@
+{
+  "_source": "Copied exactly from recommendation_engine.py in WATTZAN_Model_Training_Package. Do not change these numbers without re-validating against the training package, per the project's requirement to preserve documented rules.",
+  "capacity_utilization_thresholds_pct": {
+    "critical": 90,
+    "high": 80,
+    "elevated": 70
+  },
+  "consumption_vs_30d_mean_thresholds_pct": {
+    "high": 10,
+    "elevated": 5
+  },
+  "weather_flags": {
+    "high_heat_index_c": 36,
+    "heavy_rainfall_mm": 40
+  },
+  "expert_validation_required": true,
+  "warning": "These thresholds are provisional development defaults and require review by an electric-utility or energy expert before operational use."
+}

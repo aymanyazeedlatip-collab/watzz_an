@@ -1,0 +1,9 @@
+Sultan Kudarat municipality boundary geometry
+
+Derived from:
+faeldon/philippines-json-maps
+2023 PSGC-based low-resolution municipality/city boundaries
+Repository license: MIT
+
+The local JSON asset is included so the WATTZAN Overview choropleth can render
+without Leaflet, OpenStreetMap tiles, or a separate map server.

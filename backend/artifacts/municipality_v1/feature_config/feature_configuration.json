@@ -1,0 +1,82 @@
+{
+  "target": "consumption_kwh",
+  "categorical_features": [
+    "municipality",
+    "climate_zone",
+    "supply_system",
+    "day_of_week",
+    "month_category"
+  ],
+  "numeric_features": [
+    "grid_connected",
+    "population",
+    "customer_count",
+    "temperature_mean_c",
+    "temperature_min_c",
+    "temperature_max_c",
+    "humidity_mean_pct",
+    "rainfall_mm",
+    "heat_index_mean_c",
+    "wind_speed_mean_kph",
+    "cloud_cover_mean_pct",
+    "is_holiday",
+    "is_weekend",
+    "is_special_event",
+    "consumption_lag_1",
+    "consumption_lag_2",
+    "consumption_lag_7",
+    "consumption_lag_14",
+    "consumption_lag_30",
+    "rolling_mean_7",
+    "rolling_mean_14",
+    "rolling_mean_30",
+    "rolling_std_7",
+    "temperature_lag_1",
+    "rainfall_lag_1",
+    "doy_sin",
+    "doy_cos"
+  ],
+  "peak_categorical_features": [
+    "municipality",
+    "supply_system"
+  ],
+  "peak_numeric_features": [
+    "forecast_consumption_kwh",
+    "temperature_mean_c",
+    "humidity_mean_pct",
+    "rainfall_mm",
+    "heat_index_mean_c",
+    "is_holiday",
+    "is_weekend",
+    "customer_count"
+  ],
+  "recommendation_categorical_features": [
+    "municipality",
+    "supply_system"
+  ],
+  "recommendation_numeric_features": [
+    "forecast_capacity_utilization_pct",
+    "forecast_consumption_vs_30d_pct",
+    "heat_index_mean_c",
+    "rainfall_mm",
+    "is_holiday",
+    "is_weekend",
+    "grid_connected"
+  ],
+  "municipalities": [
+    "Bagumbayan",
+    "Columbio",
+    "Esperanza",
+    "Isulan",
+    "Kalamansig",
+    "Lambayong",
+    "Lebak",
+    "Lutayan",
+    "Palimbang",
+    "President Quirino",
+    "Senator Ninoy Aquino",
+    "Tacurong City"
+  ],
+  "test_mode": "Rolling one-day-ahead; actual previous-day observations are revealed before the next daily prediction.",
+  "seven_day_warning": "The reported test metrics do not automatically apply to a fixed recursive seven-day forecast."
+}

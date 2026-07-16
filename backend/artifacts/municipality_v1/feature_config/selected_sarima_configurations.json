@@ -1,0 +1,338 @@
+{
+  "Bagumbayan": {
+    "direct_order": [
+      2,
+      0,
+      2
+    ],
+    "direct_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "direct_fixed_validation_mape_pct": 3.9731185719248594,
+    "residual_order": [
+      1,
+      1,
+      1
+    ],
+    "residual_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "residual_relative_validation_error_pct": 3.0620536813572796,
+    "hybrid_weight": 1.5,
+    "hybrid_fixed_validation_mape_pct": 3.0128881195045887
+  },
+  "Columbio": {
+    "direct_order": [
+      2,
+      0,
+      1
+    ],
+    "direct_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "direct_fixed_validation_mape_pct": 3.6975074472083675,
+    "residual_order": [
+      2,
+      0,
+      2
+    ],
+    "residual_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "residual_relative_validation_error_pct": 9.306711041915955,
+    "hybrid_weight": 0.9,
+    "hybrid_fixed_validation_mape_pct": 9.299739372585373
+  },
+  "Esperanza": {
+    "direct_order": [
+      2,
+      0,
+      2
+    ],
+    "direct_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "direct_fixed_validation_mape_pct": 4.793922420014912,
+    "residual_order": [
+      1,
+      1,
+      1
+    ],
+    "residual_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "residual_relative_validation_error_pct": 2.5984967265180323,
+    "hybrid_weight": 1.5,
+    "hybrid_fixed_validation_mape_pct": 2.5946308730407366
+  },
+  "Isulan": {
+    "direct_order": [
+      2,
+      0,
+      2
+    ],
+    "direct_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "direct_fixed_validation_mape_pct": 5.100574843142981,
+    "residual_order": [
+      2,
+      0,
+      1
+    ],
+    "residual_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "residual_relative_validation_error_pct": 3.390260590556176,
+    "hybrid_weight": 1.5,
+    "hybrid_fixed_validation_mape_pct": 3.388619143740998
+  },
+  "Kalamansig": {
+    "direct_order": [
+      2,
+      0,
+      2
+    ],
+    "direct_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "direct_fixed_validation_mape_pct": 3.447932383592258,
+    "residual_order": [
+      2,
+      0,
+      2
+    ],
+    "residual_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "residual_relative_validation_error_pct": 2.985351269255649,
+    "hybrid_weight": 0.9,
+    "hybrid_fixed_validation_mape_pct": 2.977498954079782
+  },
+  "Lambayong": {
+    "direct_order": [
+      2,
+      0,
+      2
+    ],
+    "direct_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "direct_fixed_validation_mape_pct": 5.287750899339161,
+    "residual_order": [
+      1,
+      1,
+      1
+    ],
+    "residual_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "residual_relative_validation_error_pct": 2.7655030995389156,
+    "hybrid_weight": 1.0,
+    "hybrid_fixed_validation_mape_pct": 2.7655030995389156
+  },
+  "Lebak": {
+    "direct_order": [
+      2,
+      0,
+      1
+    ],
+    "direct_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "direct_fixed_validation_mape_pct": 3.933211767451936,
+    "residual_order": [
+      2,
+      0,
+      1
+    ],
+    "residual_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "residual_relative_validation_error_pct": 1.892570509263692,
+    "hybrid_weight": 1.0,
+    "hybrid_fixed_validation_mape_pct": 1.8925705092636924
+  },
+  "Lutayan": {
+    "direct_order": [
+      2,
+      0,
+      2
+    ],
+    "direct_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "direct_fixed_validation_mape_pct": 5.07186711592667,
+    "residual_order": [
+      1,
+      1,
+      1
+    ],
+    "residual_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "residual_relative_validation_error_pct": 3.000042796303895,
+    "hybrid_weight": 1.5,
+    "hybrid_fixed_validation_mape_pct": 2.9879922879103327
+  },
+  "Palimbang": {
+    "direct_order": [
+      2,
+      0,
+      2
+    ],
+    "direct_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "direct_fixed_validation_mape_pct": 3.0560792613529526,
+    "residual_order": [
+      1,
+      1,
+      1
+    ],
+    "residual_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "residual_relative_validation_error_pct": 2.701816720470775,
+    "hybrid_weight": 0.7,
+    "hybrid_fixed_validation_mape_pct": 2.616186871094029
+  },
+  "President Quirino": {
+    "direct_order": [
+      2,
+      0,
+      2
+    ],
+    "direct_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "direct_fixed_validation_mape_pct": 5.110283127002474,
+    "residual_order": [
+      1,
+      1,
+      1
+    ],
+    "residual_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "residual_relative_validation_error_pct": 3.1598004697532196,
+    "hybrid_weight": 0.85,
+    "hybrid_fixed_validation_mape_pct": 3.150329840230798
+  },
+  "Senator Ninoy Aquino": {
+    "direct_order": [
+      2,
+      0,
+      1
+    ],
+    "direct_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "direct_fixed_validation_mape_pct": 3.1642212403759715,
+    "residual_order": [
+      2,
+      0,
+      1
+    ],
+    "residual_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "residual_relative_validation_error_pct": 6.138357728117051,
+    "hybrid_weight": 1.0,
+    "hybrid_fixed_validation_mape_pct": 6.138357728117051
+  },
+  "Tacurong City": {
+    "direct_order": [
+      2,
+      0,
+      2
+    ],
+    "direct_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "direct_fixed_validation_mape_pct": 5.736354771024149,
+    "residual_order": [
+      2,
+      0,
+      1
+    ],
+    "residual_seasonal_order": [
+      1,
+      0,
+      1,
+      7
+    ],
+    "residual_relative_validation_error_pct": 3.7207216760161574,
+    "hybrid_weight": 0.8,
+    "hybrid_fixed_validation_mape_pct": 3.6955397487223283
+  }
+}

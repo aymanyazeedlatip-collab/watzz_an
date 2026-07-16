@@ -1,0 +1,36 @@
+{
+  "municipality": "Kalamansig",
+  "series_type": "direct_consumption",
+  "order": [
+    2,
+    0,
+    2
+  ],
+  "seasonal_order": [
+    1,
+    0,
+    1,
+    7
+  ],
+  "log_scale": true,
+  "parameter_names": [
+    "ar.L1",
+    "ar.L2",
+    "ma.L1",
+    "ma.L2",
+    "ar.S.L7",
+    "ma.S.L7",
+    "sigma2"
+  ],
+  "parameters": [
+    1.0391234781612377,
+    -0.14166062475488855,
+    -0.4259768709180885,
+    -0.10803954163840038,
+    1.0000911357789577,
+    -1.0027104184839133,
+    0.0008858005755804766
+  ],
+  "last_observation_date": "2024-12-31",
+  "statsmodels_version_note": "Reconstruct SARIMAX with the saved history, then call model.filter(parameters)."
+}

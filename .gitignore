@@ -1,0 +1,15 @@
+backend/venv/
+backend/.env
+backend/data/processed/
+backend/data/uploads/*
+!backend/data/uploads/.gitkeep
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+.DS_Store
+
+# Vercel local state and secrets
+.vercel/
+.env.local
+.env.*.local
