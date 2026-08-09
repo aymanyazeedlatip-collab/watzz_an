@@ -5,7 +5,7 @@
     "locations": 12,
     "start_date": "2020-01-01",
     "end_date": "2024-12-31",
-    "classification": "Research-grade synthetic municipality-level data"
+    "classification": "Hybrid research dataset: original SUKELCO Tacurong annual consumption/customer anchors with derived daily allocation; other municipality-day records remain research-grade synthetic."
   },
   "split": {
     "model_rows_after_lag_removal": 21564,
@@ -31,53 +31,74 @@
     "hybrid": "Pooled MLR plus a municipality-specific residual SARIMA correction.",
     "hybrid_weights": {
       "Bagumbayan": 1.5,
-      "Columbio": 0.9,
+      "Columbio": 0.8,
       "Esperanza": 1.5,
-      "Isulan": 1.5,
-      "Kalamansig": 0.9,
-      "Lambayong": 1.0,
-      "Lebak": 1.0,
+      "Isulan": 0.95,
+      "Kalamansig": 0.75,
+      "Lambayong": 1.5,
+      "Lebak": 1.15,
       "Lutayan": 1.5,
-      "Palimbang": 0.7,
-      "President Quirino": 0.85,
-      "Senator Ninoy Aquino": 1.0,
-      "Tacurong City": 0.8
+      "Palimbang": 0.8,
+      "President Quirino": 1.5,
+      "Senator Ninoy Aquino": 0.8,
+      "Tacurong City": 0.75
     }
   },
   "overall_hybrid_test_metrics": {
     "model": "Hybrid MLR-SARIMA",
-    "r2": 0.9916370290766263,
-    "rmse_kwh": 5400.525455041612,
-    "mae_kwh": 2633.4837839335964,
-    "mape_pct": 3.631884316916018,
-    "mean_error_kwh": 839.436475940621
+    "r2": 0.9917223403914806,
+    "rmse_kwh": 3757.6893884121355,
+    "mae_kwh": 2126.6127702253784,
+    "mape_pct": 3.357202752633216,
+    "mean_error_kwh": 626.089967984151
   },
   "best_hybrid_location": {
     "municipality": "Lebak",
-    "mape_pct": 2.0168768019708496
+    "mape_pct": 2.0053061720790533
   },
   "worst_hybrid_location": {
     "municipality": "Columbio",
-    "mape_pct": 7.885115031900472
+    "mape_pct": 6.804216998781
   },
   "peak_demand_metrics": {
-    "scope": "Overall",
-    "r2": 0.9764628009484995,
-    "rmse_kw": 479.1884699035934,
-    "mae_kw": 300.0873741275202,
-    "mape_pct": 6.872743190808962,
-    "mean_error_kw": 284.8218479022823
+    "r2": 0.9750272444729148,
+    "rmse_kw": 349.7858306406876,
+    "mae_kw": 248.97899076949977,
+    "mape_pct": 6.454639318519977,
+    "mean_error_kw": 234.3194307509819
   },
   "recommendation_metrics": {
-    "accuracy": 0.6930783242258652,
-    "macro_precision": 0.6474943528458761,
-    "macro_recall": 0.6635941015285706,
-    "macro_f1": 0.6145607007354839,
-    "weighted_f1": 0.7233096455816457
+    "accuracy": 0.7046903460837887,
+    "macro_precision": 0.6579415664780764,
+    "macro_recall": 0.6830066343289565,
+    "macro_f1": 0.6326756512234468,
+    "weighted_f1": 0.7334585625257547
   },
   "scientific_warnings": [
-    "The municipality-level daily data are synthetic and calibrated to official anchors.",
-    "Recommendation reference labels are synthetic and require expert validation.",
+    "Tacurong City annual consumption totals for 2020-2024 are anchored exactly to the original SUKELCO History Ledger supplied by the researcher; the daily Tacurong profile remains a derived allocation because the ledger is annual/route-aggregate rather than daily.",
+    "Other municipality-day electricity records, weather fields, capacity fields, outage fields, and recommendation reference labels remain research-grade synthetic or modeled unless otherwise documented.",
+    "Recommendation reference labels remain synthetic deterministic rules and require electric-utility expert validation.",
     "Test metrics represent rolling one-day-ahead operation, not an unobserved ten-year recursive forecast."
-  ]
+  ],
+  "original_data_integration": {
+    "source": "SUKELCO Tacurong City History Ledger supplied by the researcher",
+    "history_coverage_received": "2016-2025 annual route-aggregate ledgers",
+    "consumer_ledger_coverage_received": "2016-2026 annual/YTD route-aggregate ledgers",
+    "hard_anchor_years_used_for_daily_model": [
+      2020,
+      2021,
+      2022,
+      2023,
+      2024
+    ],
+    "method": "For Tacurong City, the pre-existing daily intra-year profile was scaled so annual kWh equals each original SUKELCO History Ledger total exactly. Annual Grand Total Consumers / 12 was used as the annual-average consumer-entry anchor. Daily weather and non-Tacurong municipality records remain research/model-derived because the supplied files do not contain daily observations for those fields.",
+    "reference_only_years": [
+      2016,
+      2017,
+      2018,
+      2019,
+      2025,
+      2026
+    ]
+  }
 }

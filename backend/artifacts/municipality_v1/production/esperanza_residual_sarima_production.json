@@ -21,11 +21,11 @@
     "sigma2"
   ],
   "parameters": [
-    0.29082269598323085,
-    -1.0052272551613524,
-    -0.3125142859367317,
-    0.37185679424584006,
-    2285677.7562403698
+    0.26248479674817743,
+    -0.9944880822898517,
+    -0.3715208634757625,
+    0.41024128440665214,
+    2549464.4606690793
   ],
   "last_observation_date": "2024-12-31",
   "statsmodels_version_note": "Reconstruct SARIMAX with the saved history, then call model.filter(parameters)."

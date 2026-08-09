@@ -1,0 +1,45 @@
+{
+  "purpose": "Retrain the existing WATTZAN municipality forecasting architecture without changing application functions.",
+  "original_sources": {
+    "history_archive": "2016-2025 HISTORY.zip",
+    "consumer_ledger_archive": "2016-2026 CONS.zip",
+    "location": "Tacurong City, town code 25"
+  },
+  "training_use": {
+    "years_used_as_hard_anchors": [
+      2020,
+      2021,
+      2022,
+      2023,
+      2024
+    ],
+    "target": "Tacurong City annual consumption_kwh",
+    "customer_anchor": "Grand Total Consumers / 12 used as an annual-average monthly consumer-entry anchor",
+    "daily_method": "Existing daily intra-year shape retained and scaled so each annual total equals the original SUKELCO History Ledger exactly.",
+    "other_municipalities": "Unchanged research-grade synthetic municipality daily records.",
+    "peak_capacity_weather": "No original daily values were supplied; existing research fields retained. Tacurong peak_demand_kw scaled with annual consumption to preserve existing load factor."
+  },
+  "reference_only_not_daily_training": {
+    "history_years": [
+      2016,
+      2017,
+      2018,
+      2019,
+      2025
+    ],
+    "consumer_ledger_years": [
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+    ],
+    "reason": "The supplied ledgers are annual route aggregates and do not contain daily timestamped load/weather observations required by the current one-day/seven-day model functions."
+  }
+}

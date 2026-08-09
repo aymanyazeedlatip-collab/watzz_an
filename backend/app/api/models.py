@@ -58,8 +58,9 @@ def get_model_status(request: Request) -> dict:
         ),
         "production_ready": bundle.production_ready,
         "synthetic_data_warning": (
-            "The municipality-day records are research-grade synthetic data calibrated to official anchors. "
-            "Replace them with observed utility and weather records before operational deployment."
+            "Hybrid research dataset: Tacurong City 2020–2024 annual electricity and consumer totals are anchored "
+            "to original SUKELCO ledgers; Tacurong daily allocation and the other municipality-day/weather records "
+            "remain modeled research data. Official daily utility and weather records are still required before operational deployment."
         ),
     }
 
@@ -76,7 +77,7 @@ def get_model_performance() -> dict:
     recommendation = model_loader.read_json_metric_file("recommendation_evaluation.json") or {}
     return {
         "model_metrics": overall,
-        "best_test_model": "Hybrid MLR-SARIMA by R2, RMSE, and MAE; direct SARIMA by MAPE",
+        "best_test_model": "Hybrid MLR-SARIMA by R2, RMSE, MAE, and MAPE",
         "test_rows": training_report.get("split", {}).get("test_rows", 4392),
         "test_period": "2024-01-01 to 2024-12-31",
         "dataset_warning": training_report.get("scientific_warnings", []),

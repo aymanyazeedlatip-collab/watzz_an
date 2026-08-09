@@ -2,8 +2,8 @@
   "municipality": "Palimbang",
   "series_type": "mlr_residual",
   "order": [
-    1,
-    1,
+    2,
+    0,
     1
   ],
   "seasonal_order": [
@@ -15,17 +15,19 @@
   "log_scale": false,
   "parameter_names": [
     "ar.L1",
+    "ar.L2",
     "ma.L1",
     "ar.S.L7",
     "ma.S.L7",
     "sigma2"
   ],
   "parameters": [
-    0.20784337381206927,
-    -0.9883137962756247,
-    1.000710912999452,
-    -0.9802994223938695,
-    5258226.331354771
+    0.4000198824061962,
+    0.08641625178179133,
+    -0.20205469081586766,
+    1.000118477515586,
+    -0.9790635759391433,
+    3402549.0356137007
   ],
   "last_observation_date": "2024-12-31",
   "statsmodels_version_note": "Reconstruct SARIMAX with the saved history, then call model.filter(parameters)."

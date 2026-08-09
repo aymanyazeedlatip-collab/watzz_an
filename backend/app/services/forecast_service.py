@@ -31,7 +31,7 @@ from app.utils.logging_config import get_logger
 logger = get_logger(__name__)
 
 DATA_WARNING = (
-    "Research-grade synthetic municipality-level development model. "
+    "Hybrid research municipality-level model; Tacurong annual load anchors use original SUKELCO ledgers while daily profiles remain derived. "
     "Not official observed municipal utility or weather data."
 )
 

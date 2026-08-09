@@ -13,9 +13,9 @@
     ],
     "direct_fixed_validation_mape_pct": 3.9731185719248594,
     "residual_order": [
-      1,
-      1,
-      1
+      2,
+      0,
+      2
     ],
     "residual_seasonal_order": [
       1,
@@ -23,9 +23,9 @@
       1,
       7
     ],
-    "residual_relative_validation_error_pct": 3.0620536813572796,
+    "residual_relative_validation_error_pct": 2.7262061511537707,
     "hybrid_weight": 1.5,
-    "hybrid_fixed_validation_mape_pct": 3.0128881195045887
+    "hybrid_fixed_validation_mape_pct": 2.720377289193373
   },
   "Columbio": {
     "direct_order": [
@@ -51,9 +51,9 @@
       1,
       7
     ],
-    "residual_relative_validation_error_pct": 9.306711041915955,
-    "hybrid_weight": 0.9,
-    "hybrid_fixed_validation_mape_pct": 9.299739372585373
+    "residual_relative_validation_error_pct": 7.922897958911583,
+    "hybrid_weight": 0.8,
+    "hybrid_fixed_validation_mape_pct": 7.906668640194495
   },
   "Esperanza": {
     "direct_order": [
@@ -79,9 +79,9 @@
       1,
       7
     ],
-    "residual_relative_validation_error_pct": 2.5984967265180323,
+    "residual_relative_validation_error_pct": 2.57082471901719,
     "hybrid_weight": 1.5,
-    "hybrid_fixed_validation_mape_pct": 2.5946308730407366
+    "hybrid_fixed_validation_mape_pct": 2.5676833773218983
   },
   "Isulan": {
     "direct_order": [
@@ -107,9 +107,9 @@
       1,
       7
     ],
-    "residual_relative_validation_error_pct": 3.390260590556176,
-    "hybrid_weight": 1.5,
-    "hybrid_fixed_validation_mape_pct": 3.388619143740998
+    "residual_relative_validation_error_pct": 3.3003137337333794,
+    "hybrid_weight": 0.95,
+    "hybrid_fixed_validation_mape_pct": 3.298864029731214
   },
   "Kalamansig": {
     "direct_order": [
@@ -125,9 +125,9 @@
     ],
     "direct_fixed_validation_mape_pct": 3.447932383592258,
     "residual_order": [
-      2,
-      0,
-      2
+      1,
+      1,
+      1
     ],
     "residual_seasonal_order": [
       1,
@@ -135,9 +135,9 @@
       1,
       7
     ],
-    "residual_relative_validation_error_pct": 2.985351269255649,
-    "hybrid_weight": 0.9,
-    "hybrid_fixed_validation_mape_pct": 2.977498954079782
+    "residual_relative_validation_error_pct": 2.5939364234021487,
+    "hybrid_weight": 0.75,
+    "hybrid_fixed_validation_mape_pct": 2.547965292087995
   },
   "Lambayong": {
     "direct_order": [
@@ -153,9 +153,9 @@
     ],
     "direct_fixed_validation_mape_pct": 5.287750899339161,
     "residual_order": [
-      1,
-      1,
-      1
+      2,
+      0,
+      2
     ],
     "residual_seasonal_order": [
       1,
@@ -163,9 +163,9 @@
       1,
       7
     ],
-    "residual_relative_validation_error_pct": 2.7655030995389156,
-    "hybrid_weight": 1.0,
-    "hybrid_fixed_validation_mape_pct": 2.7655030995389156
+    "residual_relative_validation_error_pct": 2.791892751189133,
+    "hybrid_weight": 1.5,
+    "hybrid_fixed_validation_mape_pct": 2.7832054464328904
   },
   "Lebak": {
     "direct_order": [
@@ -191,9 +191,9 @@
       1,
       7
     ],
-    "residual_relative_validation_error_pct": 1.892570509263692,
-    "hybrid_weight": 1.0,
-    "hybrid_fixed_validation_mape_pct": 1.8925705092636924
+    "residual_relative_validation_error_pct": 1.9901076345751227,
+    "hybrid_weight": 1.15,
+    "hybrid_fixed_validation_mape_pct": 1.9875510368344766
   },
   "Lutayan": {
     "direct_order": [
@@ -209,9 +209,9 @@
     ],
     "direct_fixed_validation_mape_pct": 5.07186711592667,
     "residual_order": [
-      1,
-      1,
-      1
+      2,
+      0,
+      2
     ],
     "residual_seasonal_order": [
       1,
@@ -219,9 +219,9 @@
       1,
       7
     ],
-    "residual_relative_validation_error_pct": 3.000042796303895,
+    "residual_relative_validation_error_pct": 2.755784969454951,
     "hybrid_weight": 1.5,
-    "hybrid_fixed_validation_mape_pct": 2.9879922879103327
+    "hybrid_fixed_validation_mape_pct": 2.7518027020187708
   },
   "Palimbang": {
     "direct_order": [
@@ -237,8 +237,8 @@
     ],
     "direct_fixed_validation_mape_pct": 3.0560792613529526,
     "residual_order": [
-      1,
-      1,
+      2,
+      0,
       1
     ],
     "residual_seasonal_order": [
@@ -247,9 +247,9 @@
       1,
       7
     ],
-    "residual_relative_validation_error_pct": 2.701816720470775,
-    "hybrid_weight": 0.7,
-    "hybrid_fixed_validation_mape_pct": 2.616186871094029
+    "residual_relative_validation_error_pct": 2.3607667420687957,
+    "hybrid_weight": 0.8,
+    "hybrid_fixed_validation_mape_pct": 2.3308671538821617
   },
   "President Quirino": {
     "direct_order": [
@@ -265,9 +265,9 @@
     ],
     "direct_fixed_validation_mape_pct": 5.110283127002474,
     "residual_order": [
-      1,
-      1,
-      1
+      2,
+      0,
+      2
     ],
     "residual_seasonal_order": [
       1,
@@ -275,9 +275,9 @@
       1,
       7
     ],
-    "residual_relative_validation_error_pct": 3.1598004697532196,
-    "hybrid_weight": 0.85,
-    "hybrid_fixed_validation_mape_pct": 3.150329840230798
+    "residual_relative_validation_error_pct": 2.8596465357048038,
+    "hybrid_weight": 1.5,
+    "hybrid_fixed_validation_mape_pct": 2.8569526496965545
   },
   "Senator Ninoy Aquino": {
     "direct_order": [
@@ -303,15 +303,15 @@
       1,
       7
     ],
-    "residual_relative_validation_error_pct": 6.138357728117051,
-    "hybrid_weight": 1.0,
-    "hybrid_fixed_validation_mape_pct": 6.138357728117051
+    "residual_relative_validation_error_pct": 5.216245058893825,
+    "hybrid_weight": 0.8,
+    "hybrid_fixed_validation_mape_pct": 5.192398722087775
   },
   "Tacurong City": {
     "direct_order": [
       2,
       0,
-      2
+      1
     ],
     "direct_seasonal_order": [
       1,
@@ -319,7 +319,7 @@
       1,
       7
     ],
-    "direct_fixed_validation_mape_pct": 5.736354771024149,
+    "direct_fixed_validation_mape_pct": 6.809564323130806,
     "residual_order": [
       2,
       0,
@@ -331,8 +331,8 @@
       1,
       7
     ],
-    "residual_relative_validation_error_pct": 3.7207216760161574,
-    "hybrid_weight": 0.8,
-    "hybrid_fixed_validation_mape_pct": 3.6955397487223283
+    "residual_relative_validation_error_pct": 3.5562456738089754,
+    "hybrid_weight": 0.75,
+    "hybrid_fixed_validation_mape_pct": 3.5252445386453015
   }
 }

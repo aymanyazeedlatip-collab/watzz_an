@@ -2,9 +2,9 @@
   "municipality": "Lutayan",
   "series_type": "mlr_residual",
   "order": [
-    1,
-    1,
-    1
+    2,
+    0,
+    2
   ],
   "seasonal_order": [
     1,
@@ -15,17 +15,21 @@
   "log_scale": false,
   "parameter_names": [
     "ar.L1",
+    "ar.L2",
     "ma.L1",
+    "ma.L2",
     "ar.S.L7",
     "ma.S.L7",
     "sigma2"
   ],
   "parameters": [
-    0.27579359335937326,
-    -0.9908969890670126,
-    0.9953176702685864,
-    -0.9891393223914878,
-    2417406.9697436555
+    1.0607365578300196,
+    -0.3396971392477429,
+    -0.7964128994492152,
+    0.21758882480552727,
+    0.048637289602271636,
+    0.04156379442536262,
+    1516480.8267897572
   ],
   "last_observation_date": "2024-12-31",
   "statsmodels_version_note": "Reconstruct SARIMAX with the saved history, then call model.filter(parameters)."

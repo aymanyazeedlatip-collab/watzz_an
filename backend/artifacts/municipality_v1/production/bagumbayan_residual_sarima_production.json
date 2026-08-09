@@ -2,9 +2,9 @@
   "municipality": "Bagumbayan",
   "series_type": "mlr_residual",
   "order": [
-    1,
-    1,
-    1
+    2,
+    0,
+    2
   ],
   "seasonal_order": [
     1,
@@ -15,17 +15,21 @@
   "log_scale": false,
   "parameter_names": [
     "ar.L1",
+    "ar.L2",
     "ma.L1",
+    "ma.L2",
     "ar.S.L7",
     "ma.S.L7",
     "sigma2"
   ],
   "parameters": [
-    0.22489838852774552,
-    -0.9969766409862018,
-    0.9978135899892758,
-    -0.9921298087989519,
-    2986517.3901503407
+    -0.3878790062340437,
+    0.5943724162247885,
+    0.594591291304121,
+    -0.38478625567866753,
+    0.2742499557622395,
+    -0.20654510194993214,
+    1850026.8599115435
   ],
   "last_observation_date": "2024-12-31",
   "statsmodels_version_note": "Reconstruct SARIMAX with the saved history, then call model.filter(parameters)."
