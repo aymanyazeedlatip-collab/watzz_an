@@ -4,6 +4,50 @@
   "fluid": true,
   "rewrites": [
     {
+      "source": "/vendor/chart.umd.min.js",
+      "destination": "https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"
+    },
+    {
+      "source": "/vendor/hammer.min.js",
+      "destination": "https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"
+    },
+    {
+      "source": "/vendor/chartjs-plugin-zoom.min.js",
+      "destination": "https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.2.0/dist/chartjs-plugin-zoom.min.js"
+    },
+    {
+      "source": "/vendor/lucide.min.js",
+      "destination": "https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"
+    },
+    {
+      "source": "/vendor/leaflet.js",
+      "destination": "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    },
+    {
+      "source": "/vendor/leaflet.css",
+      "destination": "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    },
+    {
+      "source": "/vendor/images/marker-icon.png",
+      "destination": "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png"
+    },
+    {
+      "source": "/vendor/images/marker-icon-2x.png",
+      "destination": "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png"
+    },
+    {
+      "source": "/vendor/images/marker-shadow.png",
+      "destination": "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png"
+    },
+    {
+      "source": "/vendor/three.min.js",
+      "destination": "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
+    },
+    {
+      "source": "/vendor/OrbitControls.js",
+      "destination": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"
+    },
+    {
       "source": "/",
       "destination": "/index.html"
     }

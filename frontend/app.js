@@ -109,6 +109,7 @@
       cameraInitialized: false,
       decorations: [],
       autoRotateFrame: null,
+      lastError: null,
     },
     shortTerm: {
       map: null,
@@ -1160,16 +1161,51 @@
     requestOverview3DRender();
   }
 
+  function detectWebGLSupport() {
+    try {
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("webgl2", { failIfMajorPerformanceCaveat: false })
+        || canvas.getContext("webgl", { failIfMajorPerformanceCaveat: false })
+        || canvas.getContext("experimental-webgl", { failIfMajorPerformanceCaveat: false });
+      return Boolean(context);
+    } catch (_error) {
+      return false;
+    }
+  }
+
   function ensureOverview3DScene() {
     const container = qs("#overview-consumption-map");
-    if (!container || !window.THREE || !window.THREE.OrbitControls) return false;
+    state.overviewMap.lastError = null;
+    if (!container) {
+      state.overviewMap.lastError = "The 3D map container is unavailable.";
+      return false;
+    }
+    if (!window.THREE?.WebGLRenderer) {
+      state.overviewMap.lastError = "The Three.js renderer did not load. Refresh the page; WATTZAN will retry through its backup library source.";
+      return false;
+    }
+    if (!window.THREE?.OrbitControls) {
+      state.overviewMap.lastError = "The 3D camera controls did not load. Refresh the page; WATTZAN will retry through its backup library source.";
+      return false;
+    }
+    if (!detectWebGLSupport()) {
+      state.overviewMap.lastError = "WebGL is disabled or unavailable in this browser. Enable hardware acceleration/WebGL and reload the page.";
+      return false;
+    }
     if (state.overviewMap.renderer) return true;
 
     const scene = new window.THREE.Scene();
     scene.background = new window.THREE.Color("#e8eff5");
 
     const camera = new window.THREE.PerspectiveCamera(38, 1, 0.1, 500);
-    const renderer = new window.THREE.WebGLRenderer({ antialias: true, alpha: false });
+    let renderer;
+    try {
+      renderer = new window.THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
+    } catch (error) {
+      console.error("[WATTZAN] WebGL renderer initialization failed", error);
+      state.overviewMap.lastError = `The WebGL renderer could not start: ${error?.message || "unknown browser graphics error"}`;
+      return false;
+    }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
     renderer.shadowMap.enabled = false;
     renderer.domElement.className = "overview-3d-canvas";
@@ -1378,7 +1414,7 @@
     setHidden("#overview-map-empty", hasData);
     if (!container || !hasData) return;
     if (!ensureOverview3DScene()) {
-      setText("#overview-map-empty", "The 3D map library or WebGL could not be loaded. Check the internet connection and browser graphics support.");
+      setText("#overview-map-empty", state.overviewMap.lastError || "The 3D map could not be initialized.");
       setHidden("#overview-map-empty", false);
       return;
     }
@@ -4645,5 +4681,6 @@
     }
   }
 
-  document.addEventListener("DOMContentLoaded", initialize);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initialize, { once: true });
+  else initialize();
 })();
