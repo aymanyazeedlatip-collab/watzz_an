@@ -6,7 +6,7 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <meta content="WATTZAN electricity forecasting and decision-support dashboard for Sultan Kudarat, Philippines." name="description"/>
 <title>WATTZAN Operations Dashboard</title>
-<link href="/assets/logo-placeholder.svg" rel="icon" type="image/svg+xml"/>
+<link href="/assets/wattzan-logo.jpg" rel="icon" type="image/jpeg"/>
 <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
 <link href="/styles.css" rel="stylesheet"/>
 <script defer="" src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
@@ -28,7 +28,7 @@
 <aside aria-label="Primary navigation" class="sidebar" id="sidebar">
 <!-- PLACEHOLDER BRANDING: replace this block when the final logo is available. -->
 <div class="brand-block">
-<img alt="WATTZAN placeholder logo" class="brand-mark" src="/assets/logo-placeholder.svg"/>
+<img alt="WATTZAN logo" class="brand-mark" src="/assets/wattzan-logo.jpg"/>
 <div>
 <div class="brand-name">WATTZAN</div>
 </div>
@@ -649,7 +649,7 @@
 </div>
 <div class="projection-method-box">
 <strong>How location affects this projection</strong>
-<p>The projection begins from the selected municipality’s own 2020–2024 synthetic electricity history. Population share remains a planning context indicator, while future energy scenarios use the municipality’s latest annual load as their base.</p>
+<p>The projection begins from the selected municipality’s 2020–2024 research history. Tacurong City is anchored to original SUKELCO annual electricity and consumer totals; other municipality-day series remain modeled research records. Population share remains a planning context indicator, while future energy scenarios use the municipality’s latest annual load as their base.</p>
 </div>
 <div class="form-actions">
 <button class="button primary" disabled="" id="run-longterm-button" type="submit">
@@ -670,7 +670,7 @@
 <span class="status-badge elevated">Scenario projection</span>
 </div>
 <div class="metric-grid long-term-metrics">
-<article class="metric-card key-card"><div class="metric-header"><span>Base-year municipal energy</span><i aria-hidden="true" data-lucide="zap"></i></div><strong class="metric-value" id="longterm-base-energy">—</strong><span class="metric-unit">GWh/year</span><p class="metric-footnote">Latest synthetic municipality history from the active dataset</p></article>
+<article class="metric-card key-card"><div class="metric-header"><span>Base-year municipal energy</span><i aria-hidden="true" data-lucide="zap"></i></div><strong class="metric-value" id="longterm-base-energy">—</strong><span class="metric-unit">GWh/year</span><p class="metric-footnote">Latest municipality history from the active research dataset</p></article>
 <article class="metric-card"><div class="metric-header"><span>Final-year projected energy</span><i aria-hidden="true" data-lucide="trending-up"></i></div><strong class="metric-value" id="longterm-final-energy">—</strong><span class="metric-unit">GWh/year</span><p class="metric-footnote" id="longterm-final-year-note">—</p></article>
 <article class="metric-card"><div class="metric-header"><span>Net annual growth</span><i aria-hidden="true" data-lucide="percent"></i></div><strong class="metric-value" id="longterm-net-growth">—</strong><span class="metric-unit">%</span><p class="metric-footnote">Demand + climate − efficiency</p></article>
 <article class="metric-card"><div class="metric-header"><span>Final estimated peak</span><i aria-hidden="true" data-lucide="gauge"></i></div><strong class="metric-value" id="longterm-final-peak">—</strong><span class="metric-unit">MW</span><p class="metric-footnote">Planning estimate from annual load factor</p></article>
@@ -729,7 +729,7 @@
 <div class="notice-grid">
 <div class="notice-box">
 <strong>Reference population source</strong>
-<span>The municipality histories are research-grade synthetic records calibrated to official population and aggregate electricity anchors. Replace them with official municipal meter and weather records before operational deployment.</span>
+<span>The active research dataset now uses original SUKELCO Tacurong City annual electricity and consumer ledger totals as hard calibration anchors for 2020–2024. Tacurong daily values are derived allocations because the supplied ledgers are annual/route aggregates, while the other municipality-day histories and weather variables remain modeled research data. Official daily meter and weather records are still required before operational deployment.</span>
 </div>
 </div>
 </div>
@@ -956,7 +956,7 @@
 <section aria-labelledby="about-project-title" class="about-hero panel">
 <div class="about-hero-copy">
 <div class="about-project-lockup">
-<div aria-hidden="true" class="about-project-mark"><img alt="" src="/assets/logo-placeholder.svg"/></div>
+<div aria-hidden="true" class="about-project-mark"><img alt="WATTZAN logo" src="/assets/wattzan-logo.jpg"/></div>
 <div><span class="panel-label">Electricity intelligence platform</span><h3 id="about-project-title">WATTZAN</h3></div>
 </div>
 <p>WATTZAN combines municipality-aware Multiple Linear Regression, municipality-specific SARIMA correction, hybrid forecasting, peak-demand estimation, capacity analysis, and structured recommendations in one interactive research dashboard.</p>

@@ -81,7 +81,7 @@ svg { flex: 0 0 auto; }
   padding: 16px 19px;
   border-bottom: 1px solid var(--border);
 }
-.brand-mark { width: 36px; height: 36px; }
+.brand-mark { width: 42px; height: 42px; border-radius: 9px; object-fit: cover; }
 .brand-name { font-size: 18px; line-height: 1.1; font-weight: 800; letter-spacing: .065em; color: var(--navy); }
 .brand-subtitle { margin-top: 3px; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
 .sidebar-nav { padding: 14px 10px; display: grid; gap: 4px; overflow-y: auto; }
@@ -137,7 +137,7 @@ svg { flex: 0 0 auto; }
 /* ABOUT PAGE */
 .about-identity { display: grid; grid-template-columns: 76px minmax(0, 1fr); align-items: center; gap: 22px; margin-bottom: 18px; }
 .about-project-mark { width: 72px; height: 72px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 7px; background: var(--surface-alt); }
-.about-project-mark img { width: 46px; height: 46px; }
+.about-project-mark img { width: 58px; height: 58px; border-radius: 12px; object-fit: cover; }
 .about-identity h3 { margin: 4px 0 8px; font-size: 26px; color: var(--navy); }
 .about-identity p, .about-card p { margin: 0; color: var(--muted); line-height: 1.7; }
 .about-grid { margin-top: 18px; }
