@@ -9,3 +9,10 @@
 - Added Vercel request-size-aware upload limit.
 - Removed unused province-baseline artifacts from the deployment package.
 - Preserved municipality forecasting calculations, model artifacts, frontend behavior, and chatbot workflow.
+
+## v15.5.2 FastAPI entrypoint correction
+
+- Removed the conflicting `functions.backend/server.py` block from `vercel.json`.
+- Explicitly selected the `fastapi` framework preset.
+- Retained the official custom entrypoint `backend.server:app` in `pyproject.toml`.
+- Enabled Fluid compute at project configuration level.
