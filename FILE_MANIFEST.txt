@@ -1,10 +1,10 @@
-WATTZAN v16.3.0 FILE MANIFEST
+WATTZAN v16.3.1 FILE MANIFEST
 
 .gitignore	235
 .python-version	5
 CLICK_TO_RUN_WATTZAN.bat	7008
-FILE_MANIFEST.txt	7946
-INSTALL_UPDATE.txt	631
+FILE_MANIFEST.txt	8026
+INSTALL_UPDATE.txt	678
 LOCAL_START_HERE.txt	364
 README.md	966
 RELEASE_NOTES_V15_5_VERCEL.md	602
@@ -19,6 +19,7 @@ RELEASE_NOTES_V16_2_8_DEPLOYMENT_RECOVERY.md	1018
 RELEASE_NOTES_V16_2_9_DENSE_GRID_RESTORE.md	1697
 RELEASE_NOTES_V16_2_ROUTE_INTELLIGENCE.md	4277
 RELEASE_NOTES_V16_3_0_PACKAGED_TACURONG_GRID.md	2310
+RELEASE_NOTES_V16_3_1_ORGANIZED_GRID.md	1972
 VERCEL_DEPENDENCY_FIX.md	641
 VERCEL_DEPLOYMENT_GUIDE.md	4901
 VERCEL_RUNTIME_CRASH_FIX.md	1120
@@ -109,24 +110,24 @@ backend/requirements.txt	291
 backend/run_server.bat	59
 backend/scripts/check_gemini_config.py	991
 backend/server.py	2721
-frontend/app.js	386537
+frontend/app.js	387995
 frontend/assets/BOUNDARY_SOURCE_NOTICE.txt	319
 frontend/assets/sultan-kudarat-municipalities.json	6367
 frontend/assets/tacurong-street-network.json	96057
 frontend/assets/wattzan-logo.jpg	261654
 frontend/assets/wattzan-planning-data.json	204913
 frontend/dependency-loader.js	6424
-frontend/index.html	90860
-frontend/styles.css	89993
-public/app.js	386537
+frontend/index.html	90914
+frontend/styles.css	90675
+public/app.js	387995
 public/assets/BOUNDARY_SOURCE_NOTICE.txt	319
 public/assets/sultan-kudarat-municipalities.json	6367
 public/assets/tacurong-street-network.json	96057
 public/assets/wattzan-logo.jpg	261654
 public/assets/wattzan-planning-data.json	204913
 public/dependency-loader.js	6424
-public/index.html	90860
-public/styles.css	89993
+public/index.html	90914
+public/styles.css	90675
 pyproject.toml	518
 requirements-local-py314.txt	443
 requirements.txt	273
@@ -141,14 +142,15 @@ scripts/test_fast_forecast_v1627.py	8629
 scripts/test_frontend_date_arithmetic.js	2255
 scripts/test_late_frontend_bootstrap.py	627
 scripts/test_packaged_grid_v1630.py	1600
-scripts/test_planning_features.py	2012
+scripts/test_planning_features.py	2536
 scripts/test_route_grid_v1629.py	73
-scripts/test_route_grid_v1630.py	5148
-scripts/test_seasonal_planning_v1625.py	2499
+scripts/test_route_grid_v1630.py	242
+scripts/test_route_grid_v1631.py	6196
+scripts/test_seasonal_planning_v1625.py	2326
 scripts/test_shortterm_weather_v1626.py	7775
 scripts/test_ui_v1622.py	229
 scripts/test_ui_v1623.py	248
-scripts/test_ui_v1624.py	8276
+scripts/test_ui_v1624.py	8313
 scripts/test_ui_v1625.py	8208
 scripts/validate_default_dataset.py	1445
 vercel.json	1777

@@ -1,4 +1,4 @@
-WATTZAN v16.3.0 FINAL DEPLOYMENT UPDATE
+WATTZAN v16.3.1 FINAL DEPLOYMENT UPDATE
 
 1. Close the local WATTZAN server if it is running.
 2. Extract the UPDATE ZIP.
@@ -6,7 +6,7 @@ WATTZAN v16.3.0 FINAL DEPLOYMENT UPDATE
 4. Choose Replace files in destination when Windows asks.
 5. Do NOT delete the hidden .git folder.
 6. Test locally with CLICK_TO_RUN_WATTZAN.bat.
-7. In Route Intelligence, confirm the dense electricity grid appears immediately over the Tacurong basemap without a Retry grid state.
+7. In Route Intelligence, confirm the organized trunk/feeder grid appears over the Tacurong basemap; zoom in to reveal finer branches, and select a route to highlight its full path.
 8. Commit and push the repository.
 9. Wait for Vercel to redeploy.
 10. Hard refresh the deployed site with Ctrl+Shift+R once.

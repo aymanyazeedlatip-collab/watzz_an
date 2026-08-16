@@ -1779,3 +1779,23 @@ body {
 .route-road-retry:hover { background: rgba(17,34,47,.96); border-color: rgba(255,209,102,.72); }
 .route-road-retry.hidden { display: none !important; }
 .route-road-retry svg { width: 14px; height: 14px; }
+
+
+/* WATTZAN v16.3.1 — organized zoom-adaptive Tacurong utility grid */
+.tacurong-route-map.route-map-osm-primary .leaflet-tile-pane {
+  filter: grayscale(.58) brightness(.58) contrast(1.06) saturate(.34);
+  opacity: .94;
+}
+.leaflet-interactive.utility-tier-primary {
+  filter: drop-shadow(0 0 2px rgba(255,209,102,.92)) drop-shadow(0 0 7px rgba(255,209,102,.35));
+}
+.leaflet-interactive.utility-tier-feeder {
+  filter: drop-shadow(0 0 2px rgba(255,159,122,.72));
+}
+.leaflet-interactive.utility-tier-distribution {
+  filter: drop-shadow(0 0 1.5px rgba(239,111,155,.5));
+}
+.leaflet-interactive.utility-tier-local {
+  filter: none;
+}
+.route-network-key small { line-height: 1.45; }

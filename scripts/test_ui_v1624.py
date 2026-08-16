@@ -43,10 +43,10 @@ window.fetch=async function(input){{const url=String(input && input.url ? input.
         grid=[c for c in calls if 'utility-grid-segment' in str(c.get('options',{}).get('className',''))]
         branches=[c for c in calls if c.get('options',{}).get('className')=='route-service-branch']
         old_full=[c for c in calls if c.get('options',{}).get('className')=='route-road-grid-route']
-        assert len(grid) >= 100, len(grid)
-        assert 40 <= len(branches) <= 72, len(branches)
+        assert 120 <= len(grid) <= 230, len(grid)
+        assert len(branches) == 0, len(branches)
         assert len(old_full)==0, len(old_full)
-        # Current network is intentionally road-aligned rather than screen-orthogonal.
+        # Current default network shows only shared road-aligned corridors; local branches are hidden until zoom/selection.
         # Verify a large sample contains finite, non-zero road segments and multiple directions.
         checked=0; angle_bins=set()
         import math
