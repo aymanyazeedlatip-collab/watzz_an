@@ -7,8 +7,8 @@
 <meta content="WATTZAN electricity forecasting and decision-support dashboard for Sultan Kudarat, Philippines." name="description"/>
 <title>WATTZAN Operations Dashboard</title>
 <link href="/assets/wattzan-logo.jpg" rel="icon" type="image/jpeg"/>
-<link href="/styles.css?v=16.2.8" rel="stylesheet"/>
-<script defer="" src="/dependency-loader.js?v=16.2.8"></script>
+<link href="/styles.css?v=16.2.9" rel="stylesheet"/>
+<script defer="" src="/dependency-loader.js?v=16.2.9"></script>
 </head>
 <body>
 <div aria-hidden="true" class="ambient-orbits">
@@ -767,7 +767,7 @@
 <div class="dashboard-grid route-map-layout">
 <article class="panel route-map-panel">
 <div class="panel-header route-map-header"><div><span class="panel-label">Interactive Tacurong grid map</span><h3>Street-aligned electricity distribution network</h3><p class="panel-description">A utility-map style planning overlay is drawn over Tacurong's street network: shared corridors appear as stronger trunks/feeders while route-specific branches follow local roads. Select a route from the map or route list, then run its forecast.</p></div><div class="chart-toolbar"><label class="compact-control">Map year<select id="route-map-year"></select></label><button aria-label="Reset Tacurong route map" class="icon-button" id="route-map-reset" type="button"><i aria-hidden="true" data-lucide="locate-fixed"></i></button></div></div>
-<div class="tacurong-route-map-shell"><div aria-label="Interactive map of Tacurong City electricity routes" class="tacurong-route-map" id="tacurong-route-map" role="application"></div><div class="route-network-key" aria-label="Electricity grid legend"><strong>Electricity Distribution Grid</strong><span><i class="grid-key-line grid-key-primary"></i>Main trunk</span><span><i class="grid-key-line grid-key-feeder"></i>Feeder</span><span><i class="grid-key-line grid-key-distribution"></i>Distribution</span><span><i class="grid-key-line grid-key-local"></i>Local branch</span><small>Planning hierarchy — not measured voltage</small></div><div class="route-map-hud"><span><i aria-hidden="true" data-lucide="mouse-pointer-2"></i>Click a route branch</span><span id="route-road-status"><i aria-hidden="true" data-lucide="route"></i>Building street-aligned grid</span></div></div>
+<div class="tacurong-route-map-shell"><div aria-label="Interactive map of Tacurong City electricity routes" class="tacurong-route-map" id="tacurong-route-map" role="application"></div><div class="route-network-key" aria-label="Electricity grid legend"><strong>Electricity Distribution Grid</strong><span><i class="grid-key-line grid-key-primary"></i>Main trunk</span><span><i class="grid-key-line grid-key-feeder"></i>Feeder</span><span><i class="grid-key-line grid-key-distribution"></i>Distribution</span><span><i class="grid-key-line grid-key-local"></i>Local branch</span><small>Planning hierarchy — not measured voltage</small></div><div class="route-map-hud"><span><i aria-hidden="true" data-lucide="mouse-pointer-2"></i>Click a route branch</span><span id="route-road-status"><i aria-hidden="true" data-lucide="route"></i>Building street-aligned grid</span><button class="route-road-retry hidden" id="route-road-retry" type="button"><i aria-hidden="true" data-lucide="refresh-cw"></i>Retry grid</button></div></div>
 <div class="route-map-legend" id="route-map-legend"></div>
 </article>
 <aside class="panel route-inspector-panel"><div class="panel-header"><div><span class="panel-label">Route workflow</span><h3 id="route-selected-title">Select a route first</h3><p class="panel-description">Choose one Tacurong route, review its latest ledger value, then run its planning forecast.</p></div></div><label class="field route-select-field">Route<select aria-label="Select Tacurong electricity route" id="route-select"></select></label><dl class="route-detail-list route-history-details">

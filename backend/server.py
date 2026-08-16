@@ -45,7 +45,7 @@ except BaseException as exc:  # pragma: no cover - deployment safety net
     from fastapi import FastAPI
     from fastapi.responses import JSONResponse
 
-    app = FastAPI(title="WATTZAN deployment diagnostics", version="16.2.8")
+    app = FastAPI(title="WATTZAN deployment diagnostics", version="16.2.9")
 
     def _safe_error_payload() -> dict:
         lines = [line for line in _IMPORT_TRACEBACK.splitlines() if line.strip()]

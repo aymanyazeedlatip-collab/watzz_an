@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     )
 
     app_name: str = "WATTZAN"
-    app_version: str = "16.2.8"
+    app_version: str = "16.2.9"
     app_timezone: str = "Asia/Manila"
     database_url: str = "sqlite:///./data/processed/wattzan.db"
     cors_origins: str = "http://127.0.0.1:8000,http://localhost:8000"

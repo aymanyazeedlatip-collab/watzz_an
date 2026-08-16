@@ -67,9 +67,9 @@
   const ROUTE_COLOR_SATURATION = 72;
   const TACURONG_OVERPASS_ENDPOINTS = [
     "https://overpass-api.de/api/interpreter",
-    "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter",
   ];
-  const TACURONG_STREET_CACHE_KEY = "wattzan-tacurong-utility-network-v1628";
+  const TACURONG_STREET_CACHE_KEY = "wattzan-tacurong-utility-network-v1629";
   const TACURONG_ROUTE_MAP_VIEW = { center: [6.6884, 124.6786], zoom: 13 };
   const TACURONG_GRID_HUB = [6.6918, 124.6774];
   const TACURONG_GRID_CORRIDORS = [
@@ -181,6 +181,7 @@
       streetGridSegments: [],
       streetNetworkPromise: null,
       streetNetworkReady: false,
+      streetNetworkFailed: false,
       roadRequestSequence: 0,
     },
     longTerm: {
@@ -4439,42 +4440,72 @@
     } catch (_) { /* Cache is only a performance enhancement. */ }
   }
 
-  async function ensureTacurongStreetNetwork() {
-    if (state.routes.streetNetworkReady || restoreCachedStreetPaths()) {
+  async function fetchTacurongRoadPayload(endpoint, query, timeoutMs = 15000) {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const body = `data=${encodeURIComponent(query)}`;
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+        body,
+        signal: controller.signal,
+      });
+      if (!response.ok) throw new Error(`street network ${response.status}`);
+      return await response.json();
+    } finally {
+      window.clearTimeout(timeout);
+    }
+  }
+
+  async function ensureTacurongStreetNetwork({ force = false } = {}) {
+    if (!force && (state.routes.streetNetworkReady || restoreCachedStreetPaths())) {
       const status = qs("#route-road-status");
       if (status) status.textContent = "Street-aligned utility grid loaded";
+      qs("#route-road-retry")?.classList.add("hidden");
       return state.routes.streetPaths;
     }
     if (state.routes.streetNetworkPromise) return state.routes.streetNetworkPromise;
+    if (force) {
+      state.routes.streetNetworkReady = false;
+      state.routes.streetNetworkFailed = false;
+      state.routes.streetPaths = new Map();
+      state.routes.streetGridSegments = [];
+      try { window.localStorage?.removeItem(TACURONG_STREET_CACHE_KEY); } catch (_) {}
+    }
+    state.routes.streetNetworkFailed = false;
+    qs("#route-road-retry")?.classList.add("hidden");
     state.routes.streetNetworkPromise = (async () => {
       const status = qs("#route-road-status");
-      if (status) status.textContent = "Building utility grid from Tacurong roads…";
+      if (status) status.textContent = "Loading Tacurong street grid…";
+      renderRouteMap();
       const query = '[out:json][timeout:25];way["highway"~"^(trunk|primary|secondary|tertiary|unclassified|residential|living_street|service)$"](6.635,124.635,6.750,124.730);out geom;';
       let lastError = null;
       for (const endpoint of TACURONG_OVERPASS_ENDPOINTS) {
-        const controller = new AbortController();
-        const timeout = window.setTimeout(() => controller.abort(), 10000);
         try {
-          const response = await fetch(`${endpoint}?data=${encodeURIComponent(query)}`, { signal: controller.signal });
-          if (!response.ok) throw new Error(`street network ${response.status}`);
-          const payload = await response.json();
+          const payload = await fetchTacurongRoadPayload(endpoint, query, 15000);
           const network = buildRoadAlignedRouteNetwork(payload);
           state.routes.streetPaths = network.paths;
           state.routes.streetGridSegments = network.gridSegments;
           state.routes.streetNetworkReady = true;
+          state.routes.streetNetworkFailed = false;
           cacheStreetNetwork(network.paths, network.gridSegments);
-          if (status) status.textContent = "Street-aligned utility grid";
+          if (status) status.textContent = "Street-aligned utility grid · select a route";
+          qs("#route-road-retry")?.classList.add("hidden");
           renderRouteMap();
           return network.paths;
         } catch (error) {
           lastError = error;
-        } finally {
-          window.clearTimeout(timeout);
+          console.warn(`[WATTZAN] Tacurong road source failed: ${endpoint}`, error);
         }
       }
-      if (status) status.textContent = "Offline utility-grid fallback";
-      throw lastError || new Error("Street network unavailable");
-    })().catch(() => state.routes.streetPaths).finally(() => { state.routes.streetNetworkPromise = null; });
+      state.routes.streetNetworkFailed = true;
+      if (status) status.textContent = "Street grid unavailable — retry";
+      qs("#route-road-retry")?.classList.remove("hidden");
+      renderRouteMap();
+      console.error("[WATTZAN] Tacurong road grid could not be loaded", lastError);
+      return state.routes.streetPaths;
+    })().finally(() => { state.routes.streetNetworkPromise = null; });
     return state.routes.streetNetworkPromise;
   }
 
@@ -4642,9 +4673,11 @@
     const roadAligned = state.routes.streetNetworkReady && state.routes.streetPaths.size >= Math.min(40, rows.length);
     const usage = routeEdgeUsage(rows, year);
 
-    // Draw the shared utility network ONCE by road segment. This removes the old visual effect
-    // where dozens of complete route paths converged into a hub and looked like radial spokes.
-    const networkSegments = roadAligned && state.routes.streetGridSegments.length ? state.routes.streetGridSegments : fallbackUtilitySegments();
+    // Draw only the real road-derived shared utility network on a working Leaflet map.
+    // v16.2.9 deliberately does NOT draw the old sparse corridor fallback here: that fallback
+    // looked like a hub-and-spoke diagram and visually regressed the utility-map design.
+    // While OSM road geometry is loading, keep the darkened road basemap visible and wait.
+    const networkSegments = roadAligned && state.routes.streetGridSegments.length ? state.routes.streetGridSegments : [];
     networkSegments.forEach((segment) => {
       const item = usage.get(routeEdgeKey(segment.path[0], segment.path[1]));
       const tier = segment.tier || utilityTierForSegment(segment, item);
@@ -4654,9 +4687,10 @@
       if (segment.roadName) line.bindTooltip?.(`${segment.roadName}<br>${tier === "primary" ? "Main trunk" : tier === "feeder" ? "Feeder" : tier === "distribution" ? "Distribution" : "Local branch"}`, { sticky: true, direction: "top", opacity: .95 });
     });
 
-    // Only each route's terminal/service branch is shown independently. The full selected route
-    // appears after clicking it, so the default map stays grid-like instead of becoming a starburst.
-    rows.forEach((route) => {
+    // Only draw route terminal/service branches after the real street graph has resolved.
+    // This prevents any temporary or failed network request from reverting the display to the
+    // old sparse spoke-like fallback that the road-grid redesign replaced.
+    if (roadAligned) rows.forEach((route) => {
       const value = routeValueForYear(route, year);
       const selected = String(route.route_no) === String(selectedNo);
       const branch = routeTerminalBranchPath(route, usage);
@@ -4673,13 +4707,17 @@
     });
 
     const selected = selectedTacurongRoute();
-    if (selected) renderSelectedRoadAlignedRoute(selected, routeValueForYear(selected, year));
+    if (selected && roadAligned) renderSelectedRoadAlignedRoute(selected, routeValueForYear(selected, year));
     const roadStatus = qs("#route-road-status");
     if (roadStatus) {
-      if (selected) roadStatus.textContent = `Route ${selected.route_no} highlighted`;
+      if (selected && roadAligned) roadStatus.textContent = `Route ${selected.route_no} highlighted`;
       else if (roadAligned) roadStatus.textContent = "Street-aligned utility grid · select a route";
-      else if (!state.routes.streetNetworkPromise) roadStatus.textContent = "Offline utility-grid fallback · select a route";
+      else if (state.routes.streetNetworkFailed) roadStatus.textContent = "Street grid unavailable — retry";
+      else if (state.routes.streetNetworkPromise) roadStatus.textContent = "Loading Tacurong street grid…";
+      else roadStatus.textContent = "Preparing Tacurong street grid…";
     }
+    const retry = qs("#route-road-retry");
+    if (retry) retry.classList.toggle("hidden", !state.routes.streetNetworkFailed);
   }
 
   function populateRouteControls() {
@@ -4919,6 +4957,7 @@
   function setupTacurongRoutes() {
     qs("#route-select")?.addEventListener("change", (event) => selectTacurongRoute(event.currentTarget.value));
     qs("#route-map-year")?.addEventListener("change", (event) => { state.routes.mapYear = Number(event.currentTarget.value); renderRouteMap(); });
+    qs("#route-road-retry")?.addEventListener("click", () => { void ensureTacurongStreetNetwork({ force: true }); });
     qs("#route-table-year")?.addEventListener("change", (event) => { state.routes.tableYear = Number(event.currentTarget.value); renderRouteTable(); });
     qs("#route-map-reset")?.addEventListener("click", () => state.routes.map?.setView(TACURONG_ROUTE_MAP_VIEW.center, TACURONG_ROUTE_MAP_VIEW.zoom, { animate: true }));
     qs("#route-export-button")?.addEventListener("click", exportTacurongRoutesCsv);
