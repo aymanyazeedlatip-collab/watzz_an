@@ -7,21 +7,21 @@
 <meta content="WATTZAN electricity forecasting and decision-support dashboard for Sultan Kudarat, Philippines." name="description"/>
 <title>WATTZAN Operations Dashboard</title>
 <link href="/assets/wattzan-logo.jpg" rel="icon" type="image/jpeg"/>
-<link href="/styles.css" rel="stylesheet"/>
-<script defer="" src="/dependency-loader.js?v=16.1.0"></script>
+<link href="/styles.css?v=16.2.7" rel="stylesheet"/>
+<script defer="" src="/dependency-loader.js?v=16.2.7"></script>
 </head>
 <body>
 <div aria-hidden="true" class="ambient-orbits">
-  <span class="ambient-orbit orbit-one"><i></i></span>
-  <span class="ambient-orbit orbit-two"><i></i></span>
-  <span class="ambient-orbit orbit-three"><i></i></span>
+<span class="ambient-orbit orbit-one"><i></i></span>
+<span class="ambient-orbit orbit-two"><i></i></span>
+<span class="ambient-orbit orbit-three"><i></i></span>
 </div>
 <a class="skip-link" href="#main-content">Skip to dashboard content</a>
 <div class="app-shell">
 <aside aria-label="Primary navigation" class="sidebar" id="sidebar">
-<!-- PLACEHOLDER BRANDING: replace this block when the final logo is available. -->
+<!-- WATTZAN project branding -->
 <div class="brand-block">
-<img alt="WATTZAN logo" class="brand-mark" src="/assets/wattzan-logo.jpg"/>
+<img alt="WATTZAN project logo" class="brand-mark" src="/assets/wattzan-logo.jpg"/>
 <div>
 <div class="brand-name">WATTZAN</div>
 </div>
@@ -45,6 +45,10 @@
 <button class="nav-subitem" data-page-target="long-term-forecast" type="button">
 <i aria-hidden="true" data-lucide="calendar-range"></i>
 <span>Long-term Forecast</span>
+</button>
+<button class="nav-subitem" data-page-target="tacurong-routes" type="button">
+<i aria-hidden="true" data-lucide="waypoints"></i>
+<span>Tacurong Route Intelligence</span>
 </button>
 <button class="nav-subitem" data-page-target="forecast-history" type="button">
 <i aria-hidden="true" data-lucide="history"></i>
@@ -124,12 +128,12 @@
 </div>
 </div>
 </header>
-<div aria-live="polite" aria-atomic="true" class="forecast-progress-shell" hidden id="forecast-progress-shell" role="status">
-  <div class="forecast-progress-copy">
-    <span class="forecast-progress-icon"><i aria-hidden="true" data-lucide="activity"></i></span>
-    <div><strong id="forecast-progress-title">Running forecast</strong><span id="forecast-progress-label">Preparing the forecast workflow…</span></div>
-  </div>
-  <div aria-hidden="true" class="forecast-progress-track"><span class="forecast-progress-bar"></span></div>
+<div aria-atomic="true" aria-live="polite" class="forecast-progress-shell" hidden="" id="forecast-progress-shell" role="status">
+<div class="forecast-progress-copy">
+<span class="forecast-progress-icon"><i aria-hidden="true" data-lucide="activity"></i></span>
+<div><strong id="forecast-progress-title">Running forecast</strong><span id="forecast-progress-label">Preparing the forecast workflow…</span></div>
+</div>
+<div aria-hidden="true" class="forecast-progress-track"><span class="forecast-progress-bar"></span></div>
 </div>
 <main class="main-content" id="main-content" tabindex="-1">
 <div class="global-error hidden" id="global-error" role="alert">
@@ -148,10 +152,7 @@
 <h2 id="overview-heading">System overview</h2>
 <p class="page-description">Forecast readiness, recent historical demand, model accuracy, and the latest saved recommendation.</p>
 </div>
-<button class="button secondary" data-refresh-page="overview" type="button">
-<i aria-hidden="true" data-lucide="refresh-cw"></i>
-              Refresh overview
-            </button>
+<div class="page-heading-actions"><button class="button secondary" data-refresh-page="overview" type="button"><i aria-hidden="true" data-lucide="refresh-cw"></i>Refresh</button></div>
 </div>
 <article aria-labelledby="overview-map-title" class="panel overview-map-panel">
 <div class="panel-header overview-map-header">
@@ -193,11 +194,18 @@
 <div><dt>Supply system</dt><dd id="overview-map-popup-supply">—</dd></div>
 <div><dt>Hybrid test MAPE</dt><dd id="overview-map-popup-mape">—</dd></div>
 <div><dt>Consumption rank</dt><dd id="overview-map-popup-rank">—</dd></div>
+<div><dt>Data status</dt><dd id="overview-map-popup-data-status">—</dd></div>
 </dl>
+<div class="overview-popup-actions">
 <button class="button primary full-width" id="overview-map-open-forecast" type="button">
 <i aria-hidden="true" data-lucide="line-chart"></i>
                   Forecast this municipality
                 </button>
+<button class="button route-explore-button full-width hidden" id="overview-map-explore-routes" type="button">
+<i aria-hidden="true" data-lucide="zoom-in"></i>
+                  Zoom into Tacurong routes
+                </button>
+</div>
 </aside>
 <div aria-label="Consumption color scale" class="overview-map-legend">
 <div class="overview-map-legend-row"><span>Lower consumption</span><span>Higher consumption</span></div>
@@ -206,7 +214,7 @@
 </div>
 <div class="panel-state hidden overview-map-empty" id="overview-map-empty">Municipality electricity data is unavailable.</div>
 </div>
-<p class="overview-map-source">Boundary geometry: 2023 PSGC-based Philippine administrative boundaries. Consumption values come from the active WATTZAN municipality dataset.</p>
+<p class="overview-map-source" id="overview-map-source">Boundary geometry: 2023 PSGC-based Philippine administrative boundaries. 2020–2024 values come from the active WATTZAN municipality dataset; 2016–2019 are planning backcasts and 2025–2026 are planning trend forecasts on the same municipality-series scale.</p>
 </article>
 <div aria-live="polite" class="metric-grid overview-metrics">
 <article class="metric-card key-card overview-stability-card">
@@ -360,10 +368,10 @@
 <h2 id="forecast-heading">Short-term electricity forecast</h2>
 <p class="page-description">Select a municipality, automatically fetch date-matched weather, or review and edit the inputs before running one-day or seven-day forecasts.</p>
 </div>
-<div aria-label="Forecast form mode" class="segmented-control" role="group">
+<div class="page-heading-actions"><div aria-label="Forecast form mode" class="segmented-control" role="group">
 <button class="segment active" data-forecast-mode="one-day" type="button">One day</button>
 <button class="segment" data-forecast-mode="seven-day" type="button">Seven days</button>
-</div>
+</div></div>
 </div>
 <article aria-labelledby="shortterm-location-title" class="panel shortterm-location-panel">
 <div class="panel-header shortterm-location-header">
@@ -395,13 +403,26 @@
 <div><dt>Population input</dt><dd id="shortterm-population-source">Loaded after selection</dd></div>
 </dl>
 <div class="weather-automation-actions">
-<button class="button secondary full-width" disabled="" id="shortterm-fetch-weather-button" type="button"><i aria-hidden="true" data-lucide="cloud-download"></i>Fetch weather inputs</button>
-<button class="button primary full-width" disabled="" id="shortterm-fetch-run-button" type="button"><i aria-hidden="true" data-lucide="cloud-lightning"></i><span>Fetch weather &amp; run one-day forecast</span></button>
+<button class="button secondary full-width" disabled="" id="shortterm-fetch-weather-button" type="button"><i aria-hidden="true" data-lucide="cloud-download"></i>Weather only</button>
+<button class="button primary full-width" disabled="" id="shortterm-fetch-run-button" type="button"><i aria-hidden="true" data-lucide="cloud-lightning"></i><span>Auto-fill &amp; Forecast</span></button>
 </div>
 <p class="form-status" id="shortterm-automation-status" role="status">Place a pin or select a municipality marker first.</p>
 <p class="automation-limit-note">Available capacity remains optional because it is an operational utility input and cannot be obtained from a weather service.</p>
 </aside>
 </div>
+</article>
+<article class="panel weather-visual-panel" id="shortterm-weather-visuals">
+<div class="panel-header">
+<div><span class="panel-label">Weather inputs</span><h3>Weather variables used by the forecast</h3><p class="panel-description">Every weather input is visualized after weather is fetched or a forecast is run. A one-day forecast uses labeled value bars so every reading is visible immediately; multi-day forecasts use time-series charts.</p></div>
+<span class="status-badge neutral" id="shortterm-weather-chart-status">Awaiting weather</span>
+</div>
+<div class="weather-chart-grid">
+<div class="weather-chart-card"><h4>Temperature &amp; heat index</h4><div class="chart-container"><canvas aria-label="Short-term temperature and heat index chart" id="shortterm-weather-temperature-chart"></canvas></div></div>
+<div class="weather-chart-card"><h4>Humidity &amp; cloud cover</h4><div class="chart-container"><canvas aria-label="Short-term humidity and cloud cover chart" id="shortterm-weather-atmosphere-chart"></canvas></div></div>
+<div class="weather-chart-card"><h4>Rainfall</h4><div class="chart-container"><canvas aria-label="Short-term rainfall chart" id="shortterm-weather-rainfall-chart"></canvas></div></div>
+<div class="weather-chart-card"><h4>Wind speed</h4><div class="chart-container"><canvas aria-label="Short-term wind speed chart" id="shortterm-weather-wind-chart"></canvas></div></div>
+</div>
+<div class="panel-state" id="shortterm-weather-chart-empty">Fetch date-matched weather to populate all eight weather-variable charts.</div>
 </article>
 <div class="forecast-layout">
 <article class="panel form-panel" id="one-day-form-panel">
@@ -461,7 +482,7 @@
 </label>
 </div>
 <div class="form-actions">
-<button class="button primary" id="run-one-day-button" type="submit"><i aria-hidden="true" data-lucide="play"></i>Run one-day forecast</button>
+<button class="button primary" id="run-one-day-button" type="submit"><i aria-hidden="true" data-lucide="play"></i>Run Forecast</button>
 <p class="form-status" id="one-day-form-status" role="status"></p>
 </div>
 </form>
@@ -490,7 +511,7 @@
 </table>
 </div>
 <div class="form-actions">
-<button class="button primary" id="run-seven-day-button" type="submit"><i aria-hidden="true" data-lucide="play"></i>Run seven-day forecast</button>
+<button class="button primary" id="run-seven-day-button" type="submit"><i aria-hidden="true" data-lucide="play"></i>Run Forecast</button>
 <p class="form-status" id="seven-day-form-status" role="status"></p>
 </div>
 </form>
@@ -545,12 +566,9 @@
 <div>
 <p class="section-kicker">Municipality planning scenario</p>
 <h2 id="longterm-heading">Long-term electricity forecast</h2>
-<p class="page-description">Pin a location in Sultan Kudarat, confirm the municipality, and generate a one-to-ten-year electricity planning projection with scenario ranges.</p>
+<p class="page-description">Pin a location in Sultan Kudarat, confirm the municipality, and generate a one-to-ten-year electricity planning projection that combines long-run demand trends with recurring monthly seasonal behavior.</p>
 </div>
-<button class="button secondary" data-refresh-page="long-term-forecast" type="button">
-<i aria-hidden="true" data-lucide="refresh-cw"></i>
-              Refresh source data
-            </button>
+<div class="page-heading-actions"><button class="button secondary" data-refresh-page="long-term-forecast" type="button"><i aria-hidden="true" data-lucide="refresh-cw"></i>Refresh inputs</button></div>
 </div>
 <div class="long-term-layout">
 <article class="panel map-panel">
@@ -591,7 +609,7 @@
 <span class="panel-label">Projection assumptions</span>
 <h3>Configure the planning horizon</h3>
 </div>
-<button class="text-button" id="longterm-reset-form" type="button">Reset assumptions</button>
+<button class="text-button" id="longterm-reset-form" type="button">Reset</button>
 </div>
 <form id="longterm-form" novalidate="">
 <div class="form-grid">
@@ -642,13 +660,10 @@
 </div>
 <div class="projection-method-box">
 <strong>How location affects this projection</strong>
-<p>The projection begins from the selected municipality’s 2020–2024 research history. Tacurong City is anchored to original SUKELCO annual electricity and consumer totals; other municipality-day series remain modeled research records. Population share remains a planning context indicator, while future energy scenarios use the municipality’s latest annual load as their base.</p>
+<p>The projection begins from the selected municipality’s own 2020–2024 WATTZAN electricity history. Future energy scenarios combine the selected demand/climate/efficiency assumptions with the municipality’s population-growth difference relative to the province, then distribute each annual total through the municipality’s recurring 2020–2024 monthly demand profile. Annual totals remain consistent while month-to-month movement is retained.</p>
 </div>
 <div class="form-actions">
-<button class="button primary" disabled="" id="run-longterm-button" type="submit">
-<i aria-hidden="true" data-lucide="play"></i>
-                    Run long-term projection
-                  </button>
+<button class="button primary" disabled="" id="run-longterm-button" type="submit"><i aria-hidden="true" data-lucide="play"></i>Run Projection</button>
 <p class="form-status" id="longterm-form-status" role="status">Place a pin to enable the projection.</p>
 </div>
 </form>
@@ -663,25 +678,34 @@
 <span class="status-badge elevated">Scenario projection</span>
 </div>
 <div class="metric-grid long-term-metrics">
-<article class="metric-card key-card"><div class="metric-header"><span>Base-year municipal energy</span><i aria-hidden="true" data-lucide="zap"></i></div><strong class="metric-value" id="longterm-base-energy">—</strong><span class="metric-unit">GWh/year</span><p class="metric-footnote">Latest municipality history from the active research dataset</p></article>
+<article class="metric-card key-card"><div class="metric-header"><span>Base-year municipal energy</span><i aria-hidden="true" data-lucide="zap"></i></div><strong class="metric-value" id="longterm-base-energy">—</strong><span class="metric-unit">GWh/year</span><p class="metric-footnote">Latest synthetic municipality history from the active dataset</p></article>
 <article class="metric-card"><div class="metric-header"><span>Final-year projected energy</span><i aria-hidden="true" data-lucide="trending-up"></i></div><strong class="metric-value" id="longterm-final-energy">—</strong><span class="metric-unit">GWh/year</span><p class="metric-footnote" id="longterm-final-year-note">—</p></article>
 <article class="metric-card"><div class="metric-header"><span>Net annual growth</span><i aria-hidden="true" data-lucide="percent"></i></div><strong class="metric-value" id="longterm-net-growth">—</strong><span class="metric-unit">%</span><p class="metric-footnote">Demand + climate − efficiency</p></article>
 <article class="metric-card"><div class="metric-header"><span>Final estimated peak</span><i aria-hidden="true" data-lucide="gauge"></i></div><strong class="metric-value" id="longterm-final-peak">—</strong><span class="metric-unit">MW</span><p class="metric-footnote">Planning estimate from annual load factor</p></article>
 <article class="metric-card"><div class="metric-header"><span>Required capacity</span><i aria-hidden="true" data-lucide="battery-charging"></i></div><strong class="metric-value" id="longterm-required-capacity">—</strong><span class="metric-unit">MW</span><p class="metric-footnote">Includes selected reserve margin</p></article>
 <article class="metric-card"><div class="metric-header"><span>Cumulative energy</span><i aria-hidden="true" data-lucide="sigma"></i></div><strong class="metric-value" id="longterm-cumulative-energy">—</strong><span class="metric-unit">GWh</span><p class="metric-footnote">Base scenario across the selected horizon</p></article>
 </div>
+<article class="panel weather-visual-panel longterm-weather-panel">
+<div class="panel-header"><div><span class="panel-label">Climate planning context</span><h3>Projected weather variables</h3><p class="panel-description">All eight WATTZAN weather inputs are shown month by month. Future values combine the existing planning trend with each municipality’s recurring 2020–2024 monthly climatology; they remain planning projections, not deterministic long-range weather forecasts.</p></div><span class="status-badge elevated">Planning projection</span></div>
+<div class="weather-chart-grid">
+<div class="weather-chart-card"><h4>Temperature &amp; heat index</h4><div class="chart-container"><canvas aria-label="Long-term temperature and heat index projection" id="longterm-weather-temperature-chart"></canvas></div></div>
+<div class="weather-chart-card"><h4>Humidity &amp; cloud cover</h4><div class="chart-container"><canvas aria-label="Long-term humidity and cloud cover projection" id="longterm-weather-atmosphere-chart"></canvas></div></div>
+<div class="weather-chart-card"><h4>Monthly rainfall</h4><div class="chart-container"><canvas aria-label="Long-term rainfall projection" id="longterm-weather-rainfall-chart"></canvas></div></div>
+<div class="weather-chart-card"><h4>Mean wind speed</h4><div class="chart-container"><canvas aria-label="Long-term wind speed projection" id="longterm-weather-wind-chart"></canvas></div></div>
+</div>
+</article>
 <div class="dashboard-grid two-thirds-grid">
 <article class="panel chart-panel">
 <div class="panel-header">
-<div><span class="panel-label">Scenario range</span><h3>Annual energy projection</h3></div>
+<div><span class="panel-label">Scenario range</span><h3>Trend + seasonal energy projection</h3></div>
 <div class="chart-toolbar">
 <label class="compact-control">View
-                      <select id="longterm-energy-chart-type"><option value="line">Line</option><option value="bar">Bar</option></select>
+                      <select id="longterm-energy-chart-type"><option value="line">Seasonal monthly line</option><option value="bar">Annual scenario bars</option></select>
 </label>
-<button aria-label="Reset annual energy chart" class="icon-button" data-reset-chart="longterm-energy-chart" type="button"><i aria-hidden="true" data-lucide="scan"></i></button>
+<button aria-label="Reset long-term energy chart" class="icon-button" data-reset-chart="longterm-energy-chart" type="button"><i aria-hidden="true" data-lucide="scan"></i></button>
 </div>
 </div>
-<div class="chart-container large"><canvas aria-label="Long-term annual energy scenario chart" id="longterm-energy-chart"></canvas></div>
+<div class="chart-container large"><canvas aria-label="Long-term trend and seasonal energy scenario chart" id="longterm-energy-chart"></canvas></div>
 </article>
 <article class="panel chart-panel">
 <div class="panel-header">
@@ -694,14 +718,14 @@
 <div class="dashboard-grid equal-grid">
 <article class="panel chart-panel">
 <div class="panel-header">
-<div><span class="panel-label">Capacity planning</span><h3>Peak demand and required capacity</h3></div>
+<div><span class="panel-label">Capacity planning</span><h3>Seasonal peak demand and required capacity</h3></div>
 <button aria-label="Reset capacity chart" class="icon-button" data-reset-chart="longterm-capacity-chart" type="button"><i aria-hidden="true" data-lucide="scan"></i></button>
 </div>
 <div class="chart-container"><canvas aria-label="Projected peak demand and required capacity chart" id="longterm-capacity-chart"></canvas></div>
 </article>
 <article class="panel chart-panel">
 <div class="panel-header">
-<div><span class="panel-label">Seasonality</span><h3>Monthly energy profile</h3></div>
+<div><span class="panel-label">Seasonality</span><h3>Recurring monthly demand profile</h3></div>
 <button aria-label="Reset monthly profile chart" class="icon-button" data-reset-chart="longterm-monthly-chart" type="button"><i aria-hidden="true" data-lucide="scan"></i></button>
 </div>
 <div class="chart-container"><canvas aria-label="Monthly energy profile chart" id="longterm-monthly-chart"></canvas></div>
@@ -722,16 +746,65 @@
 <div class="notice-grid">
 <div class="notice-box">
 <strong>Reference population source</strong>
-<span>The active research dataset now uses original SUKELCO Tacurong City annual electricity and consumer ledger totals as hard calibration anchors for 2020–2024. Tacurong daily values are derived allocations because the supplied ledgers are annual/route aggregates, while the other municipality-day histories and weather variables remain modeled research data. Official daily meter and weather records are still required before operational deployment.</span>
+<span>The municipality histories are research-grade synthetic records calibrated to official population and aggregate electricity anchors. Replace them with official municipal meter and weather records before operational deployment.</span>
 </div>
 </div>
 </div>
+</section>
+<!-- TACURONG ROUTE INTELLIGENCE -->
+<section aria-labelledby="routes-heading" class="page-section tacurong-routes-page" data-page="tacurong-routes" hidden="">
+<div class="page-heading-row route-page-heading">
+<div><p class="section-kicker">Tacurong City distribution planning</p><h2 id="routes-heading">Tacurong Route Intelligence</h2><p class="page-description">Explore the supplied SUKELCO Tacurong route ledgers, route-level electricity projections through 2034, household-equivalent consumption estimates, and city-scale weather planning variables.</p></div>
+<div class="page-heading-actions"><div class="route-source-badges"><span class="status-badge normal">SUKELCO ledger history</span><span class="status-badge elevated">2034 planning forecast</span></div></div>
+</div>
+<div aria-label="Tacurong route workflow" class="guided-workflow"><div><span>1</span><strong>Select a route</strong><small>Choose from the list or click a route corridor.</small></div><div><span>2</span><strong>Review history</strong><small>See the latest ledger value and route location.</small></div><div><span>3</span><strong>Run forecast</strong><small>Click Forecast Route to calculate the 2034 outlook.</small></div><div><span>4</span><strong>Review results</strong><small>Inspect electricity, household-equivalent, and weather charts.</small></div></div>
+<div class="metric-grid route-summary-metrics">
+<article class="metric-card key-card"><div class="metric-header"><span>Active latest-ledger routes</span><i aria-hidden="true" data-lucide="waypoints"></i></div><strong class="metric-value" id="routes-active-count">—</strong><span class="metric-unit">routes</span><p class="metric-footnote">Routes present in the latest supplied history ledger</p></article>
+<article class="metric-card"><div class="metric-header"><span>Latest ledger total</span><i aria-hidden="true" data-lucide="zap"></i></div><strong class="metric-value" id="routes-latest-total">—</strong><span class="metric-unit">GWh</span><p class="metric-footnote" id="routes-latest-year-note">—</p></article>
+<article class="metric-card"><div class="metric-header"><span>Consumer-month estimate</span><i aria-hidden="true" data-lucide="house-plug"></i></div><strong class="metric-value" id="routes-latest-household">—</strong><span class="metric-unit">kWh / entry</span><p class="metric-footnote">Household-equivalent planning metric; not unique annual households</p></article>
+<article class="metric-card"><div class="metric-header"><span>Route history span</span><i aria-hidden="true" data-lucide="chart-spline"></i></div><strong class="metric-value" id="routes-history-span">—</strong><span class="metric-unit">ledger period</span><p class="metric-footnote">Supplied Tacurong route-history coverage</p></article>
+</div>
+<div class="dashboard-grid route-map-layout">
+<article class="panel route-map-panel">
+<div class="panel-header route-map-header"><div><span class="panel-label">Interactive Tacurong grid map</span><h3>Street-aligned electricity distribution network</h3><p class="panel-description">A utility-map style planning overlay is drawn over Tacurong's street network: shared corridors appear as stronger trunks/feeders while route-specific branches follow local roads. Select a route from the map or route list, then run its forecast.</p></div><div class="chart-toolbar"><label class="compact-control">Map year<select id="route-map-year"></select></label><button aria-label="Reset Tacurong route map" class="icon-button" id="route-map-reset" type="button"><i aria-hidden="true" data-lucide="locate-fixed"></i></button></div></div>
+<div class="tacurong-route-map-shell"><div aria-label="Interactive map of Tacurong City electricity routes" class="tacurong-route-map" id="tacurong-route-map" role="application"></div><div class="route-network-key" aria-label="Electricity grid legend"><strong>Electricity Distribution Grid</strong><span><i class="grid-key-line grid-key-primary"></i>Main trunk</span><span><i class="grid-key-line grid-key-feeder"></i>Feeder</span><span><i class="grid-key-line grid-key-distribution"></i>Distribution</span><span><i class="grid-key-line grid-key-local"></i>Local branch</span><small>Planning hierarchy — not measured voltage</small></div><div class="route-map-hud"><span><i aria-hidden="true" data-lucide="mouse-pointer-2"></i>Click a route branch</span><span id="route-road-status"><i aria-hidden="true" data-lucide="route"></i>Building street-aligned grid</span></div></div>
+<div class="route-map-legend" id="route-map-legend"></div>
+</article>
+<aside class="panel route-inspector-panel"><div class="panel-header"><div><span class="panel-label">Route workflow</span><h3 id="route-selected-title">Select a route first</h3><p class="panel-description">Choose one Tacurong route, review its latest ledger value, then run its planning forecast.</p></div></div><label class="field route-select-field">Route<select aria-label="Select Tacurong electricity route" id="route-select"></select></label><dl class="route-detail-list route-history-details">
+<div><dt>Route number</dt><dd id="route-detail-number">—</dd></div>
+<div><dt>Latest route name</dt><dd id="route-detail-name">—</dd></div>
+<div><dt>Observed years</dt><dd id="route-detail-observed">—</dd></div>
+<div><dt>Latest kWh</dt><dd id="route-detail-latest-kwh">—</dd></div>
+<div><dt>Latest household-equivalent</dt><dd id="route-detail-latest-household">—</dd></div>
+</dl><div class="route-forecast-actions">
+<button class="button primary full-width" disabled="" id="route-forecast-button" type="button"><i aria-hidden="true" data-lucide="sparkles"></i><span>Forecast Route</span></button>
+<button class="button secondary full-width" disabled="" id="route-clear-selection" type="button"><i aria-hidden="true" data-lucide="x"></i>Clear selection</button>
+</div><div aria-live="polite" class="route-forecast-status" id="route-forecast-status">Select a route to enable forecasting.</div><div class="route-forecast-summary hidden" id="route-forecast-summary">
+<div><span>Stabilized annual growth</span><strong id="route-detail-growth">—</strong></div>
+<div><span>2034 route electricity</span><strong id="route-detail-2034-kwh">—</strong></div>
+<div><span>2034 household-equivalent</span><strong id="route-detail-2034-household">—</strong></div>
+</div><div class="notice-box route-method-note hidden" id="route-method-note"><strong>Forecast method</strong><span id="route-methodology-note">Annual route trend is stabilized against Tacurong history, then monthly values follow Tacurong’s recurring WATTZAN 2020–2024 seasonal demand profile.</span></div></aside>
+</div>
+<article class="panel route-forecast-empty" id="route-forecast-empty"><div class="route-empty-icon"><i aria-hidden="true" data-lucide="chart-spline"></i></div><div><strong>No route forecast yet</strong><p>Select a route above, then click <b>Forecast Route</b>. Results will appear here after a short analysis.</p></div></article><div class="route-forecast-results hidden" id="route-forecast-results"><div class="dashboard-grid equal-grid route-chart-grid">
+<article class="panel chart-panel"><div class="panel-header"><div><span class="panel-label">Route electricity</span><h3>Monthly trend + seasonal consumption</h3></div><button aria-label="Reset route consumption chart" class="icon-button" data-reset-chart="route-consumption-chart" type="button"><i aria-hidden="true" data-lucide="scan"></i></button></div><div class="chart-container large"><canvas aria-label="Route historical and forecast electricity consumption" id="route-consumption-chart"></canvas></div></article>
+<article class="panel chart-panel"><div class="panel-header"><div><span class="panel-label">Household-equivalent estimate</span><h3>Seasonal electricity per consumer-month</h3></div><button aria-label="Reset route household chart" class="icon-button" data-reset-chart="route-household-chart" type="button"><i aria-hidden="true" data-lucide="scan"></i></button></div><div class="chart-container large"><canvas aria-label="Route estimated per consumer month electricity consumption" id="route-household-chart"></canvas></div></article>
+</div><article class="panel weather-visual-panel route-weather-panel">
+<div class="panel-header"><div><span class="panel-label">Tacurong climate context</span><h3>Seasonal weather variables through 2034</h3><p class="panel-description">Route ledgers do not include route-specific weather stations, so each route uses Tacurong City climate context. Future weather combines the planning trend with recurring monthly climatology across all eight WATTZAN weather variables.</p></div><span class="status-badge elevated">City-scale weather</span></div>
+<div class="weather-chart-grid">
+<div class="weather-chart-card"><h4>Temperature &amp; heat index</h4><div class="chart-container"><canvas aria-label="Tacurong route temperature projection" id="route-weather-temperature-chart"></canvas></div></div>
+<div class="weather-chart-card"><h4>Humidity &amp; cloud cover</h4><div class="chart-container"><canvas aria-label="Tacurong route atmosphere projection" id="route-weather-atmosphere-chart"></canvas></div></div>
+<div class="weather-chart-card"><h4>Monthly rainfall</h4><div class="chart-container"><canvas aria-label="Tacurong route rainfall projection" id="route-weather-rainfall-chart"></canvas></div></div>
+<div class="weather-chart-card"><h4>Mean wind speed</h4><div class="chart-container"><canvas aria-label="Tacurong route wind projection" id="route-weather-wind-chart"></canvas></div></div>
+</div>
+</article></div>
+<article class="panel route-table-panel"><div class="panel-header"><div><span class="panel-label">Route comparison</span><h3>Ledger and planning table</h3></div><div class="chart-toolbar"><label class="compact-control">Table year<select id="route-table-year"></select></label><button class="button secondary small" id="route-export-button" type="button"><i aria-hidden="true" data-lucide="download"></i>Export CSV</button></div></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>Route</th><th>Name</th><th>Status</th><th>Electricity kWh</th><th>Consumer entries</th><th>kWh / consumer-month</th><th>Forecast growth</th></tr></thead><tbody id="route-results-body"></tbody></table></div></article>
+<div class="notice-grid"><div class="notice-box"><strong>Research integrity</strong><span>The route ledger and the current municipality model dataset use different aggregate scales and are intentionally not merged. Route projections are a dedicated Tacurong planning analysis. Monthly route history shown in the charts is a seasonal reconstruction of the annual SUKELCO ledger using Tacurong’s WATTZAN monthly demand profile, not observed monthly route metering. The grid overlay and highlighted route corridors are street-aligned planning representations, not verified SUKELCO conductor GIS or measured voltage classes.</span></div></div>
 </section>
 <!-- DATA MANAGEMENT -->
 <section aria-labelledby="data-heading" class="page-section" data-page="data-management" hidden="">
 <div class="page-heading-row">
 <div><p class="section-kicker">Dataset governance</p><h2 id="data-heading">Data management</h2><p class="page-description">Validate CSV structure before saving it, review quality issues, and inspect the active historical dataset.</p></div>
-<button class="button secondary" data-refresh-page="data-management" type="button"><i aria-hidden="true" data-lucide="refresh-cw"></i>Refresh data</button>
+<div class="page-heading-actions"><button class="button secondary" data-refresh-page="data-management" type="button"><i aria-hidden="true" data-lucide="refresh-cw"></i>Refresh</button></div>
 </div>
 <div class="dashboard-grid equal-grid">
 <article class="panel upload-panel">
@@ -756,7 +829,7 @@
 <div class="upload-result hidden" id="upload-result">
 <div><span>Dataset ID</span><strong id="uploaded-dataset-id">—</strong></div>
 <div><span>Stored rows</span><strong id="uploaded-row-count">—</strong></div>
-<button class="button primary small" id="activate-uploaded-dataset" type="button">Activate this dataset</button>
+<button class="button primary small" id="activate-uploaded-dataset" type="button">Activate dataset</button>
 </div>
 </article>
 <article class="panel active-dataset-panel">
@@ -795,7 +868,7 @@
 </section>
 <!-- MODEL PERFORMANCE -->
 <section aria-labelledby="performance-heading" class="page-section" data-page="model-performance" hidden="">
-<div class="page-heading-row"><div><p class="section-kicker">Validation evidence</p><h2 id="performance-heading">Model performance</h2><p class="page-description">Untouched 2024 test results, monthly diagnostics, statistical comparisons, peak-demand estimation, and provisional recommendation metrics.</p></div><button class="button secondary" data-refresh-page="model-performance" type="button"><i aria-hidden="true" data-lucide="refresh-cw"></i>Refresh metrics</button></div>
+<div class="page-heading-row"><div><p class="section-kicker">Validation evidence</p><h2 id="performance-heading">Model performance</h2><p class="page-description">Untouched 2024 test results, monthly diagnostics, statistical comparisons, peak-demand estimation, and provisional recommendation metrics.</p></div><div class="page-heading-actions"><button class="button secondary" data-refresh-page="model-performance" type="button"><i aria-hidden="true" data-lucide="refresh-cw"></i>Refresh</button></div></div>
 <div class="metric-grid performance-summary">
 <article class="metric-card key-card"><div class="metric-header"><span>Best test model</span><i aria-hidden="true" data-lucide="trophy"></i></div><strong class="metric-value compact" id="performance-best-model">—</strong><p class="metric-footnote" id="performance-test-period">—</p></article>
 <article class="metric-card"><div class="metric-header"><span>Test rows</span><i aria-hidden="true" data-lucide="list-checks"></i></div><strong class="metric-value" id="performance-test-rows">—</strong></article>
@@ -823,7 +896,7 @@
 </section>
 <!-- RECOMMENDATIONS -->
 <section aria-labelledby="recommendations-heading" class="page-section" data-page="recommendations" hidden="">
-<div class="page-heading-row"><div><p class="section-kicker">Decision support</p><h2 id="recommendations-heading">Recommendations</h2><p class="page-description">Latest demand classification, explainable reason codes, recommended actions, and historical decision patterns.</p></div><button class="button secondary" data-refresh-page="recommendations" type="button"><i aria-hidden="true" data-lucide="refresh-cw"></i>Refresh recommendations</button></div>
+<div class="page-heading-row"><div><p class="section-kicker">Decision support</p><h2 id="recommendations-heading">Recommendations</h2><p class="page-description">Latest demand classification, explainable reason codes, recommended actions, and historical decision patterns.</p></div><div class="page-heading-actions"><button class="button secondary" data-refresh-page="recommendations" type="button"><i aria-hidden="true" data-lucide="refresh-cw"></i>Refresh</button></div></div>
 <div class="recommendation-highlight-grid">
 <article class="panel stability-hero-card">
 <div class="stability-hero-copy">
@@ -858,7 +931,6 @@
 <article class="panel chart-panel"><div class="panel-header"><div><span class="panel-label">Historical levels</span><h3>Recommendation history</h3></div><div class="chart-toolbar"><label class="compact-control">Range<select id="recommendations-history-range"><option value="30">Latest 30</option><option value="100">Latest 100</option><option value="all">All loaded</option></select></label><button aria-label="Reset recommendation chart" class="icon-button" data-reset-chart="recommendations-history-chart" type="button"><i aria-hidden="true" data-lucide="scan"></i></button></div></div><div class="chart-container"><canvas aria-label="Historical recommendation levels" id="recommendations-history-chart"></canvas></div><div class="panel-state hidden" id="recommendations-history-empty">No forecast history is available.</div></article>
 <article class="panel chart-panel"><div class="panel-header"><div><span class="panel-label">Operating margin</span><h3>Capacity utilization history</h3></div><button aria-label="Reset capacity chart" class="icon-button" data-reset-chart="recommendations-capacity-chart" type="button"><i aria-hidden="true" data-lucide="scan"></i></button></div><div class="chart-container"><canvas aria-label="Historical capacity utilization" id="recommendations-capacity-chart"></canvas></div><div class="panel-state hidden" id="recommendations-capacity-empty">No capacity values are available in saved forecasts.</div></article>
 </div>
-
 <article class="panel assistant-embedded-panel" id="recommendations-assistant-panel">
 <div class="panel-header assistant-panel-header">
 <div>
@@ -880,22 +952,21 @@
 <div aria-live="polite" class="assistant-messages assistant-messages-embedded" id="recommendations-assistant-messages"></div>
 <form class="assistant-composer" id="recommendations-assistant-form">
 <label class="sr-only" for="recommendations-assistant-input">Ask WATTZAN Assistant</label>
-<textarea id="recommendations-assistant-input" maxlength="3000" placeholder="Ask about forecasts, recommendations, municipalities, metrics, or system limitations…" required rows="3"></textarea>
+<textarea id="recommendations-assistant-input" maxlength="3000" placeholder="Ask about forecasts, recommendations, municipalities, metrics, or system limitations…" required="" rows="3"></textarea>
 <div class="assistant-composer-actions">
 <span class="assistant-input-hint">Enter to send · Shift+Enter for a new line</span>
 <div>
-<button class="button secondary small" data-assistant-clear type="button">Clear chat</button>
+<button class="button secondary small" data-assistant-clear="" type="button">Clear chat</button>
 <button class="button primary" type="submit"><i aria-hidden="true" data-lucide="send"></i>Send question</button>
 </div>
 </div>
 </form>
 <p class="assistant-privacy-note"><i aria-hidden="true" data-lucide="shield-check"></i><span>The assistant API key stays in the backend. Your question and a compact dashboard snapshot are processed securely to generate the answer.</span></p>
 </article>
-
 </section>
 <!-- FORECAST HISTORY -->
 <section aria-labelledby="history-heading" class="page-section" data-page="forecast-history" hidden="">
-<div class="page-heading-row"><div><p class="section-kicker">Saved outputs</p><h2 id="history-heading">Forecast history</h2><p class="page-description">Filter, inspect, compare, and remove saved one-day and seven-day recursive forecast records.</p></div><button class="button secondary" data-refresh-page="forecast-history" type="button"><i aria-hidden="true" data-lucide="refresh-cw"></i>Refresh history</button></div>
+<div class="page-heading-row"><div><p class="section-kicker">Saved outputs</p><h2 id="history-heading">Forecast history</h2><p class="page-description">Filter, inspect, compare, and remove saved one-day and seven-day recursive forecast records.</p></div><div class="page-heading-actions"><button class="button secondary" data-refresh-page="forecast-history" type="button"><i aria-hidden="true" data-lucide="refresh-cw"></i>Refresh</button></div></div>
 <article class="panel filter-panel">
 <form class="filter-grid" id="history-filter-form">
 <label class="field">Start date<input name="start_date" type="date"/></label>
@@ -903,7 +974,7 @@
 <label class="field">Demand level<select name="demand_level"><option value="">All levels</option><option>NORMAL</option><option>ELEVATED</option><option>HIGH</option><option>CRITICAL</option></select></label>
 <label class="field">Forecast type<select name="forecast_type"><option value="">All types</option><option value="one_day_ahead">One day ahead</option><option value="seven_day_recursive">Seven day recursive</option></select></label>
 <label class="field">Sort by<select id="history-sort-select"><option value="created_desc">Newest created</option><option value="date_asc">Forecast date ascending</option><option value="date_desc">Forecast date descending</option><option value="prediction_desc">Highest consumption</option><option value="utilization_desc">Highest capacity utilization</option></select></label>
-<div class="filter-actions"><button class="button primary" type="submit"><i aria-hidden="true" data-lucide="filter"></i>Apply filters</button><button class="button secondary" id="reset-history-filters" type="button">Reset</button></div>
+<div class="filter-actions"><button class="button primary" type="submit"><i aria-hidden="true" data-lucide="filter"></i>Apply</button><button class="button secondary" id="reset-history-filters" type="button">Reset</button></div>
 </form>
 </article>
 <div class="dashboard-grid two-thirds-grid history-chart-grid">
@@ -918,7 +989,7 @@
 </section>
 <!-- SYSTEM HEALTH -->
 <section aria-labelledby="system-heading" class="page-section" data-page="system-information" hidden="">
-<div class="page-heading-row"><div><p class="section-kicker">Technical status</p><h2 id="system-heading">System health</h2><p class="page-description">Backend availability, database connectivity, loaded production artifacts, model readiness, and scientifically important limitations.</p></div><button class="button secondary" data-refresh-page="system-information" type="button"><i aria-hidden="true" data-lucide="refresh-cw"></i>Refresh system</button></div>
+<div class="page-heading-row"><div><p class="section-kicker">Technical status</p><h2 id="system-heading">System health</h2><p class="page-description">Backend availability, database connectivity, loaded production artifacts, model readiness, and scientifically important limitations.</p></div><div class="page-heading-actions"><button class="button secondary" data-refresh-page="system-information" type="button"><i aria-hidden="true" data-lucide="refresh-cw"></i>Refresh</button></div></div>
 <div class="metric-grid system-metrics">
 <article class="metric-card key-card"><div class="metric-header"><span>Application</span><i aria-hidden="true" data-lucide="server"></i></div><strong class="metric-value compact" id="system-app-name">—</strong><p class="metric-footnote" id="system-app-version">—</p></article>
 <article class="metric-card"><div class="metric-header"><span>Database</span><i aria-hidden="true" data-lucide="database"></i></div><strong class="metric-value compact" id="system-database-status">—</strong></article>
@@ -933,7 +1004,6 @@
 <article class="panel"><div class="panel-header"><div><span class="panel-label">Model chronology</span><h3>Training and evaluation periods</h3></div></div><dl class="timeline-list"><div><dt>Training</dt><dd id="system-training-period">—</dd></div><div><dt>Validation</dt><dd id="system-validation-period">—</dd></div><div><dt>Test</dt><dd id="system-test-period">—</dd></div></dl></article>
 <article class="panel"><div class="panel-header"><div><span class="panel-label">Loaded files</span><h3>Production artifacts</h3></div></div><ul class="artifact-list" id="system-loaded-files"></ul><div class="panel-state hidden" id="system-loaded-files-empty">No loaded artifact file names were reported.</div></article>
 </div>
-
 </section>
 <!-- ABOUT -->
 <section aria-labelledby="about-heading" class="page-section about-page" data-page="about" hidden="">
@@ -945,18 +1015,17 @@
 </div>
 <div class="about-heading-badge"><i aria-hidden="true" data-lucide="sparkles"></i><span>Research-built system</span></div>
 </div>
-
 <section aria-labelledby="about-project-title" class="about-hero panel">
 <div class="about-hero-copy">
 <div class="about-project-lockup">
-<div aria-hidden="true" class="about-project-mark"><img alt="WATTZAN logo" src="/assets/wattzan-logo.jpg"/></div>
+<div aria-hidden="true" class="about-project-mark"><img alt="" src="/assets/wattzan-logo.jpg"/></div>
 <div><span class="panel-label">Electricity intelligence platform</span><h3 id="about-project-title">WATTZAN</h3></div>
 </div>
 <p>WATTZAN combines municipality-aware Multiple Linear Regression, municipality-specific SARIMA correction, hybrid forecasting, peak-demand estimation, capacity analysis, and structured recommendations in one interactive research dashboard.</p>
 <div class="about-chip-row">
 <span><i aria-hidden="true" data-lucide="map-pinned"></i>12 municipalities and city</span>
 <span><i aria-hidden="true" data-lucide="brain-circuit"></i>Hybrid MLR–SARIMA</span>
-<span><i aria-hidden="true" data-lucide="calendar-range"></i>2020–2024 baseline</span>
+<span><i aria-hidden="true" data-lucide="calendar-range"></i>2016–2026 map context</span>
 </div>
 </div>
 <div aria-hidden="true" class="about-energy-visual">
@@ -967,14 +1036,19 @@
 <span class="about-energy-node node-one"></span><span class="about-energy-node node-two"></span><span class="about-energy-node node-three"></span>
 </div>
 </section>
-
 <div class="about-stat-strip">
 <article><strong>12</strong><span>Local model scopes</span></article>
 <article><strong>3</strong><span>Core forecast outputs</span></article>
 <article><strong>7-day</strong><span>Recursive outlook</span></article>
 <article><strong>1</strong><span>Unified decision dashboard</span></article>
 </div>
-
+<article class="panel about-mlr-panel">
+<div class="panel-header"><div><span class="panel-label">MLR transparency</span><h3>Municipality-substituted MLR equations</h3><p class="panel-description">WATTZAN trains one pooled municipality-aware MLR pipeline. The 12 entries below are the municipality-substituted forms/effective intercepts used to explain that pooled model—not 12 independently fitted production regressions.</p></div><span class="status-badge normal">12 local forms</span></div>
+<div class="about-mlr-layout">
+<div class="table-wrapper"><table class="data-table compact-table"><thead><tr><th>Municipality / city</th><th>Effective β₀</th><th>Equation</th></tr></thead><tbody id="about-mlr-models-body"></tbody></table></div>
+<aside class="mlr-equation-inspector"><span class="panel-label">Selected equation</span><h4 id="about-mlr-selected-title">Select a municipality</h4><pre id="about-mlr-equation">The full substituted MLR equation will appear here.</pre><p>The numerical slope coefficients are shared by the pooled trained pipeline; municipality/category encoding changes the substituted constant and categorical contribution.</p></aside>
+</div>
+</article>
 <div class="dashboard-grid equal-grid about-grid">
 <article class="panel about-card about-card-accent">
 <div class="about-card-icon"><i aria-hidden="true" data-lucide="target"></i></div>
@@ -987,7 +1061,6 @@
 <dl class="about-profile-list"><div><dt>Researcher</dt><dd>Zander Nathan Deatras</dd></div><div><dt>Role</dt><dd>Researcher and Developer</dd></div><div><dt>Institution</dt><dd>Tacurong City National High School</dd></div><div><dt>Coverage</dt><dd>Sultan Kudarat, Philippines</dd></div></dl></div>
 </article>
 </div>
-
 <article class="panel about-workflow-panel">
 <div class="panel-header"><div><span class="panel-label">System architecture</span><h3>From location selection to decision support</h3></div><span class="about-live-indicator"><i></i>Four-stage workflow</span></div>
 <ol class="about-process-list about-process-horizontal">
@@ -997,7 +1070,6 @@
 <li><span>4</span><div><strong>Interpret output</strong><p>Review demand level, stability, reasons, recommendations, and planning charts.</p></div></li>
 </ol>
 </article>
-
 <div class="dashboard-grid equal-grid about-grid">
 <article class="panel about-card ownership-card">
 <div class="about-card-icon"><i aria-hidden="true" data-lucide="school"></i></div>
@@ -1017,13 +1089,12 @@
 <div class="modal-header"><div><span class="panel-label">Forecast record</span><h2 id="forecast-detail-title">Forecast details</h2></div><button aria-label="Close forecast details" class="icon-button" id="close-forecast-modal" type="button"><i aria-hidden="true" data-lucide="x"></i></button></div>
 <div class="modal-body" id="forecast-detail-content"></div>
 </dialog>
-
 <button aria-controls="assistant-popover" aria-expanded="false" aria-label="Open WATTZAN Assistant" class="assistant-launcher" id="assistant-launcher" type="button">
 <i aria-hidden="true" data-lucide="bot-message-square"></i>
 <span class="assistant-launcher-label">Assistant</span>
 <span aria-hidden="true" class="assistant-launcher-dot" id="assistant-launcher-dot"></span>
 </button>
-<aside aria-label="WATTZAN Assistant chat" class="assistant-popover" hidden id="assistant-popover">
+<aside aria-label="WATTZAN Assistant chat" class="assistant-popover" hidden="" id="assistant-popover">
 <div class="assistant-popover-header">
 <div class="assistant-brand">
 <span class="assistant-brand-icon"><i aria-hidden="true" data-lucide="bot"></i></span>
@@ -1043,15 +1114,15 @@
 <div aria-live="polite" class="assistant-messages assistant-messages-popup" id="assistant-popup-messages"></div>
 <form class="assistant-composer assistant-composer-popup" id="assistant-popup-form">
 <label class="sr-only" for="assistant-popup-input">Ask WATTZAN Assistant</label>
-<textarea id="assistant-popup-input" maxlength="3000" placeholder="Ask about the current WATTZAN outputs…" required rows="2"></textarea>
+<textarea id="assistant-popup-input" maxlength="3000" placeholder="Ask about the current WATTZAN outputs…" required="" rows="2"></textarea>
 <div class="assistant-composer-actions">
-<button class="text-button" data-assistant-clear type="button">Clear</button>
+<button class="text-button" data-assistant-clear="" type="button">Clear</button>
 <button aria-label="Send question" class="button primary small" type="submit"><i aria-hidden="true" data-lucide="send"></i>Send</button>
 </div>
 </form>
 <p class="assistant-privacy-note assistant-privacy-note-popup">Dashboard context is processed through the secure backend assistant service. The API key remains in FastAPI.</p>
 </aside>
-
+<div aria-hidden="true" class="route-zoom-transition" id="route-zoom-transition"><div class="route-zoom-core"><i data-lucide="zap"></i><span>Entering Tacurong Route Intelligence</span></div></div>
 <div aria-atomic="true" aria-live="polite" class="toast-region" id="toast-region"></div>
 </body>
 </html>

@@ -127,6 +127,8 @@ class ForecastCurrentDayRequest(BaseModel):
     target_date: date
     latitude: float | None = Field(default=None, ge=5.0, le=8.0)
     longitude: float | None = Field(default=None, ge=123.0, le=126.0)
+    bridge_weather_source: str | None = Field(default=None, max_length=500)
+    bridge_used_climatology_fallback: bool = False
     days: list[DailyWeatherInput] = Field(..., min_length=1, max_length=800)
 
     @field_validator("municipality")
@@ -156,6 +158,8 @@ class ForecastCurrentWeekRequest(BaseModel):
     target_start_date: date
     latitude: float | None = Field(default=None, ge=5.0, le=8.0)
     longitude: float | None = Field(default=None, ge=123.0, le=126.0)
+    bridge_weather_source: str | None = Field(default=None, max_length=500)
+    bridge_used_climatology_fallback: bool = False
     days: list[DailyWeatherInput] = Field(..., min_length=7, max_length=800)
 
     @field_validator("municipality")

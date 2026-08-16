@@ -104,6 +104,7 @@ def activate_dataset(dataset_id: str, session: Session = Depends(get_session)) -
     target.is_active = True
     session.add(target)
     session.commit()
+    preprocessing_service.invalidate_active_dataframe_cache()
     return {"dataset_id": dataset_id, "is_active": True}
 
 

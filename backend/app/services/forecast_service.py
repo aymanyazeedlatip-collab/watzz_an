@@ -31,7 +31,7 @@ from app.utils.logging_config import get_logger
 logger = get_logger(__name__)
 
 DATA_WARNING = (
-    "Hybrid research municipality-level model; Tacurong annual load anchors use original SUKELCO ledgers while daily profiles remain derived. "
+    "Research-grade synthetic municipality-level development model. "
     "Not official observed municipal utility or weather data."
 )
 
@@ -365,6 +365,7 @@ def run_seven_day_forecast(
     residual_forecasts = _to_array(residual_state.forecast(steps=7))
     daily_results: list[dict] = []
     forecast_ids: list[str] = []
+    feature_order = _model_feature_order(model_bundle)
 
     for index, day_input in enumerate(payload.days):
         lag_features, lag_metadata = feature_builder.get_lag_and_rolling_features_from_lookup(
@@ -375,7 +376,7 @@ def run_seven_day_forecast(
             profile=profile,
             day_input=day_input,
             lag_features=lag_features,
-            feature_order=_model_feature_order(model_bundle),
+            feature_order=feature_order,
         )
         mlr_prediction, sarima_prediction, hybrid_prediction, diagnostics = _prediction_components(
             bundle=model_bundle,
@@ -578,6 +579,7 @@ def run_current_day_scenario(
     residual_forecasts = _to_array(residual_state.forecast(steps=expected_total_days))
     bridge_days_count = max(0, expected_total_days - 1)
     target_result: dict | None = None
+    feature_order = _model_feature_order(model_bundle)
 
     for index, day_input in enumerate(payload.days):
         lag_features, lag_metadata = feature_builder.get_lag_and_rolling_features_from_lookup(
@@ -588,7 +590,7 @@ def run_current_day_scenario(
             profile=profile,
             day_input=day_input,
             lag_features=lag_features,
-            feature_order=_model_feature_order(model_bundle),
+            feature_order=feature_order,
         )
         mlr_prediction, sarima_prediction, hybrid_prediction, diagnostics = _prediction_components(
             bundle=model_bundle,
@@ -622,6 +624,8 @@ def run_current_day_scenario(
             "bridge_start_date": expected_start.isoformat(),
             "bridge_days_before_target": bridge_days_count,
             "target_date": payload.target_date.isoformat(),
+            "bridge_weather_source": payload.bridge_weather_source,
+            "bridge_used_climatology_fallback": payload.bridge_used_climatology_fallback,
         }
         session.add(
             ForecastRecord(
@@ -662,6 +666,8 @@ def run_current_day_scenario(
             "bridge_end_date": (payload.target_date - timedelta(days=1)).isoformat() if bridge_days_count else None,
             "bridge_days_count": bridge_days_count,
             "base_model_state_date": model_last_date.isoformat(),
+            "bridge_weather_source": payload.bridge_weather_source,
+            "bridge_used_climatology_fallback": payload.bridge_used_climatology_fallback,
             "mlr_prediction_kwh": round(mlr_prediction, 2),
             "sarima_prediction_kwh": round(sarima_prediction, 2),
             "hybrid_prediction_kwh": round(hybrid_prediction, 2),
@@ -683,8 +689,12 @@ def run_current_day_scenario(
             "forecast_limitation": (
                 f"This one-day scenario recursively bridged {bridge_days_count} missing day(s) "
                 "using model predictions and date-matched weather rather than observed electricity "
-                "consumption. Error can accumulate across a long bridge. Upload actual municipal "
-                "electricity history for stronger research or operational validity."
+                "consumption. Error can accumulate across a long bridge. "
+                + (
+                    "Historical bridge weather used WATTZAN monthly climatology because the live archive service exceeded the fast-response budget. "
+                    if payload.bridge_used_climatology_fallback else ""
+                )
+                + "Upload actual municipal electricity history for stronger research or operational validity."
             ),
             "lag_dates_based_on_predictions": lag_metadata["lag_dates_based_on_predictions"],
             "diagnostics": diagnostics or None,
@@ -767,6 +777,7 @@ def run_current_week_scenario(
     daily_results: list[dict] = []
     forecast_ids: list[str] = []
     bridge_days_count = max(0, (payload.target_start_date - expected_start).days)
+    feature_order = _model_feature_order(model_bundle)
 
     for index, day_input in enumerate(payload.days):
         lag_features, lag_metadata = feature_builder.get_lag_and_rolling_features_from_lookup(
@@ -777,7 +788,7 @@ def run_current_week_scenario(
             profile=profile,
             day_input=day_input,
             lag_features=lag_features,
-            feature_order=_model_feature_order(model_bundle),
+            feature_order=feature_order,
         )
         mlr_prediction, sarima_prediction, hybrid_prediction, diagnostics = _prediction_components(
             bundle=model_bundle,
@@ -812,6 +823,8 @@ def run_current_week_scenario(
             "bridge_start_date": expected_start.isoformat(),
             "bridge_days_before_target": bridge_days_count,
             "target_start_date": payload.target_start_date.isoformat(),
+            "bridge_weather_source": payload.bridge_weather_source,
+            "bridge_used_climatology_fallback": payload.bridge_used_climatology_fallback,
         }
         session.add(
             ForecastRecord(
@@ -890,6 +903,8 @@ def run_current_week_scenario(
         ),
         "bridge_days_count": bridge_days_count,
         "base_model_state_date": model_last_date.isoformat(),
+        "bridge_weather_source": payload.bridge_weather_source,
+        "bridge_used_climatology_fallback": payload.bridge_used_climatology_fallback,
         "daily_forecasts": daily_results,
         "weekly_total_kwh": round(sum(values), 2),
         "weekly_average_kwh": round(float(np.mean(values)), 2),
@@ -903,9 +918,12 @@ def run_current_week_scenario(
         "forecast_limitation": (
             f"This seven-day scenario recursively bridged {bridge_days_count} missing day(s) "
             "using model predictions and date-matched weather rather than observed electricity "
-            "consumption. Error can accumulate substantially across a long bridge. For research "
-            "or operational use, upload actual municipal electricity history through the day "
-            "before the target week."
+            "consumption. Error can accumulate substantially across a long bridge. "
+            + (
+                "Historical bridge weather used WATTZAN monthly climatology because the live archive service exceeded the fast-response budget. "
+                if payload.bridge_used_climatology_fallback else ""
+            )
+            + "For research or operational use, upload actual municipal electricity history through the day before the target week."
         ),
         "expert_validation_required": True,
         "created_at": datetime.now(timezone.utc).isoformat(),

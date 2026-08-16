@@ -81,7 +81,14 @@ svg { flex: 0 0 auto; }
   padding: 16px 19px;
   border-bottom: 1px solid var(--border);
 }
-.brand-mark { width: 42px; height: 42px; border-radius: 9px; object-fit: cover; }
+.brand-mark {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid rgba(25, 72, 126, .12);
+}
 .brand-name { font-size: 18px; line-height: 1.1; font-weight: 800; letter-spacing: .065em; color: var(--navy); }
 .brand-subtitle { margin-top: 3px; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
 .sidebar-nav { padding: 14px 10px; display: grid; gap: 4px; overflow-y: auto; }
@@ -137,7 +144,12 @@ svg { flex: 0 0 auto; }
 /* ABOUT PAGE */
 .about-identity { display: grid; grid-template-columns: 76px minmax(0, 1fr); align-items: center; gap: 22px; margin-bottom: 18px; }
 .about-project-mark { width: 72px; height: 72px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 7px; background: var(--surface-alt); }
-.about-project-mark img { width: 58px; height: 58px; border-radius: 12px; object-fit: cover; }
+.about-project-mark img {
+  width: 62px;
+  height: 62px;
+  object-fit: contain;
+  border-radius: 12px;
+}
 .about-identity h3 { margin: 4px 0 8px; font-size: 26px; color: var(--navy); }
 .about-identity p, .about-card p { margin: 0; color: var(--muted); line-height: 1.7; }
 .about-grid { margin-top: 18px; }
@@ -1387,3 +1399,362 @@ button:focus-visible, input:focus-visible, select:focus-visible, .drop-zone:focu
 .recommendation-classification-card .recommendation-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .recommendation-classification-card .recommendation-stats > div:nth-child(odd) { border-left: 0; }
 .recommendation-classification-card .recommendation-stats > div:nth-child(n+3) { border-top: 1px solid var(--border); }
+
+/* ================================================================
+   WATTZAN Route Intelligence + 2026 light-interface refinement
+   ================================================================ */
+:root {
+  --radius: 12px;
+  --shadow: 0 8px 26px rgba(24, 58, 91, .07);
+  --surface-raised: rgba(255,255,255,.94);
+  --focus-ring: 0 0 0 4px rgba(47,134,213,.14);
+}
+body {
+  background:
+    radial-gradient(circle at 78% 8%, rgba(85,166,237,.09), transparent 28rem),
+    radial-gradient(circle at 22% 85%, rgba(128,99,244,.055), transparent 30rem),
+    var(--background);
+}
+.panel, .metric-card { border-radius: var(--radius); box-shadow: var(--shadow); }
+.panel { border-color: rgba(188,205,220,.76); background: var(--surface-raised); backdrop-filter: blur(12px); }
+.metric-card { transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.metric-card:hover { transform: translateY(-3px); border-color: #b8d6ec; box-shadow: 0 13px 34px rgba(24,58,91,.1); }
+.button, .icon-button, .nav-item, .nav-group-toggle, .nav-subitem, select, input, textarea { border-radius: 9px; }
+.button, .icon-button { transition: transform .16s ease, box-shadow .16s ease, background .16s ease, border-color .16s ease; }
+.button:hover:not(:disabled), .icon-button:hover:not(:disabled) { transform: translateY(-1px); }
+.button:focus-visible, .icon-button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.page-section.active { animation: wattzan-page-enter .32s cubic-bezier(.2,.8,.2,1); }
+@keyframes wattzan-page-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.topbar { background: rgba(255,255,255,.87); backdrop-filter: blur(15px); border-bottom-color: rgba(214,222,232,.72); }
+.sidebar { background: rgba(255,255,255,.96); backdrop-filter: blur(18px); }
+.sidebar-nav { gap: 6px; }
+.nav-item.active, .nav-subitem.active { box-shadow: 0 8px 22px rgba(30,90,168,.17); }
+.page-heading-row { margin-bottom: 20px; }
+.page-description { max-width: 880px; }
+.panel-header { gap: 16px; }
+.panel-description { max-width: 900px; }
+
+.overview-popup-actions { display: grid; gap: 8px; }
+.route-explore-button {
+  border: 1px solid rgba(128,99,244,.28);
+  background: linear-gradient(120deg, #f2f7ff, #f6f1ff);
+  color: #4e3aa8;
+  font-weight: 750;
+  box-shadow: 0 8px 20px rgba(78,58,168,.1);
+}
+.route-explore-button:hover { border-color: #8063f4; box-shadow: 0 12px 28px rgba(78,58,168,.15); }
+
+.weather-visual-panel { overflow: hidden; }
+.weather-chart-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+.weather-chart-card { min-width: 0; padding: 14px; border: 1px solid var(--border); border-radius: 12px; background: linear-gradient(180deg,#fff,#f8fbfe); }
+.weather-chart-card h4 { margin: 0 0 8px; color: var(--navy); font-size: 12px; letter-spacing: .015em; }
+.weather-chart-card .chart-container { min-height: 220px; }
+.longterm-weather-panel { margin: 16px 0; }
+
+.guided-workflow { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; margin: 0 0 18px; }
+.guided-workflow > div { position: relative; display: grid; grid-template-columns: 34px 1fr; grid-template-rows: auto auto; column-gap: 10px; padding: 13px; border: 1px solid var(--border); border-radius: 12px; background: rgba(255,255,255,.8); box-shadow: 0 4px 14px rgba(11,46,79,.04); }
+.guided-workflow span { grid-row: 1/3; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: var(--gradient); color: #fff; font-weight: 800; }
+.guided-workflow strong { color: var(--navy); font-size: 12px; }
+.guided-workflow small { color: var(--muted); font-size: 10px; }
+
+.route-page-heading { align-items: flex-end; }
+.route-source-badges { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.route-summary-metrics { grid-template-columns: repeat(4,minmax(0,1fr)); }
+.route-map-layout { grid-template-columns: minmax(0,2fr) minmax(300px,.72fr); align-items: stretch; }
+.route-map-panel { min-width: 0; overflow: hidden; }
+.route-map-header { align-items: flex-start; }
+.tacurong-route-map-shell { position: relative; min-height: 590px; border-radius: 14px; overflow: hidden; border: 1px solid #b7c9d9; background: #263442; }
+.tacurong-route-map { position: absolute; inset: 0; z-index: 1; }
+.tacurong-route-map .leaflet-tile-pane { filter: grayscale(1) brightness(.55) contrast(1.22) saturate(.25); }
+.tacurong-route-map .leaflet-control-zoom a { background: rgba(245,249,252,.92); color: #17324b; }
+.tacurong-route-map .leaflet-control-attribution { background: rgba(18,29,40,.72); color: #dce7ef; }
+.tacurong-route-map .leaflet-control-attribution a { color: #8ed0ff; }
+.route-map-hud { position: absolute; z-index: 500; top: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; pointer-events: none; }
+.route-map-hud span { display: flex; align-items: center; gap: 6px; padding: 7px 10px; border: 1px solid rgba(255,255,255,.16); border-radius: 999px; background: rgba(10,22,34,.73); color: #eef7ff; font-size: 10px; font-weight: 650; backdrop-filter: blur(10px); box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+.route-map-hud svg { width: 14px; }
+.route-map-legend { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+.route-legend-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 8px; border: 1px solid var(--border); border-radius: 999px; background: #fff; font-size: 10px; color: var(--muted); }
+.route-legend-chip i { width: 13px; height: 4px; border-radius: 999px; box-shadow: 0 0 8px currentColor; }
+.route-inspector-panel { align-self: stretch; }
+.route-detail-list { display: grid; gap: 0; margin: 14px 0; }
+.route-detail-list > div { display: grid; grid-template-columns: 1fr 1.15fr; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.route-detail-list dt { color: var(--muted); font-size: 11px; }
+.route-detail-list dd { margin: 0; color: var(--navy); font-size: 11px; font-weight: 700; text-align: right; overflow-wrap: anywhere; }
+.route-method-note { margin-top: 14px; }
+.route-chart-grid { margin-top: 16px; }
+.route-weather-panel, .route-table-panel { margin-top: 16px; }
+.route-table-panel tbody tr { cursor: pointer; transition: background .14s ease; }
+.route-table-panel tbody tr:hover { background: #eff7fd; }
+.route-table-panel tbody tr.selected-route-row { background: #e7f2fd; box-shadow: inset 3px 0 #2f86d5; }
+.route-status-chip { display: inline-flex; padding: 4px 7px; border-radius: 999px; font-size: 9px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.route-status-chip.observed { background: #edf7ef; color: #2f6b3c; }
+.route-status-chip.projected { background: #fff7e5; color: #8a5a00; }
+
+.route-zoom-transition { position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center; background: radial-gradient(circle at center, rgba(55,122,184,.58), rgba(8,24,39,.94) 58%); opacity: 0; pointer-events: none; transition: opacity .22s ease; }
+.route-zoom-transition.active { opacity: 1; }
+.route-zoom-core { position: relative; display: grid; place-items: center; gap: 14px; color: #fff; font-weight: 750; letter-spacing: .02em; }
+.route-zoom-core::before, .route-zoom-core::after { content: ""; position: absolute; width: 120px; height: 120px; border: 1px solid rgba(132,205,255,.65); border-radius: 50%; animation: route-zoom-ring .9s ease-out infinite; }
+.route-zoom-core::after { animation-delay: .28s; }
+.route-zoom-core svg { width: 48px; height: 48px; filter: drop-shadow(0 0 18px #5cb8ff); }
+@keyframes route-zoom-ring { from { transform: scale(.4); opacity: 1; } to { transform: scale(2.2); opacity: 0; } }
+
+.about-mlr-panel { margin-top: 14px; }
+.about-mlr-layout { display: grid; grid-template-columns: minmax(0,1.25fr) minmax(320px,.75fr); gap: 16px; align-items: start; }
+.compact-table td, .compact-table th { padding: 9px 10px; }
+.mlr-equation-inspector { position: sticky; top: calc(var(--topbar-height) + 18px); padding: 16px; border: 1px solid var(--border); border-radius: 12px; background: linear-gradient(180deg,#f7fbff,#fff); }
+.mlr-equation-inspector h4 { margin: 4px 0 10px; color: var(--navy); }
+.mlr-equation-inspector pre { max-height: 350px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; padding: 13px; border-radius: 10px; background: #102a43; color: #e6f3ff; font: 10px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; }
+.mlr-equation-inspector p { color: var(--muted); font-size: 10px; }
+.mlr-model-button { border: 0; background: transparent; color: var(--blue); cursor: pointer; font: inherit; font-size: 10px; font-weight: 750; text-decoration: underline; text-underline-offset: 2px; }
+
+.leaflet-interactive.route-glow-line { filter: drop-shadow(0 0 4px currentColor) drop-shadow(0 0 8px currentColor); }
+
+@media (max-width: 1180px) {
+  .route-summary-metrics { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .route-map-layout, .about-mlr-layout { grid-template-columns: 1fr; }
+  .mlr-equation-inspector { position: static; }
+}
+@media (max-width: 900px) {
+  .weather-chart-grid, .guided-workflow { grid-template-columns: 1fr; }
+  .route-map-hud { flex-direction: column; align-items: center; }
+  .tacurong-route-map-shell { min-height: 500px; }
+}
+@media (max-width: 680px) {
+  .route-summary-metrics { grid-template-columns: 1fr; }
+  .route-source-badges { justify-content: flex-start; }
+  .tacurong-route-map-shell { min-height: 430px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-section.active, .route-zoom-core::before, .route-zoom-core::after { animation: none !important; }
+  .route-zoom-transition, .metric-card, .button, .icon-button { transition: none !important; }
+}
+
+/* ================================================================
+   WATTZAN v16.2.3 — road-aligned Tacurong electrical grid
+   ================================================================ */
+.page-heading-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 18px;
+}
+.page-heading-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-width: max-content;
+}
+.page-heading-actions > .button.secondary {
+  min-height: 38px;
+  padding-inline: 13px;
+  background: #fff;
+}
+.button {
+  min-height: 42px;
+  gap: 8px;
+  font-weight: 730;
+}
+.button.small { min-height: 36px; }
+.icon-button { width: 40px; height: 40px; flex: 0 0 40px; }
+.panel-header > .chart-toolbar {
+  margin-left: auto;
+  align-self: flex-start;
+  padding: 4px;
+  border: 1px solid #d8e3ec;
+  border-radius: 11px;
+  background: #f7fafc;
+}
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 16px;
+  margin-top: 18px;
+  border-top: 1px solid var(--border);
+}
+.form-actions .button.primary { min-width: 160px; }
+.form-actions .form-status { margin: 0; flex: 1; }
+.weather-automation-actions { display: grid; grid-template-columns: .82fr 1.18fr; gap: 9px; }
+.overview-popup-actions .button:first-child { order: 1; }
+.overview-popup-actions .route-explore-button { order: 2; }
+.segmented-control { padding: 4px; border-radius: 11px; background: #eef4f8; border: 1px solid #dbe5ed; }
+.segment { min-height: 36px; padding-inline: 16px; border-radius: 8px; font-weight: 750; }
+
+/* Route map: quieter basemap and a shared grid rather than overlapping neon spokes. */
+.tacurong-route-map-shell { background: #3a4751; }
+.tacurong-route-map .leaflet-tile-pane { filter: grayscale(1) brightness(.73) contrast(1.08) saturate(.18); }
+.leaflet-interactive.route-grid-backbone { filter: drop-shadow(0 0 2px rgba(19,38,53,.35)); }
+.leaflet-interactive.route-grid-route { transition: opacity .16s ease, stroke-width .16s ease; }
+.leaflet-interactive.route-selected-fallback { filter: drop-shadow(0 0 4px currentColor); }
+.leaflet-interactive.route-selected-road-line { filter: drop-shadow(0 0 3px currentColor) drop-shadow(0 0 7px currentColor); }
+.route-map-hud { top: 10px; }
+.route-map-hud span { background: rgba(20,32,43,.78); }
+.route-map-legend { align-items: center; }
+.route-legend-chip i { box-shadow: none; }
+.route-legend-note { margin-left: auto; color: #536779; background: #f7fafc; }
+
+.route-inspector-panel { display: flex; flex-direction: column; }
+.route-select-field { margin-top: 4px; }
+.route-select-field select { min-height: 44px; font-weight: 700; }
+.route-history-details { margin-bottom: 16px; }
+.route-forecast-actions { display: grid; gap: 8px; margin-top: auto; padding-top: 12px; }
+.route-forecast-actions .button.primary { min-height: 48px; font-size: 12px; }
+.route-forecast-actions .button.is-loading { position: relative; pointer-events: none; }
+.route-forecast-actions .button.is-loading::after {
+  content: "";
+  width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%;
+  animation: wattzan-route-spin .7s linear infinite;
+}
+@keyframes wattzan-route-spin { to { transform: rotate(360deg); } }
+.route-forecast-status {
+  margin-top: 10px;
+  min-height: 42px;
+  padding: 10px 11px;
+  border: 1px solid #dbe6ef;
+  border-radius: 10px;
+  background: #f7fafc;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+.route-forecast-summary {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #bcd8ee;
+  border-radius: 11px;
+  background: linear-gradient(145deg,#f4faff,#fff);
+}
+.route-forecast-summary > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.route-forecast-summary span { color: var(--muted); font-size: 10px; }
+.route-forecast-summary strong { color: var(--navy); font-size: 11px; text-align: right; }
+.route-forecast-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 155px;
+  margin-top: 16px;
+  border-style: dashed;
+  background: #fbfdff;
+  text-align: left;
+}
+.route-forecast-empty .route-empty-icon {
+  width: 48px; height: 48px; display: grid; place-items: center; border-radius: 14px;
+  background: #eaf4fc; color: var(--blue);
+}
+.route-forecast-empty strong { color: var(--navy); }
+.route-forecast-empty p { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
+.route-forecast-results { scroll-margin-top: calc(var(--topbar-height) + 18px); }
+.route-method-note { margin-top: 12px; }
+
+/* Keep page-level controls predictable on every tab. */
+.upload-panel .form-actions,
+.long-term-controls-panel .form-actions,
+.form-panel .form-actions { justify-content: flex-start; }
+.filter-grid + .form-actions,
+.history-filters .form-actions { flex-wrap: wrap; }
+.text-button { min-height: 34px; padding: 6px 9px; border-radius: 8px; }
+
+@media (max-width: 900px) {
+  .page-heading-row { grid-template-columns: 1fr; }
+  .page-heading-actions { justify-content: flex-start; min-width: 0; }
+  .weather-automation-actions { grid-template-columns: 1fr; }
+  .route-legend-note { width: 100%; margin-left: 0; }
+}
+#shortterm-fetch-run-button { order: 1; }
+#shortterm-fetch-weather-button { order: 2; }
+
+
+/* ================================================================
+   WATTZAN v16.2.3 — brighter road-aligned Tacurong route grid
+   ================================================================ */
+.tacurong-route-map-shell { background: #25323d; border-color: #91a7b8; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 14px 38px rgba(18,39,56,.12); }
+.tacurong-route-map .leaflet-tile-pane { filter: grayscale(1) brightness(.61) contrast(1.17) saturate(.08); }
+.leaflet-interactive.route-grid-backbone { filter: drop-shadow(0 0 3px rgba(0,217,255,.7)) drop-shadow(0 0 8px rgba(0,217,255,.32)); }
+.leaflet-interactive.route-road-grid-route,
+.leaflet-interactive.route-grid-route { filter: drop-shadow(0 0 2px currentColor) drop-shadow(0 0 5px currentColor); transition: opacity .14s ease, stroke-width .14s ease; }
+.leaflet-interactive.route-selected-road-line { filter: drop-shadow(0 0 3px currentColor) drop-shadow(0 0 8px currentColor) drop-shadow(0 0 14px currentColor); }
+.leaflet-interactive.route-selected-halo { filter: drop-shadow(0 0 5px rgba(255,255,255,.8)); }
+.route-map-hud span { background: rgba(8,20,30,.88); border-color: rgba(143,220,255,.28); box-shadow: 0 8px 26px rgba(0,0,0,.28); }
+.route-legend-chip i { box-shadow: 0 0 5px currentColor, 0 0 9px color-mix(in srgb,currentColor 55%,transparent); }
+
+
+/* ================================================================
+   WATTZAN v16.2.4 — utility-map Tacurong network styling
+   Reference direction: dark utility basemap + crisp shared grid hierarchy.
+   ================================================================ */
+.tacurong-route-map-shell {
+  min-height: 620px;
+  background: #0b1016;
+  border-color: #263442;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.045), 0 18px 42px rgba(9,22,33,.2);
+}
+.tacurong-route-map .leaflet-tile-pane {
+  filter: brightness(.78) contrast(1.12) saturate(.58);
+}
+.tacurong-route-map.route-map-osm-fallback .leaflet-tile-pane {
+  filter: grayscale(1) invert(.9) hue-rotate(180deg) brightness(.52) contrast(1.2) saturate(.18);
+}
+.route-network-key {
+  position: absolute;
+  z-index: 520;
+  top: 76px;
+  left: 14px;
+  width: 190px;
+  display: grid;
+  gap: 7px;
+  padding: 12px 13px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 9px;
+  background: rgba(6,10,15,.9);
+  color: #f7fbff;
+  box-shadow: 0 12px 30px rgba(0,0,0,.34);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+.route-network-key strong { font-size: 10px; letter-spacing: .02em; }
+.route-network-key span { display: grid; grid-template-columns: 30px 1fr; align-items: center; gap: 8px; font-size: 9px; color: #d5dce4; }
+.route-network-key small { margin-top: 3px; color: #8e9aa6; font-size: 8px; line-height: 1.35; }
+.grid-key-line { display: block; height: 2px; border-radius: 999px; box-shadow: 0 0 4px currentColor; }
+.grid-key-primary { height: 4px; background: #ffd166; color: #ffd166; }
+.grid-key-feeder { height: 3px; background: #ff9f7a; color: #ff9f7a; }
+.grid-key-distribution { background: #ef6f9b; color: #ef6f9b; }
+.grid-key-local { height: 1px; background: #7868d8; color: #7868d8; }
+.route-map-hud { left: auto; right: 12px; transform: none; flex-direction: column; align-items: flex-end; }
+.route-map-hud span { background: rgba(6,10,15,.88); border-color: rgba(255,255,255,.12); color: #eef3f8; }
+.leaflet-interactive.utility-grid-segment { filter: drop-shadow(0 0 2px currentColor); }
+.leaflet-interactive.utility-tier-primary { filter: drop-shadow(0 0 2px rgba(255,209,102,.8)) drop-shadow(0 0 6px rgba(255,209,102,.3)); }
+.leaflet-interactive.utility-tier-feeder { filter: drop-shadow(0 0 2px rgba(255,159,122,.6)); }
+.leaflet-interactive.route-service-branch { filter: drop-shadow(0 0 2px currentColor); }
+.leaflet-interactive.route-selected-road-line {
+  filter: drop-shadow(0 0 3px currentColor) drop-shadow(0 0 7px currentColor) drop-shadow(0 0 12px currentColor);
+}
+.route-map-legend { margin-top: 10px; }
+.route-legend-line.utility-tier-primary { height: 4px; }
+.route-legend-line.utility-tier-feeder { height: 3px; }
+.route-legend-line.utility-tier-distribution { height: 2px; }
+.route-legend-line.utility-tier-local { height: 1px; }
+@media (max-width: 720px) {
+  .route-network-key { top: 76px; left: 10px; width: 165px; padding: 10px; }
+  .route-map-hud { right: 8px; }
+  .route-map-hud span:first-child { display: none; }
+}
+
+
+/* ================================================================
+   WATTZAN v16.2.7 — visible darkened OSM basemap + seasonal planning polish
+   ================================================================ */
+.tacurong-route-map.route-map-osm-primary .leaflet-tile-pane {
+  filter: grayscale(.68) brightness(.52) contrast(1.08) saturate(.38);
+  opacity: .90;
+}
+.tacurong-route-map.route-map-dark-fallback .leaflet-tile-pane {
+  filter: brightness(.84) contrast(1.08) saturate(.55);
+  opacity: .92;
+}
+.leaflet-interactive.utility-grid-segment { opacity: 1; }
+.leaflet-interactive.utility-tier-primary { filter: drop-shadow(0 0 3px rgba(255,209,102,.92)) drop-shadow(0 0 8px rgba(255,209,102,.42)); }
+.leaflet-interactive.utility-tier-feeder { filter: drop-shadow(0 0 3px rgba(255,159,122,.78)) drop-shadow(0 0 6px rgba(255,159,122,.32)); }

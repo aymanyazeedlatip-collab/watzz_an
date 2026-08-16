@@ -1,0 +1,9 @@
+WATTZAN v16.2.7 - LOCAL START
+
+1. Extract this ZIP completely.
+2. Double-click CLICK_TO_RUN_WATTZAN.bat.
+3. On the first run, stay connected to the internet while packages install.
+4. The browser opens automatically when the server is ready.
+5. Keep the black WATTZAN window open while using the site.
+
+Designed for Windows with CPython 3.14.x (including 3.14.5).

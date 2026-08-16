@@ -4,6 +4,7 @@ from __future__ import annotations
 import uuid
 from io import BytesIO
 from pathlib import Path
+from threading import RLock
 
 import pandas as pd
 from sqlmodel import Session, select
@@ -19,8 +20,33 @@ DEFAULT_DATASET_FILENAME = "wattzan_municipality_model_dataset.csv"
 TARGET_COLUMN = "consumption_kwh"
 COVERAGE_AREA = "12 municipalities/city, Sultan Kudarat, Philippines"
 DATA_CLASSIFICATION = (
-    "HYBRID RESEARCH DATASET / ORIGINAL SUKELCO TACURONG ANNUAL ANCHORS + DERIVED/MODELED DAILY MUNICIPALITY DATA"
+    "RESEARCH-GRADE SYNTHETIC MUNICIPALITY-LEVEL DATA / NOT OFFICIAL OBSERVED DAILY UTILITY DATA"
 )
+
+# Parsing the 20k+ row active CSV on every API request adds avoidable latency,
+# especially on Vercel where an uploaded dataset may live in Postgres as bytes.
+# Keep one immutable parsed dataframe per warm process and invalidate it whenever
+# the active dataset changes. Callers already copy/filter before mutating it.
+_ACTIVE_FRAME_CACHE_LOCK = RLock()
+_ACTIVE_FRAME_CACHE_KEY: tuple | None = None
+_ACTIVE_FRAME_CACHE: pd.DataFrame | None = None
+
+
+def invalidate_active_dataframe_cache() -> None:
+    global _ACTIVE_FRAME_CACHE_KEY, _ACTIVE_FRAME_CACHE
+    with _ACTIVE_FRAME_CACHE_LOCK:
+        _ACTIVE_FRAME_CACHE_KEY = None
+        _ACTIVE_FRAME_CACHE = None
+
+
+def _active_record_cache_key(record: DatasetRecord) -> tuple:
+    return (
+        record.id,
+        record.stored_file_name,
+        int(record.row_count or 0),
+        record.uploaded_at.isoformat() if record.uploaded_at else None,
+        len(record.file_content) if record.file_content else 0,
+    )
 
 
 def ensure_default_dataset_registered(session: Session) -> None:
@@ -41,6 +67,7 @@ def ensure_default_dataset_registered(session: Session) -> None:
             existing_default.is_active = True
             session.add(existing_default)
             session.commit()
+            invalidate_active_dataframe_cache()
         return
 
     frame = pd.read_csv(default_path)
@@ -66,6 +93,7 @@ def ensure_default_dataset_registered(session: Session) -> None:
     )
     session.add(record)
     session.commit()
+    invalidate_active_dataframe_cache()
     logger.info("Registered municipality default dataset (%d rows).", len(frame))
 
 
@@ -80,9 +108,18 @@ def resolve_dataset_path(record: DatasetRecord) -> Path:
 
 
 def load_active_dataframe(session: Session) -> tuple[pd.DataFrame | None, DatasetRecord | None]:
+    global _ACTIVE_FRAME_CACHE_KEY, _ACTIVE_FRAME_CACHE
+
     record = get_active_dataset_record(session)
     if record is None:
+        invalidate_active_dataframe_cache()
         return None, None
+
+    cache_key = _active_record_cache_key(record)
+    with _ACTIVE_FRAME_CACHE_LOCK:
+        if _ACTIVE_FRAME_CACHE_KEY == cache_key and _ACTIVE_FRAME_CACHE is not None:
+            return _ACTIVE_FRAME_CACHE, record
+
     if record.file_content:
         frame = pd.read_csv(BytesIO(record.file_content))
     else:
@@ -94,6 +131,10 @@ def load_active_dataframe(session: Session) -> tuple[pd.DataFrame | None, Datase
     frame["date"] = pd.to_datetime(frame["date"], errors="coerce")
     sort_columns = [column for column in ["municipality", "date"] if column in frame.columns]
     frame = frame.sort_values(sort_columns).reset_index(drop=True)
+
+    with _ACTIVE_FRAME_CACHE_LOCK:
+        _ACTIVE_FRAME_CACHE_KEY = cache_key
+        _ACTIVE_FRAME_CACHE = frame
     return frame, record
 
 

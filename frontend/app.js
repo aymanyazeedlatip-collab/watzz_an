@@ -8,6 +8,7 @@
     overview: "Overview",
     forecast: "Short-term Forecast",
     "long-term-forecast": "Long-term Forecast",
+    "tacurong-routes": "Tacurong Route Intelligence",
     "data-management": "Data Management",
     "model-performance": "Model Performance",
     recommendations: "Recommendations",
@@ -61,6 +62,51 @@
   ]);
 
   const OVERVIEW_MAP_ASSET = "/assets/sultan-kudarat-municipalities.json";
+  const PLANNING_DATA_ASSET = "/assets/wattzan-planning-data.json";
+  const ROUTE_FORECAST_END_YEAR = 2034;
+  const ROUTE_COLOR_SATURATION = 72;
+  const TACURONG_OVERPASS_ENDPOINTS = [
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter",
+  ];
+  const TACURONG_STREET_CACHE_KEY = "wattzan-tacurong-utility-network-v1624";
+  const TACURONG_ROUTE_MAP_VIEW = { center: [6.6884, 124.6786], zoom: 13 };
+  const TACURONG_GRID_HUB = [6.6918, 124.6774];
+  const TACURONG_GRID_CORRIDORS = [
+    // Offline fallback only. These corridors are shaped to the principal Tacurong street/highway axes;
+    // when the online OSM road graph is available, every route is snapped to the real road network instead.
+    [[6.7240,124.6650],[6.7145,124.6674],[6.7058,124.6701],[6.6992,124.6724],[6.6942,124.6749],[6.6918,124.6774],[6.6868,124.6780],[6.6800,124.6782],[6.6726,124.6771],[6.6630,124.6755],[6.6535,124.6723]],
+    [[6.6918,124.6774],[6.6922,124.6840],[6.6928,124.6910],[6.6925,124.6985],[6.6918,124.7060],[6.6890,124.7135]],
+    [[6.6918,124.6774],[6.6900,124.6710],[6.6880,124.6640],[6.6850,124.6570],[6.6810,124.6500]],
+    [[6.6992,124.6724],[6.7045,124.6810],[6.7088,124.6900],[6.7120,124.7000],[6.7150,124.7090]],
+    [[6.6868,124.6780],[6.6815,124.6860],[6.6760,124.6945],[6.6700,124.7030],[6.6640,124.7110]],
+    [[6.6800,124.6782],[6.6750,124.6695],[6.6690,124.6610],[6.6620,124.6540]],
+    [[6.7058,124.6701],[6.7090,124.6610],[6.7115,124.6525],[6.7080,124.6460]],
+    [[6.6922,124.6840],[6.6980,124.6865],[6.7030,124.6890],[6.7075,124.6950]],
+    [[6.6880,124.6640],[6.6940,124.6590],[6.7000,124.6540],[6.7070,124.6500]],
+    [[6.6760,124.6945],[6.6780,124.7020],[6.6810,124.7095],[6.6860,124.7160]],
+    [[6.6726,124.6771],[6.6680,124.6840],[6.6640,124.6910],[6.6600,124.6990]],
+  ];
+  const TACURONG_FALLBACK_ENDPOINTS = [[6.718,124.666],[6.712,124.706],[6.687,124.714],[6.653,124.700],[6.647,124.676],[6.657,124.650],[6.708,124.648],[6.733,124.662]];
+  const TACURONG_ZONE_COLORS = [
+    { name: "North", color: "#14b8a6" }, { name: "Northeast", color: "#8b5cf6" },
+    { name: "East", color: "#f59e0b" }, { name: "Southeast", color: "#ef6a5b" },
+    { name: "South", color: "#ec4899" }, { name: "Southwest", color: "#22a06b" },
+    { name: "West", color: "#2f86d5" }, { name: "Northwest", color: "#6366f1" },
+  ];
+  // Approximate planning anchors only. The real streets/labels/landmarks come from OpenStreetMap;
+  // the supplied SUKELCO route ledgers do not contain conductor GIS coordinates.
+  const TACURONG_ROUTE_ANCHORS = {
+    "POBLACION": [6.6918, 124.6768], "POB": [6.6918, 124.6768], "NAT'L": [6.6936, 124.6813], "HIGHWAY": [6.6936, 124.6813],
+    "LEDESMA": [6.6877, 124.6755], "BONIFACIO": [6.6925, 124.6732], "MABINI": [6.6901, 124.6787], "MALVAR": [6.6867, 124.6802],
+    "LAPU": [6.6892, 124.6715], "GEN. LUNA": [6.6940, 124.6844], "PUBLIC MARKET": [6.6920, 124.6775], "PUB MKT": [6.6920, 124.6775],
+    "GANSING": [6.7040, 124.6750], "CAYAMBANAN": [6.7130, 124.6990], "SAN EMMANUEL": [6.7205, 124.6625], "BARAS": [6.6575, 124.7040],
+    "RAJAHMUDA": [6.6700, 124.7160], "RAJAH MUDA": [6.6700, 124.7160], "NEW PASSI": [6.7290, 124.6920], "SAN ANTONIO": [6.6650, 124.6600],
+    "SAN RAFAEL": [6.6455, 124.6840], "NEW LAGAO": [6.6810, 124.7135], "NEW ISABELA": [6.6725, 124.6755], "NEW ISABEL": [6.6725, 124.6755],
+    "KALANDAGAN": [6.7015, 124.6875], "CALEAN": [6.6500, 124.6670], "SAN PABLO": [6.6820, 124.6510], "KATUNGAL": [6.7370, 124.6640],
+    "BUENAFLOR": [6.7190, 124.7150], "CARMEN": [6.7100, 124.6470], "TINA": [6.6745, 124.6425], "LIWAYWAY": [6.6860, 124.7000],
+    "LANC HETA": [6.6990, 124.7060], "LANCHETA": [6.6990, 124.7060], "APILADO": [6.7075, 124.6595], "SALUKAG": [6.6980, 124.7210]
+  };
   const OVERVIEW_MAP_VIEWBOX = { width: 920, height: 640 };
   const OVERVIEW_MAP_COLORS = ["#ffffff", "#bfdbfe", "#60a5fa", "#3b82f6", "#2563eb", "#3451d1", "#4f46e5"];
   const SVG_NS = "http://www.w3.org/2000/svg";
@@ -83,6 +129,7 @@
     activeDataset: null,
     municipalityProfiles: [],
     dataSummary: null,
+    planningData: null,
     history: [],
     filteredHistory: [],
     selectedFile: null,
@@ -109,7 +156,6 @@
       cameraInitialized: false,
       decorations: [],
       autoRotateFrame: null,
-      lastError: null,
     },
     shortTerm: {
       map: null,
@@ -121,6 +167,21 @@
       weatherRows: [],
       weatherLoading: false,
       weatherCache: new Map(),
+    },
+    routes: {
+      map: null,
+      layers: [],
+      selectedRouteNo: null,
+      mapYear: null,
+      tableYear: 2025,
+      forecastReady: false,
+      forecastLoading: false,
+      roadGeometry: new Map(),
+      streetPaths: new Map(),
+      streetGridSegments: [],
+      streetNetworkPromise: null,
+      streetNetworkReady: false,
+      roadRequestSequence: 0,
     },
     longTerm: {
       map: null,
@@ -513,6 +574,12 @@
     else chart.reset();
   }
 
+  function destroyChart(canvasId) {
+    const chart = state.charts.get(canvasId);
+    if (chart) chart.destroy();
+    state.charts.delete(canvasId);
+  }
+
   function makeDataset(label, data, color, options = {}) {
     return {
       label,
@@ -609,7 +676,7 @@
   }
 
   const NAV_GROUP_PAGES = {
-    forecast: new Set(["forecast", "long-term-forecast", "forecast-history"]),
+    forecast: new Set(["forecast", "long-term-forecast", "tacurong-routes", "forecast-history"]),
     system: new Set(["system-information", "model-performance", "data-management"]),
   };
 
@@ -725,6 +792,10 @@
     if (page === "forecast" && state.shortTerm.map) {
       window.setTimeout(() => state.shortTerm.map.invalidateSize(), 80);
     }
+    if (page === "tacurong-routes") {
+      renderTacurongRoutes();
+      window.setTimeout(() => state.routes.map?.invalidateSize(), 90);
+    }
     if (page === "overview" && state.overviewMap.renderer) {
       window.setTimeout(() => {
         resizeOverview3DRenderer();
@@ -745,6 +816,7 @@
       dataSummary: apiFetch("/data/summary"),
       history: apiFetch("/forecast/history?limit=1000"),
       overviewMapGeometry: loadOverviewMapGeometry(),
+      planningData: loadPlanningData(),
     };
     const entries = Object.entries(calls);
     const settled = await Promise.allSettled(entries.map(([, promise]) => promise));
@@ -752,7 +824,7 @@
     settled.forEach((result, index) => {
       const key = entries[index][0];
       if (result.status === "fulfilled") {
-        if (key !== "overviewMapGeometry") successCount += 1;
+        if (!["overviewMapGeometry", "planningData"].includes(key)) successCount += 1;
         if (key === "history") state.history = result.value.forecasts || [];
         else if (key === "municipalityProfiles") state.municipalityProfiles = result.value.municipalities || [];
         else if (key === "overviewMapGeometry") state.overviewMap.geometry = result.value;
@@ -785,6 +857,9 @@
     renderRecommendations();
     renderHistory();
     renderSystemInformation();
+    renderAboutMlrModels();
+    renderTacurongRoutes();
+    renderShortTermWeatherCharts();
     renderAssistantMessages();
     populateForecastMunicipalitySelects();
     prefillForecastDates();
@@ -803,6 +878,8 @@
         await Promise.all([refreshSummary(), refreshActiveDataset()]);
         prefillLongTermForm();
         if (state.longTerm.projection) renderLongTermProjection(state.longTerm.projection);
+      } else if (page === "tacurong-routes") {
+        renderTacurongRoutes();
       } else if (page === "data-management") {
         await Promise.all([refreshActiveDataset(), refreshSummary()]);
         renderDataManagement();
@@ -865,11 +942,21 @@
     return element;
   }
 
+  async function loadPlanningData() {
+    const response = await fetch(PLANNING_DATA_ASSET, { cache: "no-store" });
+    if (!response.ok) throw new Error(`Planning data could not be loaded (${response.status}).`);
+    return response.json();
+  }
+
   function overviewMapYears() {
-    const byMunicipality = state.dataSummary?.annual_consumption_by_municipality_kwh || {};
     const years = new Set();
+    const byMunicipality = state.dataSummary?.annual_consumption_by_municipality_kwh || {};
     Object.values(byMunicipality).forEach((values) => Object.keys(values || {}).forEach((year) => years.add(String(year))));
-    return [...years].sort((a, b) => Number(a) - Number(b));
+    const planning = state.planningData?.municipality_consumption_annual || {};
+    Object.values(planning).forEach((values) => Object.keys(values || {}).forEach((year) => {
+      if (Number(year) <= 2026) years.add(String(year));
+    }));
+    return [...years].filter((year) => Number(year) >= 2016 && Number(year) <= 2026).sort((a, b) => Number(a) - Number(b));
   }
 
   function populateOverviewMapYears() {
@@ -886,13 +973,26 @@
   }
 
   function municipalityAnnualValues(year) {
-    const source = state.dataSummary?.annual_consumption_by_municipality_kwh || {};
+    const active = state.dataSummary?.annual_consumption_by_municipality_kwh || {};
+    const planning = state.planningData?.municipality_consumption_annual || {};
     const values = {};
     MUNICIPALITIES.forEach((item) => {
-      const numeric = Number(source[item.name]?.[String(year)]);
+      const activeValue = Number(active[item.name]?.[String(year)]);
+      const planningValue = Number(planning[item.name]?.[String(year)]?.kwh);
+      const numeric = Number.isFinite(activeValue) ? activeValue : planningValue;
       if (Number.isFinite(numeric)) values[item.name] = numeric;
     });
     return values;
+  }
+
+  function municipalityAnnualStatus(name, year) {
+    const activeValue = Number(state.dataSummary?.annual_consumption_by_municipality_kwh?.[name]?.[String(year)]);
+    if (Number.isFinite(activeValue)) return "Active WATTZAN dataset";
+    const status = state.planningData?.municipality_consumption_annual?.[name]?.[String(year)]?.status;
+    if (status === "WATTZAN_TREND_BACKCAST") return "Modeled WATTZAN backcast";
+    if (status === "WATTZAN_TREND_FORECAST") return "WATTZAN planning trend forecast";
+    if (status === "SUKELCO_ROUTE_LEDGER") return "SUKELCO route ledger";
+    return status ? humanize(status) : "Unavailable";
   }
 
   function hexToRgb(hex) {
@@ -1054,6 +1154,8 @@
     setText("#overview-map-popup-supply", humanize(profile?.supply_system));
     setText("#overview-map-popup-mape", metric ? formatPercent(metric.mape_pct, 2) : null);
     setText("#overview-map-popup-rank", municipalityMapRank(values, name));
+    setText("#overview-map-popup-data-status", municipalityAnnualStatus(name, year));
+    setHidden("#overview-map-explore-routes", name !== "Tacurong City");
     setHidden(popup, false);
     refreshIcons(popup);
   }
@@ -1161,51 +1263,16 @@
     requestOverview3DRender();
   }
 
-  function detectWebGLSupport() {
-    try {
-      const canvas = document.createElement("canvas");
-      const context = canvas.getContext("webgl2", { failIfMajorPerformanceCaveat: false })
-        || canvas.getContext("webgl", { failIfMajorPerformanceCaveat: false })
-        || canvas.getContext("experimental-webgl", { failIfMajorPerformanceCaveat: false });
-      return Boolean(context);
-    } catch (_error) {
-      return false;
-    }
-  }
-
   function ensureOverview3DScene() {
     const container = qs("#overview-consumption-map");
-    state.overviewMap.lastError = null;
-    if (!container) {
-      state.overviewMap.lastError = "The 3D map container is unavailable.";
-      return false;
-    }
-    if (!window.THREE?.WebGLRenderer) {
-      state.overviewMap.lastError = "The Three.js renderer did not load. Refresh the page; WATTZAN will retry through its backup library source.";
-      return false;
-    }
-    if (!window.THREE?.OrbitControls) {
-      state.overviewMap.lastError = "The 3D camera controls did not load. Refresh the page; WATTZAN will retry through its backup library source.";
-      return false;
-    }
-    if (!detectWebGLSupport()) {
-      state.overviewMap.lastError = "WebGL is disabled or unavailable in this browser. Enable hardware acceleration/WebGL and reload the page.";
-      return false;
-    }
+    if (!container || !window.THREE || !window.THREE.OrbitControls) return false;
     if (state.overviewMap.renderer) return true;
 
     const scene = new window.THREE.Scene();
     scene.background = new window.THREE.Color("#e8eff5");
 
     const camera = new window.THREE.PerspectiveCamera(38, 1, 0.1, 500);
-    let renderer;
-    try {
-      renderer = new window.THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
-    } catch (error) {
-      console.error("[WATTZAN] WebGL renderer initialization failed", error);
-      state.overviewMap.lastError = `The WebGL renderer could not start: ${error?.message || "unknown browser graphics error"}`;
-      return false;
-    }
+    const renderer = new window.THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
     renderer.shadowMap.enabled = false;
     renderer.domElement.className = "overview-3d-canvas";
@@ -1414,7 +1481,7 @@
     setHidden("#overview-map-empty", hasData);
     if (!container || !hasData) return;
     if (!ensureOverview3DScene()) {
-      setText("#overview-map-empty", state.overviewMap.lastError || "The 3D map could not be initialized.");
+      setText("#overview-map-empty", "The 3D map library or WebGL could not be loaded. Check the internet connection and browser graphics support.");
       setHidden("#overview-map-empty", false);
       return;
     }
@@ -1895,7 +1962,7 @@
     return new Promise((resolve) => window.requestAnimationFrame(() => resolve()));
   }
 
-  async function fetchExternalWeatherJson(url, timeoutMs = 25000, maximumAttempts = 2) {
+  async function fetchExternalWeatherJson(url, timeoutMs = 14000, maximumAttempts = 2) {
     let lastError = null;
     for (let attempt = 1; attempt <= maximumAttempts; attempt += 1) {
       const controller = new AbortController();
@@ -2036,11 +2103,41 @@
 
   async function fetchNextForecastDate(municipalityName) {
     return apiFetch(`/forecast/next-date?municipality=${encodeURIComponent(municipalityName)}`, {
-      timeout: 15000,
+      timeout: 8000,
     });
   }
 
-  async function fetchOpenMeteoScenarioRange(lat, lng, startDate, endDate, onProgress = null) {
+  function buildPlanningWeatherBridgeRows(municipalityName, startDate, endDate) {
+    const source = state.planningData?.municipality_weather_monthly?.[municipalityName];
+    if (!source) return [];
+    const dates = buildIsoDateRange(startDate, endDate, 800);
+    return dates.map((dateValue) => {
+      const period = dateValue.slice(0, 7);
+      const row = { date: dateValue, source: "WATTZAN monthly climatology bridge fallback" };
+      Object.keys(WEATHER_LABELS).forEach((field) => {
+        const value = Number(source[field]?.[period]?.value);
+        if (!Number.isFinite(value)) {
+          row[field] = null;
+          return;
+        }
+        if (field === "rainfall_mm") {
+          const [yearValue, monthValue] = period.split("-").map(Number);
+          const daysInMonth = new Date(Date.UTC(yearValue, monthValue, 0)).getUTCDate();
+          row[field] = value / Math.max(1, daysInMonth);
+        } else {
+          row[field] = value;
+        }
+      });
+      if (!Number.isFinite(row.heat_index_mean_c) && Number.isFinite(row.temperature_mean_c) && Number.isFinite(row.humidity_mean_pct)) {
+        row.heat_index_mean_c = calculateHeatIndexCelsius(row.temperature_mean_c, row.humidity_mean_pct);
+      }
+      return row;
+    }).filter((row) => Number.isFinite(row.temperature_mean_c)
+      && Number.isFinite(row.humidity_mean_pct)
+      && Number.isFinite(row.rainfall_mm));
+  }
+
+  async function fetchOpenMeteoScenarioRange(lat, lng, startDate, endDate, municipalityName, onProgress = null) {
     const expectedDates = buildIsoDateRange(startDate, endDate, 800);
     const today = isoDateInManila();
     const maximumForecastDate = addDaysIso(today, 15);
@@ -2048,19 +2145,17 @@
     const segments = [];
     const archiveEnd = endDate < archiveCutoff ? endDate : addDaysIso(archiveCutoff, -1);
 
+    // Open-Meteo accepts an explicit start/end time interval. Use one historical request
+    // instead of the old chain of 90-day requests. For a current 2026 forecast this turns
+    // ~7 serial network waits into at most two concurrent calls (archive + live forecast).
     if (startDate <= archiveEnd) {
-      let chunkStart = startDate;
-      while (chunkStart <= archiveEnd) {
-        const candidateEnd = addDaysIso(chunkStart, 89);
-        const chunkEnd = candidateEnd < archiveEnd ? candidateEnd : archiveEnd;
-        segments.push({
-          source: "Open-Meteo Historical Weather",
-          startDate: chunkStart,
-          endDate: chunkEnd,
-          url: openMeteoUrl(OPEN_METEO_ARCHIVE_URL, lat, lng, chunkStart, chunkEnd),
-        });
-        chunkStart = addDaysIso(chunkEnd, 1);
-      }
+      segments.push({
+        kind: "archive",
+        source: "Open-Meteo Historical Weather",
+        startDate,
+        endDate: archiveEnd,
+        url: openMeteoUrl(OPEN_METEO_ARCHIVE_URL, lat, lng, startDate, archiveEnd),
+      });
     }
 
     if (endDate >= archiveCutoff) {
@@ -2069,6 +2164,7 @@
         throw new Error(`Open-Meteo forecasts are available only through ${maximumForecastDate}. Choose an earlier target week.`);
       }
       segments.push({
+        kind: "forecast",
         source: "Open-Meteo Forecast API",
         startDate: forecastStart,
         endDate,
@@ -2078,21 +2174,43 @@
 
     if (!segments.length) throw new Error("No weather date range was selected for the scenario bridge.");
     const cache = state.shortTerm.weatherCache;
-    const collected = [];
-    for (let index = 0; index < segments.length; index += 1) {
-      const segment = segments[index];
-      if (onProgress) onProgress(index + 1, segments.length, segment);
+    const startedAt = performance.now();
+
+    // Fetch independent historical/live segments concurrently. Historical weather has a
+    // bounded 14-second budget; if that service is unusually slow, use WATTZAN's already
+    // packaged monthly climatology only for the missing bridge portion. The target date/week
+    // still comes from the live Forecast API, so a slow archive cannot hold the UI for minutes.
+    const segmentResults = await Promise.all(segments.map(async (segment, index) => {
+      if (onProgress) onProgress(index + 1, segments.length, segment, "started");
       await yieldToBrowser();
       let payload = cache.get(segment.url);
-      if (!payload) {
-        payload = await fetchExternalWeatherJson(segment.url, 30000);
+      if (payload) {
+        const rows = parseOpenMeteoDaily(payload).map((row) => ({ ...row, source: segment.source }));
+        if (onProgress) onProgress(index + 1, segments.length, segment, "cached");
+        return { rows, fallback: false };
+      }
+
+      try {
+        const timeoutMs = segment.kind === "archive" ? 12000 : 14000;
+        const attempts = segment.kind === "archive" ? 1 : 2;
+        payload = await fetchExternalWeatherJson(segment.url, timeoutMs, attempts);
         cache.set(segment.url, payload);
         if (cache.size > 32) cache.delete(cache.keys().next().value);
+        const rows = parseOpenMeteoDaily(payload).map((row) => ({ ...row, source: segment.source }));
+        if (onProgress) onProgress(index + 1, segments.length, segment, "completed");
+        return { rows, fallback: false };
+      } catch (error) {
+        if (segment.kind !== "archive") throw error;
+        const fallbackRows = buildPlanningWeatherBridgeRows(municipalityName, segment.startDate, segment.endDate);
+        const expectedFallbackCount = inclusiveDayCount(segment.startDate, segment.endDate);
+        if (fallbackRows.length !== expectedFallbackCount) throw error;
+        console.warn("Historical weather service was slow/unavailable; using WATTZAN monthly climatology for bridge days only.", error);
+        if (onProgress) onProgress(index + 1, segments.length, segment, "fallback");
+        return { rows: fallbackRows, fallback: true };
       }
-      const rows = parseOpenMeteoDaily(payload).map((row) => ({ ...row, source: segment.source }));
-      collected.push(...rows);
-    }
+    }));
 
+    const collected = segmentResults.flatMap((result) => result.rows);
     const byDate = new Map(collected.map((row) => [row.date, row]));
     const ordered = expectedDates.map((dateValue) => byDate.get(dateValue));
     const missing = expectedDates.filter((_, index) => !ordered[index]);
@@ -2100,7 +2218,14 @@
       throw new Error(`Weather data was unavailable for ${missing.length} bridge date(s). First missing date: ${missing[0]}.`);
     }
     const sources = [...new Set(ordered.map((row) => row.source))];
-    return { rows: ordered, source: sources.join(" + "), segmentCount: segments.length };
+    const usedClimatologyFallback = segmentResults.some((result) => result.fallback);
+    return {
+      rows: ordered,
+      source: sources.join(" + "),
+      segmentCount: segments.length,
+      usedClimatologyFallback,
+      fetchElapsedMs: Math.round(performance.now() - startedAt),
+    };
   }
 
   function currentWeekScenarioDay(weatherRow, municipality, targetStartDate, targetCapacityByDate) {
@@ -2191,8 +2316,10 @@
       pin.lng,
       bridgeStartDate,
       targetDate,
-      (current, total, segment) => {
-        setText(status, `Downloading weather segment ${current} of ${total} (${segment.startDate} to ${segment.endDate})…`, "");
+      municipality.name,
+      (current, total, segment, phase) => {
+        const label = phase === "fallback" ? "Using fast climatology fallback for historical bridge" : "Loading weather";
+        setText(status, `${label} ${current} of ${total} (${segment.startDate} to ${segment.endDate})…`, "");
       },
     );
 
@@ -2201,6 +2328,7 @@
     if (populateTargetForm && !targetInputOverride) fillOneDayWeatherInputs(targetRow, municipality);
     state.shortTerm.weatherRows = [targetRow];
     state.shortTerm.weatherSource = weatherResult.source;
+    renderShortTermWeatherCharts();
     state.shortTerm.weatherDates = targetDate;
     updateShortTermLocationSummary();
     await yieldToBrowser();
@@ -2210,6 +2338,8 @@
       target_date: targetDate,
       latitude: pin.lat,
       longitude: pin.lng,
+      bridge_weather_source: weatherResult.source,
+      bridge_used_climatology_fallback: weatherResult.usedClimatologyFallback,
       days: weatherResult.rows.map((row) => currentDayScenarioDay(row, municipality, targetDate, targetInputOverride)),
     };
 
@@ -2218,7 +2348,7 @@
     const result = await apiFetch("/forecast/current-day", {
       method: "POST",
       body: JSON.stringify(payload),
-      timeout: 180000,
+      timeout: 18000,
     });
     state.latestForecastResult = { mode: "one-day", payload: result };
     renderForecastResult(state.latestForecastResult);
@@ -2266,8 +2396,10 @@
       pin.lng,
       bridgeStartDate,
       targetEndDate,
-      (current, total, segment) => {
-        setText(status, `Downloading weather segment ${current} of ${total} (${segment.startDate} to ${segment.endDate})…`, "");
+      municipality.name,
+      (current, total, segment, phase) => {
+        const label = phase === "fallback" ? "Using fast climatology fallback for historical bridge" : "Loading weather";
+        setText(status, `${label} ${current} of ${total} (${segment.startDate} to ${segment.endDate})…`, "");
       },
     );
 
@@ -2276,6 +2408,7 @@
     fillSevenDayWeatherInputs(targetRows, municipality);
     state.shortTerm.weatherRows = targetRows;
     state.shortTerm.weatherSource = weatherResult.source;
+    renderShortTermWeatherCharts();
     state.shortTerm.weatherDates = `${targetStartDate} to ${targetEndDate}`;
     updateShortTermLocationSummary();
     await yieldToBrowser();
@@ -2286,6 +2419,8 @@
       target_start_date: targetStartDate,
       latitude: pin.lat,
       longitude: pin.lng,
+      bridge_weather_source: weatherResult.source,
+      bridge_used_climatology_fallback: weatherResult.usedClimatologyFallback,
       days: weatherResult.rows.map((row) => currentWeekScenarioDay(row, municipality, targetStartDate, capacityByDate)),
     };
 
@@ -2294,7 +2429,7 @@
     const result = await apiFetch("/forecast/current-week", {
       method: "POST",
       body: JSON.stringify(payload),
-      timeout: 180000,
+      timeout: 18000,
     });
     state.latestForecastResult = { mode: "seven-day", payload: result };
     renderForecastResult(state.latestForecastResult);
@@ -2459,6 +2594,7 @@
       const result = await fetchOpenMeteoRange(pin.lat, pin.lng, startDate, endDate);
       state.shortTerm.weatherRows = result.rows;
       state.shortTerm.weatherSource = result.source;
+      renderShortTermWeatherCharts();
       state.shortTerm.weatherDates = startDate === endDate ? startDate : `${startDate} to ${endDate}`;
 
       setText(status, "Weather received. Applying the date-matched inputs…", "");
@@ -2688,7 +2824,7 @@
       } else {
         setText(status, "Sending inputs to the production models…", "");
         updateForecastProgress("Running the one-day hybrid forecast…");
-        result = await apiFetch("/forecast/one-day", { method: "POST", body: JSON.stringify(payload) });
+        result = await apiFetch("/forecast/one-day", { method: "POST", body: JSON.stringify(payload), timeout: 18000 });
         state.latestForecastResult = { mode: "one-day", payload: result };
         renderForecastResult(state.latestForecastResult);
         await refreshHistory();
@@ -2779,7 +2915,7 @@
       setButtonBusy(button, true, "Running seven-day forecast…");
       setText(status, "Executing recursive daily forecasts…", "");
       updateForecastProgress("Running seven recursive hybrid forecast steps…");
-      const result = await apiFetch("/forecast/seven-day", { method: "POST", body: JSON.stringify(payload), timeout: 90000 });
+      const result = await apiFetch("/forecast/seven-day", { method: "POST", body: JSON.stringify(payload), timeout: 18000 });
       state.latestForecastResult = { mode: "seven-day", payload: result };
       renderForecastResult(state.latestForecastResult);
       status.className = "form-status success";
@@ -3198,6 +3334,14 @@
       .sort((a, b) => a.year - b.year);
   }
 
+  function historicalMonthlyEntries(summary = state.dataSummary) {
+    const monthly = summary?.monthly_consumption_kwh || {};
+    return Object.entries(monthly)
+      .map(([period, value]) => ({ period: String(period), kwh: Number(value) }))
+      .filter((item) => /^\d{4}-\d{2}$/.test(item.period) && Number.isFinite(item.kwh) && item.kwh > 0)
+      .sort((a, b) => a.period.localeCompare(b.period));
+  }
+
   function calculateHistoricalCagrPct() {
     const entries = historicalAnnualEntries(state.longTerm.municipalitySummary || state.dataSummary);
     if (entries.length < 2) return null;
@@ -3231,13 +3375,33 @@
 
   function buildMonthlySeasonalShares(latestYear, summary = state.dataSummary) {
     const monthly = summary?.monthly_consumption_kwh || {};
-    const monthValues = Array.from({ length: 12 }, (_, index) => {
-      const key = `${latestYear}-${String(index + 1).padStart(2, "0")}`;
-      return Number(monthly[key]) || 0;
+    const byYear = new Map();
+    Object.entries(monthly).forEach(([period, rawValue]) => {
+      const match = /^(\d{4})-(\d{2})$/.exec(String(period));
+      const value = Number(rawValue);
+      if (!match || !Number.isFinite(value) || value < 0) return;
+      const year = Number(match[1]);
+      const month = Number(match[2]);
+      if (month < 1 || month > 12) return;
+      if (!byYear.has(year)) byYear.set(year, Array(12).fill(0));
+      byYear.get(year)[month - 1] = value;
     });
-    const total = monthValues.reduce((sum, value) => sum + value, 0);
-    if (total <= 0) return Array(12).fill(1 / 12);
-    return monthValues.map((value) => value / total);
+    const yearlyShares = [...byYear.values()].map((values) => {
+      const total = values.reduce((sum, value) => sum + value, 0);
+      return total > 0 ? values.map((value) => value / total) : null;
+    }).filter(Boolean);
+    if (!yearlyShares.length) {
+      const packaged = state.planningData?.municipality_monthly_consumption_seasonality?.[state.longTerm.selectedMunicipality?.name || ""];
+      if (packaged) {
+        const values = Array.from({ length: 12 }, (_, index) => Number(packaged[String(index + 1)]) || 0);
+        const total = values.reduce((sum, value) => sum + value, 0);
+        if (total > 0) return values.map((value) => value / total);
+      }
+      return Array(12).fill(1 / 12);
+    }
+    const averaged = Array.from({ length: 12 }, (_, month) => yearlyShares.reduce((sum, row) => sum + row[month], 0) / yearlyShares.length);
+    const total = averaged.reduce((sum, value) => sum + value, 0);
+    return total > 0 ? averaged.map((value) => value / total) : Array(12).fill(1 / 12);
   }
 
   function calculateLongTermProjection(form) {
@@ -3277,9 +3441,10 @@
       const municipalityPopulation = selected.population * (1 + municipalityPopGrowth) ** step;
       const provincePopulation = PROVINCE_2024_POPULATION * (1 + provincePopGrowth) ** step;
       const share = municipalityPopulation / provincePopulation;
-      const conservativeKwh = lastHistorical.kwh * (1 + conservativeGrowth) ** step;
-      const baseKwh = lastHistorical.kwh * (1 + baseGrowth) ** step;
-      const highKwh = lastHistorical.kwh * (1 + highGrowth) ** step;
+      const populationDemandFactor = ((1 + municipalityPopGrowth) / (1 + provincePopGrowth)) ** step;
+      const conservativeKwh = lastHistorical.kwh * (1 + conservativeGrowth) ** step * populationDemandFactor;
+      const baseKwh = lastHistorical.kwh * (1 + baseGrowth) ** step * populationDemandFactor;
+      const highKwh = lastHistorical.kwh * (1 + highGrowth) ** step * populationDemandFactor;
       const daysInYear = new Date(year, 1, 29).getMonth() === 1 ? 366 : 365;
       const peakKw = baseKwh / daysInYear / 24 / loadFactor;
       const requiredCapacityKw = peakKw * reserveMultiplier;
@@ -3298,6 +3463,29 @@
     }
 
     const seasonalShares = buildMonthlySeasonalShares(baseYear, municipalitySummary);
+    const historicalMonthly = historicalMonthlyEntries(municipalitySummary);
+    const monthlyRows = [];
+    years.slice(1).forEach((row) => {
+      seasonalShares.forEach((shareValue, monthIndex) => {
+        const month = monthIndex + 1;
+        const daysInMonth = new Date(row.year, month, 0).getDate();
+        const conservativeKwh = row.conservativeKwh * shareValue;
+        const baseKwh = row.baseKwh * shareValue;
+        const highKwh = row.highKwh * shareValue;
+        const peakKw = baseKwh / daysInMonth / 24 / loadFactor;
+        monthlyRows.push({
+          period: `${row.year}-${String(month).padStart(2, "0")}`,
+          year: row.year,
+          month,
+          share: shareValue,
+          conservativeKwh,
+          baseKwh,
+          highKwh,
+          peakKw,
+          requiredCapacityKw: peakKw * reserveMultiplier,
+        });
+      });
+    });
     return {
       municipality: selected,
       assumptions: {
@@ -3316,7 +3504,9 @@
       baseYear,
       currentShare,
       historicalAnnual: annualEntries,
+      historicalMonthly,
       seasonalShares,
+      monthlyRows,
       years,
     };
   }
@@ -3340,32 +3530,44 @@
     renderLongTermShareChart(projection);
     renderLongTermCapacityChart(projection);
     renderLongTermMonthlyChart(projection);
+    renderLongTermWeatherCharts(projection);
     renderLongTermTable(projection);
     refreshIcons(qs("#longterm-results"));
   }
 
   function renderLongTermEnergyChart(projection) {
     const type = qs("#longterm-energy-chart-type")?.value || "line";
-    const historical = projection.historicalAnnual.map((item) => ({ x: String(item.year), y: item.kwh / 1e6 }));
-    const futureRows = projection.years;
-    const labels = [...new Set([...historical.map((item) => item.x), ...futureRows.map((row) => String(row.year))])];
-    const historicalMap = new Map(historical.map((item) => [item.x, item.y]));
-    const valueByYear = (field) => {
-      const map = new Map(futureRows.map((row) => [String(row.year), row[field] / 1e6]));
-      return labels.map((label) => map.get(label) ?? null);
-    };
+    if (type === "bar") {
+      const historical = projection.historicalAnnual.map((item) => ({ x: String(item.year), y: item.kwh / 1e6 }));
+      const futureRows = projection.years;
+      const labels = [...new Set([...historical.map((item) => item.x), ...futureRows.map((row) => String(row.year))])];
+      const historicalMap = new Map(historical.map((item) => [item.x, item.y]));
+      const valueByYear = (field) => {
+        const map = new Map(futureRows.map((row) => [String(row.year), row[field] / 1e6]));
+        return labels.map((label) => map.get(label) ?? null);
+      };
+      createChart("longterm-energy-chart", { type: "bar", data: { labels, datasets: [
+        makeDataset("Municipality historical energy (GWh/year)", labels.map((label) => historicalMap.get(label) ?? null), COLORS.gray, { type: "line", pointRadius: 3 }),
+        makeDataset(`Conservative (${formatNumber(projection.assumptions.conservativeGrowthPct, 2)}%)`, valueByYear("conservativeKwh"), COLORS.blue2, { type: "bar" }),
+        makeDataset(`Base (${formatNumber(projection.assumptions.netGrowthPct, 2)}%)`, valueByYear("baseKwh"), COLORS.navy, { type: "bar" }),
+        makeDataset(`High (${formatNumber(projection.assumptions.highGrowthPct, 2)}%)`, valueByYear("highKwh"), COLORS.purple, { type: "bar" }),
+      ] }, options: chartBaseOptions({ yTitle: "Annual energy (GWh)" }) });
+      return;
+    }
+    const historicalRows = projection.historicalMonthly || [];
+    const futureRows = projection.monthlyRows || [];
+    const labels = [...historicalRows.map((row) => row.period), ...futureRows.map((row) => row.period)];
+    const history = new Map(historicalRows.map((row) => [row.period, row.kwh / 1e6]));
+    const future = (field) => { const map = new Map(futureRows.map((row) => [row.period, row[field] / 1e6])); return labels.map((label) => map.get(label) ?? null); };
     createChart("longterm-energy-chart", {
-      type,
-      data: {
-        labels,
-        datasets: [
-          makeDataset("Municipality historical energy (GWh)", labels.map((label) => historicalMap.get(label) ?? null), COLORS.gray, { type: "line", pointRadius: 3 }),
-          makeDataset(`Conservative (${formatNumber(projection.assumptions.conservativeGrowthPct, 2)}%)`, valueByYear("conservativeKwh"), COLORS.blue2, { type, hidden: false }),
-          makeDataset(`Base (${formatNumber(projection.assumptions.netGrowthPct, 2)}%)`, valueByYear("baseKwh"), COLORS.navy, { type, borderWidth: 3 }),
-          makeDataset(`High (${formatNumber(projection.assumptions.highGrowthPct, 2)}%)`, valueByYear("highKwh"), COLORS.purple, { type }),
-        ],
-      },
-      options: chartBaseOptions({ yTitle: "Annual energy (GWh)" }),
+      type: "line",
+      data: { labels, datasets: [
+        makeDataset("Historical monthly energy (GWh)", labels.map((label) => history.get(label) ?? null), COLORS.gray, { type: "line", pointRadius: 0, borderWidth: 2 }),
+        makeDataset("Conservative trend + seasonality", future("conservativeKwh"), COLORS.blue2, { type: "line", pointRadius: 0 }),
+        makeDataset("Base trend + seasonality", future("baseKwh"), COLORS.navy, { type: "line", pointRadius: 0, borderWidth: 3 }),
+        makeDataset("High trend + seasonality", future("highKwh"), COLORS.purple, { type: "line", pointRadius: 0 }),
+      ] },
+      options: chartBaseOptions({ yTitle: "Monthly energy (GWh)" }),
     });
   }
 
@@ -3395,17 +3597,17 @@
   }
 
   function renderLongTermCapacityChart(projection) {
-    const rows = projection.years;
+    const rows = projection.monthlyRows || [];
     const datasets = [
-      makeDataset("Estimated peak demand (MW)", rows.map((row) => row.peakKw / 1000), COLORS.high, { fill: true }),
-      makeDataset("Required capacity with reserve (MW)", rows.map((row) => row.requiredCapacityKw / 1000), COLORS.navy, { borderWidth: 3 }),
+      makeDataset("Estimated monthly peak demand (MW)", rows.map((row) => row.peakKw / 1000), COLORS.high, { fill: true, pointRadius: 0 }),
+      makeDataset("Required capacity with reserve (MW)", rows.map((row) => row.requiredCapacityKw / 1000), COLORS.navy, { borderWidth: 3, pointRadius: 0 }),
     ];
     if (projection.assumptions.availableCapacityKw) {
-      datasets.push(makeDataset("Entered available capacity (MW)", rows.map(() => projection.assumptions.availableCapacityKw / 1000), COLORS.critical, { borderWidth: 2 }));
+      datasets.push(makeDataset("Entered available capacity (MW)", rows.map(() => projection.assumptions.availableCapacityKw / 1000), COLORS.critical, { borderWidth: 2, pointRadius: 0 }));
     }
     createChart("longterm-capacity-chart", {
       type: "line",
-      data: { labels: rows.map((row) => row.year), datasets },
+      data: { labels: rows.map((row) => row.period), datasets },
       options: chartBaseOptions({ yTitle: "Capacity (MW)" }),
     });
   }
@@ -3540,6 +3742,993 @@
       setText("#longterm-form-status", `Municipality confirmed as ${municipality.name}.`, "");
     });
     updateLongTermLocationSummary();
+  }
+
+
+  const WEATHER_LABELS = {
+    temperature_mean_c: "Mean temperature",
+    temperature_min_c: "Minimum temperature",
+    temperature_max_c: "Maximum temperature",
+    heat_index_mean_c: "Heat index",
+    humidity_mean_pct: "Relative humidity",
+    cloud_cover_mean_pct: "Cloud cover",
+    rainfall_mm: "Rainfall",
+    wind_speed_mean_kph: "Wind speed",
+  };
+
+  function weatherChartDataset(label, values, color, options = {}) {
+    const pointRadius = values.length > 48 ? 0 : values.length <= 2 ? 5 : 3;
+    return makeDataset(label, values, color, { type: "line", pointRadius, ...options });
+  }
+
+  const WEATHER_VALUE_LABEL_PLUGIN = {
+    id: "wattzanWeatherValueLabels",
+    afterDatasetsDraw(chart, _args, pluginOptions) {
+      if (!pluginOptions?.display) return;
+      const context = chart.ctx;
+      context.save();
+      context.fillStyle = COLORS.navy;
+      context.font = "600 12px Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+      chart.data.datasets.forEach((dataset, datasetIndex) => {
+        const meta = chart.getDatasetMeta(datasetIndex);
+        if (meta.hidden) return;
+        meta.data.forEach((element, index) => {
+          const value = Number(dataset.data[index]);
+          if (!Number.isFinite(value)) return;
+          const suffix = dataset.valueSuffix || pluginOptions.suffix || "";
+          const decimals = Math.abs(value) >= 100 ? 0 : Math.abs(value) < 1 ? 2 : 1;
+          const text = `${formatNumber(value, decimals)}${suffix}`;
+          const position = element.tooltipPosition();
+          context.textAlign = "center";
+          context.textBaseline = "bottom";
+          context.fillText(text, position.x, Math.max(14, position.y - 8));
+        });
+      });
+      context.restore();
+    },
+  };
+
+  function singleDayWeatherOptions(yTitle, suffix) {
+    const options = chartBaseOptions({ yTitle, beginAtZero: true, showLegend: false });
+    options.layout = { padding: { top: 28, left: 4, right: 4, bottom: 0 } };
+    options.interaction = { mode: "nearest", intersect: true };
+    options.plugins.zoom = { pan: { enabled: false }, zoom: { wheel: { enabled: false }, pinch: { enabled: false } } };
+    options.plugins.wattzanWeatherValueLabels = { display: true, suffix };
+    options.scales.x.grid = { display: false };
+    options.scales.x.ticks = { color: COLORS.muted, maxRotation: 0, autoSkip: false };
+    options.scales.y.grace = "18%";
+    return options;
+  }
+
+  function singleDayBarDataset(values, colors, suffix) {
+    return {
+      label: "Forecast value",
+      data: values,
+      backgroundColor: colors.map((color) => `${color}D9`),
+      borderColor: colors,
+      borderWidth: 1.5,
+      borderRadius: 8,
+      borderSkipped: false,
+      maxBarThickness: 72,
+      valueSuffix: suffix,
+    };
+  }
+
+  function renderSingleDayWeatherCharts(prefix, row) {
+    const finite = (field) => Number.isFinite(Number(row[field])) ? Number(row[field]) : null;
+    createChart(`${prefix}-temperature-chart`, {
+      type: "bar",
+      data: {
+        labels: ["Mean", "Minimum", "Maximum", "Heat index"],
+        datasets: [singleDayBarDataset([
+          finite("temperature_mean_c"),
+          finite("temperature_min_c"),
+          finite("temperature_max_c"),
+          finite("heat_index_mean_c"),
+        ], [COLORS.navy, COLORS.blue2, COLORS.high, COLORS.purple], " °C")],
+      },
+      options: singleDayWeatherOptions("Temperature (°C)", " °C"),
+      plugins: [WEATHER_VALUE_LABEL_PLUGIN],
+    });
+    createChart(`${prefix}-atmosphere-chart`, {
+      type: "bar",
+      data: {
+        labels: ["Relative humidity", "Cloud cover"],
+        datasets: [singleDayBarDataset([
+          finite("humidity_mean_pct"),
+          finite("cloud_cover_mean_pct"),
+        ], [COLORS.blue, COLORS.gray], "%")],
+      },
+      options: singleDayWeatherOptions("Percent (%)", "%"),
+      plugins: [WEATHER_VALUE_LABEL_PLUGIN],
+    });
+    createChart(`${prefix}-rainfall-chart`, {
+      type: "bar",
+      data: {
+        labels: ["Rainfall"],
+        datasets: [singleDayBarDataset([finite("rainfall_mm")], [COLORS.blue2], " mm/day")],
+      },
+      options: singleDayWeatherOptions("Rainfall (mm/day)", " mm/day"),
+      plugins: [WEATHER_VALUE_LABEL_PLUGIN],
+    });
+    createChart(`${prefix}-wind-chart`, {
+      type: "bar",
+      data: {
+        labels: ["Mean wind speed"],
+        datasets: [singleDayBarDataset([finite("wind_speed_mean_kph")], [COLORS.success], " km/h")],
+      },
+      options: singleDayWeatherOptions("Wind speed (km/h)", " km/h"),
+      plugins: [WEATHER_VALUE_LABEL_PLUGIN],
+    });
+  }
+
+  function renderWeatherChartSet(prefix, labels, rows, { rainfallAnnual = false, rainfallMonthly = false } = {}) {
+    if (!labels.length || !rows.length) return;
+    const values = (field) => rows.map((row) => Number.isFinite(Number(row[field])) ? Number(row[field]) : null);
+    createChart(`${prefix}-temperature-chart`, {
+      type: "line",
+      data: { labels, datasets: [
+        weatherChartDataset(WEATHER_LABELS.temperature_mean_c, values("temperature_mean_c"), COLORS.navy, { borderWidth: 3 }),
+        weatherChartDataset(WEATHER_LABELS.temperature_min_c, values("temperature_min_c"), COLORS.blue2),
+        weatherChartDataset(WEATHER_LABELS.temperature_max_c, values("temperature_max_c"), COLORS.high),
+        weatherChartDataset(WEATHER_LABELS.heat_index_mean_c, values("heat_index_mean_c"), COLORS.purple),
+      ] },
+      options: chartBaseOptions({ yTitle: "Temperature (°C)", beginAtZero: false }),
+    });
+    createChart(`${prefix}-atmosphere-chart`, {
+      type: "line",
+      data: { labels, datasets: [
+        weatherChartDataset(WEATHER_LABELS.humidity_mean_pct, values("humidity_mean_pct"), COLORS.blue),
+        weatherChartDataset(WEATHER_LABELS.cloud_cover_mean_pct, values("cloud_cover_mean_pct"), COLORS.gray),
+      ] },
+      options: chartBaseOptions({ yTitle: "Percent (%)", beginAtZero: true }),
+    });
+    createChart(`${prefix}-rainfall-chart`, {
+      type: labels.length <= 2 ? "bar" : "line",
+      data: { labels, datasets: [makeDataset(WEATHER_LABELS.rainfall_mm, values("rainfall_mm"), COLORS.blue2, { type: labels.length <= 2 ? "bar" : "line", fill: true })] },
+      options: chartBaseOptions({ yTitle: rainfallAnnual ? "Annual rainfall (mm)" : rainfallMonthly ? "Monthly rainfall (mm)" : "Rainfall (mm/day)", beginAtZero: true }),
+    });
+    createChart(`${prefix}-wind-chart`, {
+      type: "line",
+      data: { labels, datasets: [weatherChartDataset(WEATHER_LABELS.wind_speed_mean_kph, values("wind_speed_mean_kph"), COLORS.success, { fill: true })] },
+      options: chartBaseOptions({ yTitle: "Wind speed (km/h)", beginAtZero: true }),
+    });
+  }
+
+  function renderShortTermWeatherCharts() {
+    const rows = state.shortTerm.weatherRows || [];
+    const empty = qs("#shortterm-weather-chart-empty");
+    if (!rows.length) {
+      setHidden(empty, false);
+      setText("#shortterm-weather-chart-status", "Awaiting weather");
+      ["shortterm-weather-temperature-chart", "shortterm-weather-atmosphere-chart", "shortterm-weather-rainfall-chart", "shortterm-weather-wind-chart"].forEach(destroyChart);
+      return;
+    }
+    setHidden(empty, true);
+    setText("#shortterm-weather-chart-status", rows.length === 1 ? "1 forecast day • values labeled" : `${rows.length} forecast days`);
+    if (rows.length === 1) {
+      renderSingleDayWeatherCharts("shortterm-weather", rows[0]);
+      return;
+    }
+    renderWeatherChartSet("shortterm-weather", rows.map((row) => row.date || row.forecast_date || "Weather"), rows);
+  }
+
+  function planningWeatherRows(municipalityName, startYear, endYear) {
+    const source = state.planningData?.municipality_weather_annual?.[municipalityName];
+    if (!source) return [];
+    const rows = [];
+    for (let year = startYear; year <= endYear; year += 1) {
+      const row = { year };
+      Object.keys(WEATHER_LABELS).forEach((field) => { row[field] = Number(source[field]?.[String(year)]?.value); });
+      rows.push(row);
+    }
+    return rows;
+  }
+
+  function planningWeatherMonthlyRows(municipalityName, startYear, endYear) {
+    const source = state.planningData?.municipality_weather_monthly?.[municipalityName];
+    if (!source) return [];
+    const rows = [];
+    for (let year = startYear; year <= endYear; year += 1) {
+      for (let month = 1; month <= 12; month += 1) {
+        const period = `${year}-${String(month).padStart(2, "0")}`;
+        const row = { period, year, month };
+        Object.keys(WEATHER_LABELS).forEach((field) => { row[field] = Number(source[field]?.[period]?.value); });
+        rows.push(row);
+      }
+    }
+    return rows;
+  }
+
+  function renderLongTermWeatherCharts(projection) {
+    if (!projection?.municipality) return;
+    const endYear = Math.min(ROUTE_FORECAST_END_YEAR, projection.years.at(-1)?.year || ROUTE_FORECAST_END_YEAR);
+    const rows = planningWeatherMonthlyRows(projection.municipality.name, 2020, endYear);
+    renderWeatherChartSet("longterm-weather", rows.map((row) => row.period), rows, { rainfallMonthly: true });
+  }
+
+  function routePlanningRows() { return state.planningData?.tacurong_routes || []; }
+
+  function routeAnchorCandidates(route) {
+    const name = String(route?.route_name || "").toUpperCase().replace(/\./g, "");
+    const points = [];
+    Object.entries(TACURONG_ROUTE_ANCHORS).forEach(([token, coord]) => {
+      const normalized = token.replace(/\./g, "");
+      if (name.includes(normalized) && !points.some((point) => point[0] === coord[0] && point[1] === coord[1])) points.push(coord);
+    });
+    if (!points.length) {
+      const remap = name.match(/(?:REMAP(?: FROM)?\s*)(\d{4})/);
+      if (remap) {
+        const original = routePlanningRows().find((item) => String(item.route_no) === remap[1]);
+        if (original && String(original.route_no) !== String(route.route_no)) return routeAnchorCandidates(original);
+      }
+    }
+    return points;
+  }
+
+  function routeEndpoint(route) {
+    const anchors = routeAnchorCandidates(route);
+    if (anchors.length) {
+      return anchors.reduce((best, point) => {
+        const dBest = (best[0]-TACURONG_GRID_HUB[0])**2 + (best[1]-TACURONG_GRID_HUB[1])**2;
+        const dPoint = (point[0]-TACURONG_GRID_HUB[0])**2 + (point[1]-TACURONG_GRID_HUB[1])**2;
+        return dPoint > dBest ? point : best;
+      }, anchors[0]);
+    }
+    const n = Number(String(route?.route_no || "0").replace(/\D/g,"")) || 0;
+    return TACURONG_FALLBACK_ENDPOINTS[n % TACURONG_FALLBACK_ENDPOINTS.length];
+  }
+
+  function routeZoneInfo(route) {
+    const endpoint = routeEndpoint(route);
+    const north = endpoint[0] - TACURONG_GRID_HUB[0];
+    const east = endpoint[1] - TACURONG_GRID_HUB[1];
+    // 0=N, then clockwise in 45-degree service zones.
+    const angle = (Math.atan2(east, north) * 180 / Math.PI + 360) % 360;
+    const index = Math.round(angle / 45) % 8;
+    return TACURONG_ZONE_COLORS[index];
+  }
+
+  function routeColor(routeOrNo) {
+    const route = typeof routeOrNo === "object" ? routeOrNo : routePlanningRows().find((item) => String(item.route_no) === String(routeOrNo));
+    return route ? routeZoneInfo(route).color : "#2f86d5";
+  }
+
+  function routeValueForYear(route, year) {
+    const historical = route?.historical?.find((row) => Number(row.year) === Number(year));
+    if (historical) return { ...historical, projected: false };
+    const forecast = route?.forecast?.find((row) => Number(row.year) === Number(year));
+    if (forecast) return { ...forecast, projected: true, route_name: route.route_name };
+    return null;
+  }
+
+  function coordinateDistanceKm(a, b) {
+    const meanLat = ((Number(a[0]) + Number(b[0])) / 2) * Math.PI / 180;
+    const dy = (Number(a[0]) - Number(b[0])) * 111.32;
+    const dx = (Number(a[1]) - Number(b[1])) * 111.32 * Math.cos(meanLat);
+    return Math.hypot(dx, dy);
+  }
+
+  function nearestPointIndex(path, target) {
+    let bestIndex = 0;
+    let bestDistance = Infinity;
+    path.forEach((point, index) => {
+      const distance = coordinateDistanceKm(point, target);
+      if (distance < bestDistance) { bestDistance = distance; bestIndex = index; }
+    });
+    return bestIndex;
+  }
+
+  function fallbackRoadGridPath(route) {
+    const target = routeEndpoint(route);
+    let best = null;
+    TACURONG_GRID_CORRIDORS.forEach((corridor) => {
+      const hubIndex = nearestPointIndex(corridor, TACURONG_GRID_HUB);
+      const targetIndex = nearestPointIndex(corridor, target);
+      const distance = coordinateDistanceKm(corridor[targetIndex], target);
+      if (!best || distance < best.distance) best = { corridor, hubIndex, targetIndex, distance };
+    });
+    if (!best) return [TACURONG_GRID_HUB, target];
+    const step = best.targetIndex >= best.hubIndex ? 1 : -1;
+    const path = [];
+    for (let index = best.hubIndex; ; index += step) {
+      path.push(best.corridor[index]);
+      if (index === best.targetIndex) break;
+    }
+    if (coordinateDistanceKm(path.at(-1), target) > .12) path.push(target);
+    return path;
+  }
+
+  function routeDisplayPath(route) {
+    return state.routes.streetPaths.get(String(route.route_no)) || fallbackRoadGridPath(route);
+  }
+
+  function graphKey(lat, lng) { return `${Number(lat).toFixed(6)},${Number(lng).toFixed(6)}`; }
+
+  function routeEdgeKey(a, b) {
+    const ka = graphKey(a[0], a[1]);
+    const kb = graphKey(b[0], b[1]);
+    return ka < kb ? `${ka}|${kb}` : `${kb}|${ka}`;
+  }
+
+  function stableSegmentHash(a, b) {
+    const text = routeEdgeKey(a, b);
+    let hash = 2166136261;
+    for (let index = 0; index < text.length; index += 1) {
+      hash ^= text.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
+  }
+
+  function buildTacurongRoadGraph(payload) {
+    const nodes = [];
+    const nodeByKey = new Map();
+    const adjacency = [];
+    const edges = [];
+    const edgeKeys = new Set();
+    const getNode = (lat, lng) => {
+      const key = graphKey(lat, lng);
+      if (nodeByKey.has(key)) return nodeByKey.get(key);
+      const index = nodes.length;
+      nodes.push([Number(lat), Number(lng)]);
+      adjacency.push([]);
+      nodeByKey.set(key, index);
+      return index;
+    };
+    (payload?.elements || []).forEach((way) => {
+      if (!Array.isArray(way.geometry) || way.geometry.length < 2) return;
+      const highway = String(way.tags?.highway || "residential");
+      const roadName = String(way.tags?.name || "");
+      let previous = null;
+      way.geometry.forEach((point) => {
+        if (!Number.isFinite(Number(point.lat)) || !Number.isFinite(Number(point.lon))) return;
+        const current = getNode(point.lat, point.lon);
+        if (previous !== null && previous !== current) {
+          const weight = coordinateDistanceKm(nodes[previous], nodes[current]);
+          if (weight > 0 && weight < 2.5) {
+            adjacency[previous].push([current, weight]);
+            adjacency[current].push([previous, weight]);
+            const key = routeEdgeKey(nodes[previous], nodes[current]);
+            if (!edgeKeys.has(key)) {
+              edgeKeys.add(key);
+              edges.push({ a: previous, b: current, highway, roadName });
+            }
+          }
+        }
+        previous = current;
+      });
+    });
+    return { nodes, adjacency, edges };
+  }
+
+  function nearestGraphNode(graph, target, allowed = null) {
+    let best = -1;
+    let bestDistance = Infinity;
+    graph.nodes.forEach((point, index) => {
+      if (allowed && !allowed.has(index)) return;
+      const distance = coordinateDistanceKm(point, target);
+      if (distance < bestDistance) { bestDistance = distance; best = index; }
+    });
+    return best;
+  }
+
+  function shortestRoadTree(graph, source) {
+    const distances = new Float64Array(graph.nodes.length);
+    distances.fill(Infinity);
+    const previous = new Int32Array(graph.nodes.length);
+    previous.fill(-1);
+    const heap = [];
+    const push = (node, distance) => {
+      heap.push([distance, node]);
+      let i = heap.length - 1;
+      while (i > 0) {
+        const parent = Math.floor((i - 1) / 2);
+        if (heap[parent][0] <= heap[i][0]) break;
+        [heap[parent], heap[i]] = [heap[i], heap[parent]];
+        i = parent;
+      }
+    };
+    const pop = () => {
+      if (!heap.length) return null;
+      const root = heap[0];
+      const last = heap.pop();
+      if (heap.length && last) {
+        heap[0] = last;
+        let i = 0;
+        while (true) {
+          const left = i * 2 + 1, right = left + 1;
+          let smallest = i;
+          if (left < heap.length && heap[left][0] < heap[smallest][0]) smallest = left;
+          if (right < heap.length && heap[right][0] < heap[smallest][0]) smallest = right;
+          if (smallest === i) break;
+          [heap[i], heap[smallest]] = [heap[smallest], heap[i]];
+          i = smallest;
+        }
+      }
+      return root;
+    };
+    distances[source] = 0;
+    push(source, 0);
+    while (heap.length) {
+      const item = pop();
+      if (!item) break;
+      const [distance, node] = item;
+      if (distance !== distances[node]) continue;
+      graph.adjacency[node].forEach(([next, weight]) => {
+        const nextDistance = distance + weight;
+        if (nextDistance < distances[next]) {
+          distances[next] = nextDistance;
+          previous[next] = node;
+          push(next, nextDistance);
+        }
+      });
+    }
+    return { distances, previous };
+  }
+
+  function reconstructRoadPath(graph, tree, targetNode) {
+    if (targetNode < 0 || !Number.isFinite(tree.distances[targetNode])) return null;
+    const indices = [];
+    let node = targetNode;
+    let guard = 0;
+    while (node >= 0 && guard <= graph.nodes.length) {
+      indices.push(node);
+      node = tree.previous[node];
+      guard += 1;
+    }
+    indices.reverse();
+    return indices.length >= 2 ? indices.map((index) => graph.nodes[index]) : null;
+  }
+
+  function buildRoadAlignedRouteNetwork(payload) {
+    const graph = buildTacurongRoadGraph(payload);
+    if (graph.nodes.length < 80) throw new Error("Tacurong road graph is incomplete");
+    const source = nearestGraphNode(graph, TACURONG_GRID_HUB);
+    if (source < 0) throw new Error("Tacurong grid hub is outside road graph");
+    const tree = shortestRoadTree(graph, source);
+    const reachable = new Set();
+    tree.distances.forEach((distance, index) => { if (Number.isFinite(distance)) reachable.add(index); });
+    if (reachable.size < 50) throw new Error("Tacurong road graph is disconnected");
+
+    const paths = new Map();
+    const routeEdgeKeys = new Set();
+    const anchors = [];
+    routePlanningRows().forEach((route) => {
+      const endpoint = routeEndpoint(route);
+      anchors.push(endpoint);
+      const endpointNode = nearestGraphNode(graph, endpoint, reachable);
+      const path = reconstructRoadPath(graph, tree, endpointNode);
+      if (path?.length >= 2) {
+        paths.set(String(route.route_no), path);
+        for (let index = 0; index < path.length - 1; index += 1) routeEdgeKeys.add(routeEdgeKey(path[index], path[index + 1]));
+      }
+    });
+    if (paths.size < Math.min(40, routePlanningRows().length)) throw new Error("Too few road-aligned routes were resolved");
+
+    const majorRoads = new Set(["trunk", "primary", "secondary", "tertiary"]);
+    const gridSegments = [];
+    graph.edges.forEach((edge) => {
+      const a = graph.nodes[edge.a], b = graph.nodes[edge.b];
+      const key = routeEdgeKey(a, b);
+      const onRouteNetwork = routeEdgeKeys.has(key);
+      const major = majorRoads.has(edge.highway);
+      const midpoint = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+      let nearServiceArea = false;
+      if (!major && !onRouteNetwork) {
+        nearServiceArea = anchors.some((anchor) => coordinateDistanceKm(midpoint, anchor) < .75) || coordinateDistanceKm(midpoint, TACURONG_GRID_HUB) < 1.2;
+      }
+      // Keep every actual route edge and principal road. Sample a subset of neighborhood streets
+      // around service areas to produce a connected utility-map mesh without painting every road.
+      const sampledLocal = nearServiceArea && stableSegmentHash(a, b) % 4 === 0;
+      if (!onRouteNetwork && !major && !sampledLocal) return;
+      gridSegments.push({ path: [a, b], highway: edge.highway, roadName: edge.roadName, onRouteNetwork });
+    });
+    return { paths, gridSegments };
+  }
+
+  function restoreCachedStreetPaths() {
+    try {
+      const raw = window.localStorage?.getItem(TACURONG_STREET_CACHE_KEY);
+      if (!raw) return false;
+      const payload = JSON.parse(raw);
+      if (Number(payload?.routeCount) !== routePlanningRows().length || !payload?.paths) return false;
+      const paths = new Map(Object.entries(payload.paths).filter(([, path]) => Array.isArray(path) && path.length >= 2));
+      const gridSegments = Array.isArray(payload.gridSegments) ? payload.gridSegments.filter((segment) => Array.isArray(segment?.path) && segment.path.length === 2) : [];
+      if (paths.size < Math.min(40, routePlanningRows().length) || gridSegments.length < 20) return false;
+      state.routes.streetPaths = paths;
+      state.routes.streetGridSegments = gridSegments;
+      state.routes.streetNetworkReady = true;
+      return true;
+    } catch (_) { return false; }
+  }
+
+  function cacheStreetNetwork(paths, gridSegments) {
+    try {
+      const plain = Object.fromEntries(paths.entries());
+      window.localStorage?.setItem(TACURONG_STREET_CACHE_KEY, JSON.stringify({ routeCount: routePlanningRows().length, paths: plain, gridSegments }));
+    } catch (_) { /* Cache is only a performance enhancement. */ }
+  }
+
+  async function ensureTacurongStreetNetwork() {
+    if (state.routes.streetNetworkReady || restoreCachedStreetPaths()) {
+      const status = qs("#route-road-status");
+      if (status) status.textContent = "Street-aligned utility grid loaded";
+      return state.routes.streetPaths;
+    }
+    if (state.routes.streetNetworkPromise) return state.routes.streetNetworkPromise;
+    state.routes.streetNetworkPromise = (async () => {
+      const status = qs("#route-road-status");
+      if (status) status.textContent = "Building utility grid from Tacurong roads…";
+      const query = '[out:json][timeout:25];way["highway"~"^(trunk|primary|secondary|tertiary|unclassified|residential|living_street|service)$"](6.635,124.635,6.750,124.730);out geom;';
+      let lastError = null;
+      for (const endpoint of TACURONG_OVERPASS_ENDPOINTS) {
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 10000);
+        try {
+          const response = await fetch(`${endpoint}?data=${encodeURIComponent(query)}`, { signal: controller.signal });
+          if (!response.ok) throw new Error(`street network ${response.status}`);
+          const payload = await response.json();
+          const network = buildRoadAlignedRouteNetwork(payload);
+          state.routes.streetPaths = network.paths;
+          state.routes.streetGridSegments = network.gridSegments;
+          state.routes.streetNetworkReady = true;
+          cacheStreetNetwork(network.paths, network.gridSegments);
+          if (status) status.textContent = "Street-aligned utility grid";
+          renderRouteMap();
+          return network.paths;
+        } catch (error) {
+          lastError = error;
+        } finally {
+          window.clearTimeout(timeout);
+        }
+      }
+      if (status) status.textContent = "Offline utility-grid fallback";
+      throw lastError || new Error("Street network unavailable");
+    })().catch(() => state.routes.streetPaths).finally(() => { state.routes.streetNetworkPromise = null; });
+    return state.routes.streetNetworkPromise;
+  }
+
+  function initializeTacurongRouteMap() {
+    if (!window.L || state.routes.map || !qs("#tacurong-route-map")) return;
+    const container = qs("#tacurong-route-map");
+    const map = window.L.map("tacurong-route-map", { zoomControl: true, preferCanvas: false }).setView(TACURONG_ROUTE_MAP_VIEW.center, TACURONG_ROUTE_MAP_VIEW.zoom);
+    container?.classList.add("route-map-osm-primary");
+    const baseTiles = window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+    let tileErrors = 0, fallbackStarted = false;
+    baseTiles.on?.("tileerror", () => {
+      tileErrors += 1;
+      if (fallbackStarted || tileErrors < 3) return;
+      fallbackStarted = true;
+      try { map.removeLayer(baseTiles); } catch (_) {}
+      container?.classList.remove("route-map-osm-primary");
+      container?.classList.add("route-map-dark-fallback");
+      window.L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        maxZoom: 20,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; CARTO',
+      }).addTo(map);
+    });
+    state.routes.map = map;
+    void ensureTacurongStreetNetwork();
+  }
+
+  function addRouteMapLayer(layer) { state.routes.layers.push(layer); return layer; }
+
+  function routeEdgeUsage(rows, year) {
+    const usage = new Map();
+    rows.forEach((route) => {
+      const path = routeDisplayPath(route);
+      const value = routeValueForYear(route, year);
+      for (let index = 0; index < path.length - 1; index += 1) {
+        const key = routeEdgeKey(path[index], path[index + 1]);
+        if (!usage.has(key)) usage.set(key, { count: 0, loadKwh: 0, routes: [] });
+        const item = usage.get(key);
+        item.count += 1;
+        item.loadKwh += Number(value?.kwh || 0);
+        item.routes.push(String(route.route_no));
+      }
+    });
+    return usage;
+  }
+
+  function utilityTierForSegment(segment, usageItem) {
+    const count = Number(usageItem?.count || 0);
+    const road = String(segment?.highway || "");
+    if (road === "trunk" || road === "primary" || count >= 10) return "primary";
+    if (road === "secondary" || count >= 5) return "feeder";
+    if (road === "tertiary" || count >= 2 || segment?.onRouteNetwork) return "distribution";
+    return "local";
+  }
+
+  const UTILITY_TIER_STYLE = {
+    primary: { color: "#ffd166", weight: 4.2, opacity: .98 },
+    feeder: { color: "#ff9f7a", weight: 3.0, opacity: .94 },
+    distribution: { color: "#ef6f9b", weight: 2.1, opacity: .9 },
+    local: { color: "#7868d8", weight: 1.25, opacity: .8 },
+  };
+
+  function fallbackUtilitySegments() {
+    const segments = [];
+    TACURONG_GRID_CORRIDORS.forEach((corridor, corridorIndex) => {
+      for (let index = 0; index < corridor.length - 1; index += 1) {
+        const tier = corridorIndex < 2 ? "primary" : corridorIndex < 6 ? "feeder" : corridorIndex < 9 ? "distribution" : "local";
+        segments.push({ path: [corridor[index], corridor[index + 1]], tier, highway: tier });
+      }
+    });
+    return segments;
+  }
+
+  function routeTerminalBranchPath(route, usage) {
+    const path = routeDisplayPath(route);
+    if (path.length <= 2) return path;
+    let start = Math.max(0, path.length - 5);
+    for (let index = path.length - 2; index >= 0; index -= 1) {
+      const item = usage.get(routeEdgeKey(path[index], path[index + 1]));
+      if (Number(item?.count || 0) > 1) { start = index; break; }
+      start = index;
+    }
+    const branch = path.slice(start);
+    return branch.length >= 2 ? branch : path.slice(-2);
+  }
+
+  function renderSelectedRoadAlignedRoute(route, value) {
+    const map = state.routes.map;
+    if (!map || !route) return;
+    const color = routeColor(route);
+    const path = routeDisplayPath(route);
+    addRouteMapLayer(window.L.polyline(path, { color: "#071018", weight: 12, opacity: .82, lineCap: "round", lineJoin: "round", interactive: false, className: "route-selected-shadow" }).addTo(map));
+    addRouteMapLayer(window.L.polyline(path, { color: "#ffffff", weight: 8, opacity: .96, lineCap: "round", lineJoin: "round", interactive: false, className: "route-selected-halo" }).addTo(map));
+    const line = addRouteMapLayer(window.L.polyline(path, { color, weight: 5.6, opacity: 1, lineCap: "round", lineJoin: "round", className: "route-selected-road-line" }).addTo(map));
+    const status = value ? (value.projected ? "Planning projection" : "SUKELCO ledger") : "No row for selected year";
+    line.bindTooltip(`<strong>Route ${route.route_no}</strong><br>${route.route_name}<br>${status}${value ? `<br>${formatNumber(value.kwh, 0)} kWh` : ""}`, { sticky: true, direction: "top", opacity: .98 });
+    line.on("click", () => selectTacurongRoute(route.route_no, { focusMap: false }));
+  }
+
+  function renderRouteMap() {
+    initializeTacurongRouteMap();
+    const map = state.routes.map;
+    if (!map) return;
+    state.routes.layers.forEach((layer) => { try { map.removeLayer(layer); } catch (_) {} });
+    state.routes.layers = [];
+    const year = Number(state.routes.mapYear || state.planningData?.route_latest_year || 2025);
+    const selectedNo = state.routes.selectedRouteNo;
+    const rows = routePlanningRows();
+    const roadAligned = state.routes.streetNetworkReady && state.routes.streetPaths.size >= Math.min(40, rows.length);
+    const usage = routeEdgeUsage(rows, year);
+
+    // Draw the shared utility network ONCE by road segment. This removes the old visual effect
+    // where dozens of complete route paths converged into a hub and looked like radial spokes.
+    const networkSegments = roadAligned && state.routes.streetGridSegments.length ? state.routes.streetGridSegments : fallbackUtilitySegments();
+    networkSegments.forEach((segment) => {
+      const item = usage.get(routeEdgeKey(segment.path[0], segment.path[1]));
+      const tier = segment.tier || utilityTierForSegment(segment, item);
+      const style = UTILITY_TIER_STYLE[tier] || UTILITY_TIER_STYLE.local;
+      addRouteMapLayer(window.L.polyline(segment.path, { color: "#061019", weight: style.weight + 2.2, opacity: .62, lineCap: "round", lineJoin: "round", interactive: false, className: `utility-grid-shadow utility-tier-${tier}` }).addTo(map));
+      const line = addRouteMapLayer(window.L.polyline(segment.path, { color: style.color, weight: style.weight, opacity: style.opacity, lineCap: "round", lineJoin: "round", interactive: false, className: `utility-grid-segment utility-tier-${tier}` }).addTo(map));
+      if (segment.roadName) line.bindTooltip?.(`${segment.roadName}<br>${tier === "primary" ? "Main trunk" : tier === "feeder" ? "Feeder" : tier === "distribution" ? "Distribution" : "Local branch"}`, { sticky: true, direction: "top", opacity: .95 });
+    });
+
+    // Only each route's terminal/service branch is shown independently. The full selected route
+    // appears after clicking it, so the default map stays grid-like instead of becoming a starburst.
+    rows.forEach((route) => {
+      const value = routeValueForYear(route, year);
+      const selected = String(route.route_no) === String(selectedNo);
+      const branch = routeTerminalBranchPath(route, usage);
+      const color = routeColor(route);
+      if (!selected) {
+        addRouteMapLayer(window.L.polyline(branch, { color: "#08121b", weight: 4.8, opacity: .48, lineCap: "round", lineJoin: "round", interactive: false, className: "route-service-branch-shadow" }).addTo(map));
+        addRouteMapLayer(window.L.polyline(branch, { color, weight: 2.05, opacity: .95, lineCap: "round", lineJoin: "round", interactive: false, className: "route-service-branch" }).addTo(map));
+      }
+      const hit = addRouteMapLayer(window.L.polyline(branch, { color: "#000000", weight: 13, opacity: 0.001, lineCap: "round", lineJoin: "round", className: "route-grid-hit" }).addTo(map));
+      const status = value ? (value.projected ? "Planning projection" : "SUKELCO ledger") : "No row for selected year";
+      const tooltip = `<strong>Route ${route.route_no}</strong><br>${route.route_name}<br>${status}${value ? `<br>${formatNumber(value.kwh, 0)} kWh` : ""}`;
+      hit.bindTooltip(tooltip, { sticky: true, direction: "top", opacity: .98 });
+      hit.on("click", () => selectTacurongRoute(route.route_no, { focusMap: false }));
+    });
+
+    const selected = selectedTacurongRoute();
+    if (selected) renderSelectedRoadAlignedRoute(selected, routeValueForYear(selected, year));
+    const roadStatus = qs("#route-road-status");
+    if (roadStatus) {
+      if (selected) roadStatus.textContent = `Route ${selected.route_no} highlighted`;
+      else if (roadAligned) roadStatus.textContent = "Street-aligned utility grid · select a route";
+      else if (!state.routes.streetNetworkPromise) roadStatus.textContent = "Offline utility-grid fallback · select a route";
+    }
+  }
+
+  function populateRouteControls() {
+    const routes = routePlanningRows();
+    const routeSelect = qs("#route-select");
+    if (routeSelect) {
+      const current = state.routes.selectedRouteNo || "";
+      clearElement(routeSelect);
+      const placeholder = new Option("Select a route…", "");
+      routeSelect.appendChild(placeholder);
+      routes.forEach((route) => routeSelect.appendChild(new Option(`Route ${route.route_no} — ${route.route_name}`, route.route_no)));
+      state.routes.selectedRouteNo = routes.some((route) => String(route.route_no) === String(current)) ? String(current) : null;
+      routeSelect.value = state.routes.selectedRouteNo || "";
+    }
+    const years = Array.from({ length: ROUTE_FORECAST_END_YEAR - 2016 + 1 }, (_, index) => 2016 + index);
+    [["#route-map-year", "mapYear", state.planningData?.route_latest_year || 2025], ["#route-table-year", "tableYear", state.planningData?.route_latest_year || 2025]].forEach(([selector, key, fallback]) => {
+      const select = qs(selector); if (!select) return;
+      const current = Number(state.routes[key] || select.value || fallback);
+      clearElement(select); years.forEach((year) => select.appendChild(new Option(String(year), String(year))));
+      state.routes[key] = years.includes(current) ? current : fallback; select.value = String(state.routes[key]);
+    });
+  }
+
+  function selectedTacurongRoute() { return routePlanningRows().find((route) => String(route.route_no) === String(state.routes.selectedRouteNo)) || null; }
+
+  function resetRouteForecastDisplay() {
+    state.routes.forecastReady = false;
+    state.routes.forecastLoading = false;
+    setHidden(qs("#route-forecast-results"), true);
+    setHidden(qs("#route-forecast-empty"), false);
+    setHidden(qs("#route-forecast-summary"), true);
+    setHidden(qs("#route-method-note"), true);
+    ["route-consumption-chart","route-household-chart","route-weather-temperature-chart","route-weather-atmosphere-chart","route-weather-rainfall-chart","route-weather-wind-chart"].forEach(destroyChart);
+  }
+
+  function selectTacurongRoute(routeNo, { focusMap = true } = {}) {
+    if (!routeNo) { clearTacurongRouteSelection(); return; }
+    state.routes.selectedRouteNo = String(routeNo);
+    const select = qs("#route-select"); if (select) select.value = state.routes.selectedRouteNo;
+    resetRouteForecastDisplay();
+    renderTacurongRouteInspector();
+    renderRouteTable();
+    renderRouteMap();
+    if (focusMap && state.routes.map) {
+      const route = selectedTacurongRoute();
+      if (route) state.routes.map.fitBounds(window.L.latLngBounds(routeDisplayPath(route)).pad(.32), { maxZoom: 16, animate: true });
+    }
+  }
+
+  function clearTacurongRouteSelection() {
+    state.routes.selectedRouteNo = null;
+    const select = qs("#route-select"); if (select) select.value = "";
+    resetRouteForecastDisplay();
+    renderTacurongRouteInspector();
+    renderRouteTable();
+    renderRouteMap();
+    state.routes.map?.setView(TACURONG_ROUTE_MAP_VIEW.center, TACURONG_ROUTE_MAP_VIEW.zoom, { animate: true });
+  }
+
+  function renderTacurongRouteInspector() {
+    const route = selectedTacurongRoute();
+    const forecastButton = qs("#route-forecast-button");
+    const clearButton = qs("#route-clear-selection");
+    if (!route) {
+      setText("#route-selected-title", "Select a route first");
+      ["#route-detail-number","#route-detail-name","#route-detail-observed","#route-detail-latest-kwh","#route-detail-latest-household","#route-detail-growth","#route-detail-2034-kwh","#route-detail-2034-household"].forEach((selector) => setText(selector,"—"));
+      if (forecastButton) forecastButton.disabled = true;
+      if (clearButton) clearButton.disabled = true;
+      setText("#route-forecast-status", "Select a route to enable forecasting.");
+      setHidden(qs("#route-forecast-summary"), true);
+      setHidden(qs("#route-method-note"), true);
+      return;
+    }
+    const latest = route.historical.at(-1);
+    const final = route.forecast.find((row) => Number(row.year) === ROUTE_FORECAST_END_YEAR) || route.forecast.at(-1);
+    setText("#route-selected-title", `Route ${route.route_no}`);
+    setText("#route-detail-number", route.route_no);
+    setText("#route-detail-name", route.route_name);
+    setText("#route-detail-observed", `${route.observed_years} ledger years`);
+    setText("#route-detail-latest-kwh", `${formatNumber(latest?.kwh, 0)} kWh`);
+    setText("#route-detail-latest-household", `${formatNumber(latest?.consumer_month_kwh, 2)} kWh / entry`);
+    if (forecastButton) forecastButton.disabled = state.routes.forecastLoading;
+    if (clearButton) clearButton.disabled = state.routes.forecastLoading;
+    if (state.routes.forecastReady) {
+      setText("#route-detail-growth", formatPercent(route.kwh_growth_pct, 2));
+      setText("#route-detail-2034-kwh", `${formatNumber(final?.kwh, 0)} kWh`);
+      setText("#route-detail-2034-household", `${formatNumber(final?.consumer_month_kwh, 2)} kWh / entry`);
+      setText("#route-methodology-note", state.planningData?.methodology?.route_forecast);
+      setText("#route-forecast-status", `Route ${route.route_no} forecast complete through ${ROUTE_FORECAST_END_YEAR}.`);
+      setHidden(qs("#route-forecast-summary"), false);
+      setHidden(qs("#route-method-note"), false);
+    } else {
+      setText("#route-forecast-status", `Route ${route.route_no} selected. Click Forecast Route when ready.`);
+      setHidden(qs("#route-forecast-summary"), true);
+      setHidden(qs("#route-method-note"), true);
+    }
+  }
+
+  function renderRouteCharts() {
+    const route = selectedTacurongRoute();
+    if (!route || !state.routes.forecastReady) return;
+    const historical = route.historical_monthly_reconstruction || [];
+    const forecast = route.monthly_forecast || [];
+    const labels = [...historical.map((row) => row.period), ...forecast.map((row) => row.period)];
+    const histKwh = new Map(historical.map((row) => [row.period, Number(row.kwh) / 1e6]));
+    const fcKwh = new Map(forecast.map((row) => [row.period, Number(row.kwh) / 1e6]));
+    const histHouse = new Map(historical.map((row) => [row.period, Number(row.consumer_month_kwh)]));
+    const fcHouse = new Map(forecast.map((row) => [row.period, Number(row.consumer_month_kwh)]));
+    const color = routeColor(route);
+    createChart("route-consumption-chart", { type: "line", data: { labels, datasets: [
+      makeDataset("Annual ledger → seasonal monthly reconstruction (GWh/month)", labels.map((label) => histKwh.get(label) ?? null), COLORS.navy, { borderWidth: 2, pointRadius: 0 }),
+      makeDataset("Trend + seasonal route forecast (GWh/month)", labels.map((label) => fcKwh.get(label) ?? null), color, { borderWidth: 3, pointRadius: 0 }),
+    ] }, options: chartBaseOptions({ yTitle: "Route electricity (GWh/month)", beginAtZero: false }) });
+    createChart("route-household-chart", { type: "line", data: { labels, datasets: [
+      makeDataset("Ledger-based seasonal reconstruction", labels.map((label) => histHouse.get(label) ?? null), COLORS.blue, { borderWidth: 2, pointRadius: 0 }),
+      makeDataset("Trend + seasonal household-equivalent forecast", labels.map((label) => fcHouse.get(label) ?? null), COLORS.purple, { borderWidth: 3, pointRadius: 0 }),
+    ] }, options: chartBaseOptions({ yTitle: "kWh per consumer-month", beginAtZero: false }) });
+  }
+
+  function renderRouteWeatherCharts() {
+    if (!state.routes.forecastReady) return;
+    const rows = planningWeatherMonthlyRows("Tacurong City", 2020, ROUTE_FORECAST_END_YEAR);
+    renderWeatherChartSet("route-weather", rows.map((row) => row.period), rows, { rainfallMonthly: true });
+  }
+
+  async function runTacurongRouteForecast() {
+    const route = selectedTacurongRoute();
+    if (!route || state.routes.forecastLoading) return;
+    state.routes.forecastLoading = true;
+    const button = qs("#route-forecast-button");
+    const label = button?.querySelector("span");
+    if (button) { button.disabled = true; button.classList.add("is-loading"); }
+    if (label) label.textContent = "Forecasting…";
+    qs("#route-clear-selection")?.setAttribute("disabled", "");
+    setText("#route-forecast-status", `Analyzing Route ${route.route_no} history and Tacurong planning conditions…`);
+    await new Promise((resolve) => window.setTimeout(resolve, 700));
+    // Forecast values are precomputed from the supplied ledger history; the short delay makes the explicit workflow visible without pretending to retrain a model.
+    state.routes.forecastLoading = false;
+    state.routes.forecastReady = true;
+    if (button) { button.disabled = false; button.classList.remove("is-loading"); }
+    if (label) label.textContent = "Forecast Route Again";
+    qs("#route-clear-selection")?.removeAttribute("disabled");
+    renderTacurongRouteInspector();
+    renderRouteCharts();
+    renderRouteWeatherCharts();
+    setHidden(qs("#route-forecast-empty"), true);
+    setHidden(qs("#route-forecast-results"), false);
+    window.setTimeout(() => qs("#route-forecast-results")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+  }
+
+  function renderRouteTable() {
+    const body = qs("#route-results-body"); if (!body) return;
+    clearElement(body);
+    const year = Number(state.routes.tableYear || state.planningData?.route_latest_year || 2025);
+    routePlanningRows().forEach((route) => {
+      const value = routeValueForYear(route, year);
+      const tr = createElement("tr", String(route.route_no) === String(state.routes.selectedRouteNo) ? "selected-route-row" : "");
+      tr.dataset.routeNo = route.route_no;
+      const statusCell = createElement("td");
+      const status = createElement("span", `route-status-chip ${value?.projected ? "projected" : "observed"}`, value ? (value.projected ? "Projected" : "Ledger") : "No row");
+      statusCell.appendChild(status);
+      tr.append(createTableCell(route.route_no), createTableCell(route.route_name, "wrap"), statusCell,
+        createTableCell(value ? formatNumber(value.kwh, 0) : "—", "numeric"),
+        createTableCell(value ? formatNumber(value.consumer_entries, 0) : "—", "numeric"),
+        createTableCell(value ? formatNumber(value.consumer_month_kwh, 2) : "—", "numeric"),
+        createTableCell(formatPercent(route.kwh_growth_pct, 2), "numeric"));
+      tr.addEventListener("click", () => selectTacurongRoute(route.route_no));
+      body.appendChild(tr);
+    });
+  }
+
+  function renderRouteSummary() {
+    const routes = routePlanningRows(); if (!routes.length) return;
+    const latestYear = Number(state.planningData.route_latest_year);
+    const latestRows = routes.map((route) => routeValueForYear(route, latestYear)).filter(Boolean);
+    const latestKwh = latestRows.reduce((sum, row) => sum + Number(row.kwh || 0), 0);
+    const latestConsumers = latestRows.reduce((sum, row) => sum + Number(row.consumer_entries || 0), 0);
+    setText("#routes-active-count", routes.length);
+    setText("#routes-latest-total", formatNumber(latestKwh / 1e6, 2));
+    setText("#routes-latest-year-note", `${latestYear} supplied Tacurong route ledger`);
+    setText("#routes-latest-household", latestConsumers > 0 ? formatNumber(latestKwh / latestConsumers, 2) : null);
+    setText("#routes-history-span", `${state.planningData?.route_history_period || "2016–2025"}`);
+  }
+
+  function renderRouteLegend() {
+    const legend = qs("#route-map-legend"); if (!legend) return;
+    clearElement(legend);
+    const items = [
+      ["primary", "Main trunk"], ["feeder", "Feeder"], ["distribution", "Distribution"], ["local", "Local branch"],
+    ];
+    items.forEach(([tier, label]) => {
+      const chip = createElement("span", "route-legend-chip");
+      const line = createElement("i");
+      line.className = `route-legend-line utility-tier-${tier}`;
+      line.style.background = UTILITY_TIER_STYLE[tier].color;
+      chip.append(line, document.createTextNode(label));
+      legend.appendChild(chip);
+    });
+    legend.appendChild(createElement("span", "route-legend-chip route-legend-note", "Grid classes are planning hierarchy, not measured voltage · click a branch to select its route"));
+  }
+
+  function renderTacurongRoutes() {
+    if (!qs("#route-select") || !routePlanningRows().length) return;
+    populateRouteControls();
+    renderRouteSummary();
+    renderTacurongRouteInspector();
+    if (state.routes.forecastReady) { renderRouteCharts(); renderRouteWeatherCharts(); }
+    renderRouteTable();
+    renderRouteLegend();
+    if (state.currentPage === "tacurong-routes") {
+      initializeTacurongRouteMap();
+      renderRouteMap();
+      window.setTimeout(() => state.routes.map?.invalidateSize(), 80);
+    }
+  }
+
+  function exportTacurongRoutesCsv() {
+    const year = Number(state.routes.tableYear || state.planningData?.route_latest_year || 2025);
+    const headers = ["year","route_no","route_name","status","electricity_kwh","consumer_entries","kwh_per_consumer_month","stabilized_growth_pct"];
+    const rows = routePlanningRows().map((route) => {
+      const value = routeValueForYear(route, year);
+      return [year, route.route_no, route.route_name, value ? (value.projected ? "projection" : "ledger") : "unavailable", value?.kwh ?? "", value?.consumer_entries ?? "", value?.consumer_month_kwh ?? "", route.kwh_growth_pct];
+    });
+    const escapeCsv = (value) => `"${String(value ?? "").replaceAll('"','""')}"`;
+    const csv = [headers, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\r\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `wattzan_tacurong_routes_${year}.csv`;
+    document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(link.href);
+  }
+
+  function setupTacurongRoutes() {
+    qs("#route-select")?.addEventListener("change", (event) => selectTacurongRoute(event.currentTarget.value));
+    qs("#route-map-year")?.addEventListener("change", (event) => { state.routes.mapYear = Number(event.currentTarget.value); renderRouteMap(); });
+    qs("#route-table-year")?.addEventListener("change", (event) => { state.routes.tableYear = Number(event.currentTarget.value); renderRouteTable(); });
+    qs("#route-map-reset")?.addEventListener("click", () => state.routes.map?.setView(TACURONG_ROUTE_MAP_VIEW.center, TACURONG_ROUTE_MAP_VIEW.zoom, { animate: true }));
+    qs("#route-export-button")?.addEventListener("click", exportTacurongRoutesCsv);
+    qs("#route-forecast-button")?.addEventListener("click", runTacurongRouteForecast);
+    qs("#route-clear-selection")?.addEventListener("click", clearTacurongRouteSelection);
+  }
+
+  function renderAboutMlrModels() {
+    const body = qs("#about-mlr-models-body"); if (!body) return;
+    const models = state.planningData?.mlr_substituted_models || [];
+    clearElement(body);
+    models.forEach((model) => {
+      const tr = createElement("tr");
+      const actionCell = createElement("td");
+      const button = createElement("button", "mlr-model-button", "Inspect full equation"); button.type = "button";
+      button.addEventListener("click", () => {
+        setText("#about-mlr-selected-title", model.municipality);
+        setText("#about-mlr-equation", model.equation || model.general_formula, "Equation unavailable");
+      });
+      actionCell.appendChild(button);
+      tr.append(createTableCell(model.municipality), createTableCell(formatNumber(model.effective_intercept, 5), "numeric"), actionCell);
+      body.appendChild(tr);
+    });
+    if (models[0]) {
+      setText("#about-mlr-selected-title", models[0].municipality);
+      setText("#about-mlr-equation", models[0].equation || models[0].general_formula);
+    }
+  }
+
+  async function animateOverviewToTacurongRoutes() {
+    const overlay = qs("#route-zoom-transition");
+    const camera = state.overviewMap.camera;
+    const renderer = state.overviewMap.renderer;
+    const scene = state.overviewMap.scene;
+    const mesh = state.overviewMap.meshes.find((item) => item.userData.municipality === "Tacurong City");
+    stopOverview3DAutoRotate();
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    if (!reduced && camera && renderer && scene && mesh) {
+      const start = camera.position.clone();
+      const target = mesh.position.clone();
+      const end = new window.THREE.Vector3(target.x + 8, 24, target.z + 30);
+      const began = performance.now();
+      await new Promise((resolve) => {
+        const tick = (now) => {
+          const t = Math.min(1, (now - began) / 650);
+          const eased = 1 - (1 - t) ** 3;
+          camera.position.lerpVectors(start, end, eased);
+          camera.lookAt(target.x, 2.5, target.z);
+          renderer.render(scene, camera);
+          if (t < 1) window.requestAnimationFrame(tick); else resolve();
+        };
+        window.requestAnimationFrame(tick);
+      });
+    }
+    overlay?.classList.add("active");
+    await new Promise((resolve) => window.setTimeout(resolve, reduced ? 0 : 260));
+    await navigateTo("tacurong-routes");
+    await new Promise((resolve) => window.setTimeout(resolve, reduced ? 0 : 180));
+    overlay?.classList.remove("active");
   }
 
   function setupDataManagement() {
@@ -4611,6 +5800,7 @@
       resetOverview3DCamera();
     });
     qs("#overview-map-popup-close")?.addEventListener("click", () => closeOverviewMapPopup());
+    qs("#overview-map-explore-routes")?.addEventListener("click", () => animateOverviewToTacurongRoutes().catch((error) => showToast("Route view unavailable", errorMessage(error), "error")));
     qs("#overview-map-open-forecast")?.addEventListener("click", async () => {
       const name = state.overviewMap.selectedMunicipality;
       if (!name) return;
@@ -4666,6 +5856,7 @@
     setupForecastForms();
     setupShortTermLocationAutomation();
     setupLongTermForecast();
+    setupTacurongRoutes();
     setupDataManagement();
     setupPerformanceControls();
     setupHistory();
@@ -4681,6 +5872,13 @@
     }
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initialize, { once: true });
-  else initialize();
+  // app.js is injected asynchronously by dependency-loader.js. On a normal browser
+  // DOMContentLoaded can fire before that network/dependency bootstrap finishes, so merely
+  // registering a DOMContentLoaded listener here can leave the entire UI uninitialized.
+  // Initialize immediately whenever the document has already finished parsing.
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initialize, { once: true });
+  } else {
+    initialize();
+  }
 })();
