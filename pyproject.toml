@@ -1,6 +1,6 @@
 [project]
 name = "wattzan"
-version = "16.2.9"
+version = "16.3.0"
 requires-python = ">=3.12,<3.15"
 dependencies = [
     "fastapi>=0.115,<1",

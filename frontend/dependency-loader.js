@@ -2,7 +2,7 @@
   "use strict";
 
   const runtime = window.WATTZAN_FRONTEND_RUNTIME = window.WATTZAN_FRONTEND_RUNTIME || {
-    version: "16.2.9",
+    version: "16.3.0",
     dependencies: {},
     startedAt: new Date().toISOString(),
   };
@@ -159,7 +159,7 @@
 
     runtime.finishedAt = new Date().toISOString();
     window.dispatchEvent(new CustomEvent("wattzan:dependencies-ready", { detail: runtime }));
-    await loadScript("/app.js?v=16.2.9", 12000);
+    await loadScript("/app.js?v=16.3.0", 12000);
   }
 
   bootstrap().catch(async (error) => {
@@ -167,7 +167,7 @@
     console.error("[WATTZAN] Frontend dependency bootstrap failed", error);
     // The application is intentionally still started. It contains graceful
     // fallbacks so non-3D/API functions remain usable when a visual library fails.
-    try { await loadScript("/app.js?v=16.2.9", 12000); } catch (appError) {
+    try { await loadScript("/app.js?v=16.3.0", 12000); } catch (appError) {
       console.error("[WATTZAN] Application script could not be loaded", appError);
     }
   });

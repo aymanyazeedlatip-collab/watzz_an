@@ -1,14 +1,12 @@
-WATTZAN v16.1 UPDATE INSTALLATION
+WATTZAN v16.3.0 FINAL DEPLOYMENT UPDATE
 
-1. Extract this ZIP.
-2. Copy all extracted files/folders into the ROOT of your existing WATTZAN
-   GitHub repository.
-3. Choose Replace files in the destination when Windows asks.
-4. In GitHub Desktop, commit with: Fix 3D map dependency loading and runtime reliability
-5. Push origin.
-6. Wait for the Vercel Production deployment to become Ready.
-7. Open the website and press Ctrl+F5 once.
-8. Open Overview and confirm the 3D map renders.
-9. Check /api/health and /api/deployment-diagnostics.
-
-No Vercel environment variable changes are required.
+1. Close the local WATTZAN server if it is running.
+2. Extract the UPDATE ZIP.
+3. Copy every file/folder inside the extracted update into your existing local watzz_an Git repository.
+4. Choose Replace files in destination when Windows asks.
+5. Do NOT delete the hidden .git folder.
+6. Test locally with CLICK_TO_RUN_WATTZAN.bat.
+7. In Route Intelligence, confirm the dense electricity grid appears immediately over the Tacurong basemap without a Retry grid state.
+8. Commit and push the repository.
+9. Wait for Vercel to redeploy.
+10. Hard refresh the deployed site with Ctrl+Shift+R once.
