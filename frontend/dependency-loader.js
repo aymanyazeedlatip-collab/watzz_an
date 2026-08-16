@@ -2,7 +2,7 @@
   "use strict";
 
   const runtime = window.WATTZAN_FRONTEND_RUNTIME = window.WATTZAN_FRONTEND_RUNTIME || {
-    version: "16.2.7",
+    version: "16.2.8",
     dependencies: {},
     startedAt: new Date().toISOString(),
   };
@@ -16,7 +16,7 @@
     };
   }
 
-  function loadScript(url, timeoutMs = 15000) {
+  function loadScript(url, timeoutMs = 4500) {
     return new Promise((resolve, reject) => {
       const script = document.createElement("script");
       let settled = false;
@@ -40,7 +40,7 @@
     });
   }
 
-  function loadStylesheet(url, timeoutMs = 12000) {
+  function loadStylesheet(url, timeoutMs = 4500) {
     return new Promise((resolve, reject) => {
       const link = document.createElement("link");
       let settled = false;
@@ -112,56 +112,54 @@
   }
 
   async function bootstrap() {
-    await ensureLeafletCss();
+    // Independent browser libraries are loaded concurrently. This avoids a deployment
+    // waiting through a long chain of CDN timeouts before app.js is even allowed to start.
+    await Promise.allSettled([
+      ensureLeafletCss(),
+      ensureScript({
+        name: "Chart.js", primary: "/vendor/chart.umd.min.js",
+        fallback: "https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js",
+        test: () => Boolean(window.Chart),
+      }),
+      ensureScript({
+        name: "Hammer.js", primary: "/vendor/hammer.min.js",
+        fallback: "https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js",
+        test: () => Boolean(window.Hammer),
+      }),
+      ensureScript({
+        name: "Lucide", primary: "/vendor/lucide.min.js",
+        fallback: "https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js",
+        test: () => Boolean(window.lucide?.createIcons),
+      }),
+      ensureScript({
+        name: "Leaflet", primary: "/vendor/leaflet.js",
+        fallback: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
+        test: () => Boolean(window.L?.map),
+      }),
+      ensureScript({
+        name: "Three.js", primary: "/vendor/three.min.js",
+        fallback: "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js",
+        test: () => Boolean(window.THREE?.WebGLRenderer), required: true,
+      }),
+    ]);
 
-    await ensureScript({
-      name: "Chart.js",
-      primary: "/vendor/chart.umd.min.js",
-      fallback: "https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js",
-      test: () => Boolean(window.Chart),
-    });
-    await ensureScript({
-      name: "Hammer.js",
-      primary: "/vendor/hammer.min.js",
-      fallback: "https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js",
-      test: () => Boolean(window.Hammer),
-    });
-    await ensureScript({
-      name: "Chart Zoom",
-      primary: "/vendor/chartjs-plugin-zoom.min.js",
-      fallback: "https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.2.0/dist/chartjs-plugin-zoom.min.js",
-      test: () => Boolean(window.Chart?.registry?.plugins?.get?.("zoom")),
-    });
-    await ensureScript({
-      name: "Lucide",
-      primary: "/vendor/lucide.min.js",
-      fallback: "https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js",
-      test: () => Boolean(window.lucide?.createIcons),
-    });
-    await ensureScript({
-      name: "Leaflet",
-      primary: "/vendor/leaflet.js",
-      fallback: "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
-      test: () => Boolean(window.L?.map),
-    });
-    await ensureScript({
-      name: "Three.js",
-      primary: "/vendor/three.min.js",
-      fallback: "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js",
-      test: () => Boolean(window.THREE?.WebGLRenderer),
-      required: true,
-    });
-    await ensureScript({
-      name: "OrbitControls",
-      primary: "/vendor/OrbitControls.js",
-      fallback: "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js",
-      test: () => Boolean(window.THREE?.OrbitControls),
-      required: true,
-    });
+    // Plugins depend on their parent libraries, so load only this second wave afterward.
+    await Promise.allSettled([
+      ensureScript({
+        name: "Chart Zoom", primary: "/vendor/chartjs-plugin-zoom.min.js",
+        fallback: "https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.2.0/dist/chartjs-plugin-zoom.min.js",
+        test: () => Boolean(window.Chart?.registry?.plugins?.get?.("zoom")),
+      }),
+      ensureScript({
+        name: "OrbitControls", primary: "/vendor/OrbitControls.js",
+        fallback: "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js",
+        test: () => Boolean(window.THREE?.OrbitControls), required: true,
+      }),
+    ]);
 
     runtime.finishedAt = new Date().toISOString();
     window.dispatchEvent(new CustomEvent("wattzan:dependencies-ready", { detail: runtime }));
-    await loadScript("/app.js?v=16.2.7", 20000);
+    await loadScript("/app.js?v=16.2.8", 12000);
   }
 
   bootstrap().catch(async (error) => {
@@ -169,7 +167,7 @@
     console.error("[WATTZAN] Frontend dependency bootstrap failed", error);
     // The application is intentionally still started. It contains graceful
     // fallbacks so non-3D/API functions remain usable when a visual library fails.
-    try { await loadScript("/app.js?v=16.2.7", 20000); } catch (appError) {
+    try { await loadScript("/app.js?v=16.2.8", 12000); } catch (appError) {
       console.error("[WATTZAN] Application script could not be loaded", appError);
     }
   });

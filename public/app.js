@@ -69,7 +69,7 @@
     "https://overpass-api.de/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
   ];
-  const TACURONG_STREET_CACHE_KEY = "wattzan-tacurong-utility-network-v1624";
+  const TACURONG_STREET_CACHE_KEY = "wattzan-tacurong-utility-network-v1628";
   const TACURONG_ROUTE_MAP_VIEW = { center: [6.6884, 124.6786], zoom: 13 };
   const TACURONG_GRID_HUB = [6.6918, 124.6774];
   const TACURONG_GRID_CORRIDORS = [
@@ -556,12 +556,129 @@
     };
   }
 
+  function nativeChartColor(value, index = 0) {
+    if (Array.isArray(value)) return value[index % Math.max(1, value.length)] || COLORS.blue;
+    return value || COLORS.blue;
+  }
+
+  function createNativeChartFallback(canvasId, config) {
+    const canvas = qs(`#${canvasId}`);
+    if (!canvas) return null;
+    const parent = canvas.parentElement;
+    parent?.querySelector(`.native-chart-fallback[data-chart-id="${canvasId}"]`)?.remove();
+    canvas.style.display = "none";
+
+    const labels = Array.isArray(config?.data?.labels) ? config.data.labels : [];
+    const datasets = (config?.data?.datasets || []).filter((dataset) => !dataset.hidden);
+    const wrapper = createElement("div", "native-chart-fallback");
+    wrapper.dataset.chartId = canvasId;
+    const svg = svgElement("svg", { viewBox: "0 0 900 330", preserveAspectRatio: "none", role: "img", "aria-label": canvas.getAttribute("aria-label") || "WATTZAN chart" });
+    const width = 900, height = 330, left = 62, right = 18, top = 18, bottom = 52;
+    const plotW = width - left - right, plotH = height - top - bottom;
+    const finiteValues = datasets.flatMap((dataset) => (dataset.data || []).map(Number).filter(Number.isFinite));
+    if (!labels.length || !finiteValues.length) {
+      const message = svgElement("text", { x: width / 2, y: height / 2, "text-anchor": "middle", fill: COLORS.muted, "font-size": 15 });
+      message.textContent = "No chart data available";
+      svg.appendChild(message);
+    } else {
+      let yMin = Math.min(...finiteValues), yMax = Math.max(...finiteValues);
+      const beginAtZero = Boolean(config?.options?.scales?.y?.beginAtZero);
+      if (beginAtZero) yMin = Math.min(0, yMin);
+      if (Math.abs(yMax - yMin) < 1e-9) { const pad = Math.max(1, Math.abs(yMax) * .12); yMin -= pad; yMax += pad; }
+      else { const pad = (yMax - yMin) * .08; yMin -= beginAtZero ? 0 : pad; yMax += pad; }
+      const xAt = (index) => labels.length <= 1 ? left + plotW / 2 : left + index * plotW / (labels.length - 1);
+      const yAt = (value) => top + (yMax - value) * plotH / (yMax - yMin);
+
+      for (let tick = 0; tick <= 5; tick += 1) {
+        const y = top + tick * plotH / 5;
+        const value = yMax - tick * (yMax - yMin) / 5;
+        svg.appendChild(svgElement("line", { x1: left, y1: y, x2: width - right, y2: y, stroke: "#d6dee8", "stroke-opacity": .75, "stroke-width": 1 }));
+        const label = svgElement("text", { x: left - 9, y: y + 4, "text-anchor": "end", fill: COLORS.muted, "font-size": 11 });
+        label.textContent = formatNumber(value, Math.abs(value) >= 100 ? 0 : 1);
+        svg.appendChild(label);
+      }
+      const maxXTicks = Math.min(9, labels.length);
+      const tickIndices = [...new Set(Array.from({ length: maxXTicks }, (_, i) => Math.round(i * (labels.length - 1) / Math.max(1, maxXTicks - 1))))];
+      tickIndices.forEach((index) => {
+        const x = xAt(index);
+        const label = svgElement("text", { x, y: height - 22, "text-anchor": "middle", fill: COLORS.muted, "font-size": 10 });
+        label.textContent = String(labels[index] ?? "");
+        svg.appendChild(label);
+      });
+
+      const defaultType = config?.type || "line";
+      datasets.forEach((dataset, datasetIndex) => {
+        const type = dataset.type || defaultType;
+        const values = (dataset.data || []).map((value) => Number(value));
+        if (type === "bar") {
+          const groups = Math.max(1, datasets.length);
+          const slot = plotW / Math.max(1, labels.length);
+          const barWidth = Math.min(68, slot * .72 / groups);
+          values.forEach((value, index) => {
+            if (!Number.isFinite(value)) return;
+            const baseY = yAt(Math.max(0, yMin));
+            const valueY = yAt(value);
+            const x = labels.length <= 1 ? left + plotW / 2 : left + (index + .5) * slot;
+            const offset = (datasetIndex - (groups - 1) / 2) * barWidth;
+            const rect = svgElement("rect", { x: x + offset - barWidth * .42, y: Math.min(baseY, valueY), width: barWidth * .84, height: Math.max(2, Math.abs(baseY - valueY)), rx: 5, fill: nativeChartColor(dataset.backgroundColor || dataset.borderColor, index), "fill-opacity": .9 });
+            svg.appendChild(rect);
+            if (labels.length <= 8) {
+              const valueText = svgElement("text", { x: x + offset, y: Math.max(13, valueY - 7), "text-anchor": "middle", fill: COLORS.navy, "font-size": 11, "font-weight": 700 });
+              valueText.textContent = `${formatNumber(value, Math.abs(value) >= 100 ? 0 : Math.abs(value) < 1 ? 2 : 1)}${dataset.valueSuffix || ""}`;
+              svg.appendChild(valueText);
+            }
+          });
+        } else {
+          let segment = [];
+          const flush = () => {
+            if (segment.length >= 2) {
+              const polyline = svgElement("polyline", { points: segment.join(" "), fill: "none", stroke: nativeChartColor(dataset.borderColor || dataset.backgroundColor), "stroke-width": dataset.borderWidth || 2.4, "stroke-linejoin": "round", "stroke-linecap": "round" });
+              svg.appendChild(polyline);
+            }
+            segment = [];
+          };
+          values.forEach((value, index) => {
+            if (!Number.isFinite(value)) { flush(); return; }
+            segment.push(`${xAt(index)},${yAt(value)}`);
+          });
+          flush();
+        }
+      });
+      const yTitle = config?.options?.scales?.y?.title?.text;
+      if (yTitle) {
+        const title = svgElement("text", { x: 16, y: height / 2, transform: `rotate(-90 16 ${height / 2})`, "text-anchor": "middle", fill: COLORS.muted, "font-size": 11 });
+        title.textContent = yTitle; svg.appendChild(title);
+      }
+    }
+    wrapper.appendChild(svg);
+    if (datasets.length && config?.options?.plugins?.legend?.display !== false) {
+      const legend = createElement("div", "native-chart-legend");
+      datasets.forEach((dataset, index) => {
+        const item = createElement("span");
+        const swatch = createElement("i");
+        swatch.style.background = nativeChartColor(dataset.borderColor || dataset.backgroundColor, index);
+        item.append(swatch, document.createTextNode(dataset.label || `Series ${index + 1}`));
+        legend.appendChild(item);
+      });
+      wrapper.appendChild(legend);
+    }
+    parent?.appendChild(wrapper);
+    const fallback = {
+      destroy() { wrapper.remove(); canvas.style.display = ""; },
+      resetZoom() {}, reset() {}, update() {}, nativeFallback: true,
+    };
+    state.charts.set(canvasId, fallback);
+    return fallback;
+  }
+
   function createChart(canvasId, config) {
-    if (!window.Chart) return null;
     const canvas = qs(`#${canvasId}`);
     if (!canvas) return null;
     const existing = state.charts.get(canvasId);
     if (existing) existing.destroy();
+    if (!window.Chart) return createNativeChartFallback(canvasId, config);
+    canvas.style.display = "";
+    canvas.parentElement?.querySelector(`.native-chart-fallback[data-chart-id="${canvasId}"]`)?.remove();
     const chart = new window.Chart(canvas.getContext("2d"), config);
     state.charts.set(canvasId, chart);
     return chart;
@@ -942,10 +1059,83 @@
     return element;
   }
 
+  function normalizePlanningData(payload) {
+    if (!payload || typeof payload !== "object") return payload;
+
+    // Deployment-compact route schema. Expand it in memory so the rest of the
+    // application keeps the exact same route-data contract used by local builds.
+    if (!Array.isArray(payload.tacurong_routes) && Array.isArray(payload.tacurong_routes_compact)) {
+      const seasonal = payload.municipality_monthly_consumption_seasonality?.["Tacurong City"] || {};
+      const monthShare = (month) => {
+        const value = Number(seasonal[String(month)]);
+        return Number.isFinite(value) && value > 0 ? value : 1 / 12;
+      };
+      const monthlyRows = (annualRows, status) => annualRows.flatMap((row) => {
+        const annualKwh = Number(row.kwh || 0);
+        const annualConsumerMonth = Number(row.consumer_month_kwh || 0);
+        return Array.from({ length: 12 }, (_, index) => {
+          const month = index + 1;
+          const share = monthShare(month);
+          return {
+            period: `${row.year}-${String(month).padStart(2, "0")}`,
+            year: row.year,
+            month,
+            kwh: annualKwh * share,
+            consumer_month_kwh: annualConsumerMonth * share * 12,
+            status,
+          };
+        });
+      });
+      payload.tacurong_routes = payload.tacurong_routes_compact.map((route) => {
+        const historical = (route.historical || []).map((row) => ({
+          year: Number(row[0]), kwh: Number(row[1]), consumer_entries: Number(row[2]),
+          consumer_month_kwh: Number(row[3]), route_name: route.route_name, status: "SUKELCO_LEDGER",
+        }));
+        const forecast = (route.forecast || []).map((row) => ({
+          year: Number(row[0]), kwh: Number(row[1]), consumer_entries: Number(row[2]),
+          consumer_month_kwh: Number(row[3]), effective_growth_pct: Number(row[4]),
+          status: "ROUTE_DAMPED_TREND_PROJECTION",
+        }));
+        return {
+          route_no: String(route.route_no),
+          route_name: route.route_name,
+          latest_year: Number(payload.route_latest_year || historical.at(-1)?.year || 2025),
+          observed_years: historical.length,
+          kwh_growth_pct: Number(route.kwh_growth_pct || 0),
+          historical,
+          forecast,
+          historical_monthly_reconstruction: monthlyRows(historical, "SEASONAL_RECONSTRUCTION_FROM_ANNUAL_LEDGER"),
+          monthly_forecast: monthlyRows(forecast, "TREND_PLUS_SEASONAL_ROUTE_PROJECTION"),
+        };
+      });
+    }
+
+    // Deployment-compact weather schema. The compact file stores one shared
+    // period axis and numeric arrays; expand those arrays into the existing map.
+    if (!payload.municipality_weather_monthly && payload.municipality_weather_monthly_compact) {
+      const periods = Array.isArray(payload.weather_periods) ? payload.weather_periods : [];
+      const fields = Array.isArray(payload.weather_fields) ? payload.weather_fields : [];
+      payload.municipality_weather_monthly = {};
+      Object.entries(payload.municipality_weather_monthly_compact).forEach(([municipality, fieldArrays]) => {
+        const municipalityMap = {};
+        fields.forEach((field, fieldIndex) => {
+          const periodMap = {};
+          periods.forEach((period, periodIndex) => {
+            const value = Number(fieldArrays?.[fieldIndex]?.[periodIndex]);
+            if (Number.isFinite(value)) periodMap[period] = { value, status: "PACKAGED_SEASONAL_PLANNING" };
+          });
+          municipalityMap[field] = periodMap;
+        });
+        payload.municipality_weather_monthly[municipality] = municipalityMap;
+      });
+    }
+    return payload;
+  }
+
   async function loadPlanningData() {
     const response = await fetch(PLANNING_DATA_ASSET, { cache: "no-store" });
     if (!response.ok) throw new Error(`Planning data could not be loaded (${response.status}).`);
-    return response.json();
+    return normalizePlanningData(await response.json());
   }
 
   function overviewMapYears() {
@@ -2049,55 +2239,52 @@
     });
   }
 
-  async function fetchOpenMeteoRange(lat, lng, startDate, endDate) {
+  async function fetchOpenMeteoRange(lat, lng, startDate, endDate, municipalityName = null) {
     const today = isoDateInManila();
     const maximumForecastDate = addDaysIso(today, 15);
-    // Dates from this cutoff onward (including the last few days before "today") are
-    // requested from the forecast endpoint, not the archive endpoint, because the archive
-    // dataset lags real time and would otherwise return incomplete rows for recent dates.
     const archiveCutoff = addDaysIso(today, -OPEN_METEO_RECENT_ARCHIVE_BUFFER_DAYS);
     const segments = [];
     if (startDate < archiveCutoff) {
       const historicalEnd = endDate < archiveCutoff ? endDate : addDaysIso(archiveCutoff, -1);
-      segments.push({
-        source: "Open-Meteo Historical Weather",
-        url: openMeteoUrl(OPEN_METEO_ARCHIVE_URL, lat, lng, startDate, historicalEnd),
-      });
+      segments.push({ kind: "archive", source: "Open-Meteo Historical Weather", startDate, endDate: historicalEnd, url: openMeteoUrl(OPEN_METEO_ARCHIVE_URL, lat, lng, startDate, historicalEnd) });
     }
     if (endDate >= archiveCutoff) {
       const forecastStart = startDate > archiveCutoff ? startDate : archiveCutoff;
-      if (endDate > maximumForecastDate) {
-        throw new Error(`Open-Meteo forecasts are available only through ${maximumForecastDate}. Choose an earlier date.`);
-      }
-      segments.push({
-        source: "Open-Meteo Forecast API",
-        url: openMeteoUrl(OPEN_METEO_FORECAST_URL, lat, lng, forecastStart, endDate),
-      });
+      if (endDate > maximumForecastDate) throw new Error(`Open-Meteo forecasts are available only through ${maximumForecastDate}. Choose an earlier date.`);
+      segments.push({ kind: "forecast", source: "Open-Meteo Forecast API", startDate: forecastStart, endDate, url: openMeteoUrl(OPEN_METEO_FORECAST_URL, lat, lng, forecastStart, endDate) });
     }
     if (!segments.length) throw new Error("No weather date range was selected.");
 
     const cache = state.shortTerm.weatherCache;
-    const segmentRows = await Promise.all(segments.map(async (segment) => {
-      let payload = cache.get(segment.url);
-      if (!payload) {
-        payload = await fetchExternalWeatherJson(segment.url);
-        cache.set(segment.url, payload);
-        if (cache.size > 24) cache.delete(cache.keys().next().value);
+    const segmentResults = await Promise.all(segments.map(async (segment) => {
+      try {
+        let payload = cache.get(segment.url);
+        if (!payload) {
+          payload = await fetchExternalWeatherJson(segment.url, 6500, 1);
+          cache.set(segment.url, payload);
+          if (cache.size > 24) cache.delete(cache.keys().next().value);
+        }
+        await yieldToBrowser();
+        return { rows: parseOpenMeteoDaily(payload).map((row) => ({ ...row, source: segment.source })), fallback: false };
+      } catch (error) {
+        const fallbackRows = municipalityName ? buildPlanningWeatherBridgeRows(municipalityName, segment.startDate, segment.endDate) : [];
+        const expectedFallbackCount = inclusiveDayCount(segment.startDate, segment.endDate);
+        if (fallbackRows.length !== expectedFallbackCount) throw error;
+        const source = segment.kind === "forecast"
+          ? "WATTZAN seasonal climatology fallback (live weather unavailable)"
+          : "WATTZAN monthly climatology bridge fallback";
+        console.warn(`${segment.source} unavailable; using packaged WATTZAN climatology.`, error);
+        return { rows: fallbackRows.map((row) => ({ ...row, source })), fallback: true };
       }
-      await yieldToBrowser();
-      return parseOpenMeteoDaily(payload).map((row) => ({ ...row, source: segment.source }));
     }));
-    const rows = segmentRows.flat();
+    const rows = segmentResults.flatMap((result) => result.rows);
     const byDate = new Map(rows.map((row) => [row.date, row]));
-    // Build a bounded UTC calendar-date range. The previous local-time loop could fail to
-    // advance in UTC+08:00 because converting local midnight to ISO returned the prior UTC
-    // date, which caused an infinite loop and Chrome's “Page Unresponsive” warning.
     const expectedDates = buildIsoDateRange(startDate, endDate, 16);
     const ordered = expectedDates.map((dateValue) => byDate.get(dateValue));
     const missing = expectedDates.filter((_, index) => !ordered[index]);
     if (missing.length) throw new Error(`Weather data was unavailable for: ${missing.join(", ")}.`);
     const sourceNames = [...new Set(ordered.map((row) => row.source))];
-    return { rows: ordered, source: sourceNames.join(" + ") };
+    return { rows: ordered, source: sourceNames.join(" + "), usedClimatologyFallback: segmentResults.some((result) => result.fallback) };
   }
 
 
@@ -2200,13 +2387,15 @@
         if (onProgress) onProgress(index + 1, segments.length, segment, "completed");
         return { rows, fallback: false };
       } catch (error) {
-        if (segment.kind !== "archive") throw error;
         const fallbackRows = buildPlanningWeatherBridgeRows(municipalityName, segment.startDate, segment.endDate);
         const expectedFallbackCount = inclusiveDayCount(segment.startDate, segment.endDate);
         if (fallbackRows.length !== expectedFallbackCount) throw error;
-        console.warn("Historical weather service was slow/unavailable; using WATTZAN monthly climatology for bridge days only.", error);
+        const fallbackSource = segment.kind === "forecast"
+          ? "WATTZAN seasonal climatology fallback (live weather unavailable)"
+          : "WATTZAN monthly climatology bridge fallback";
+        console.warn(`${segment.source} was slow/unavailable; using packaged WATTZAN climatology for this segment.`, error);
         if (onProgress) onProgress(index + 1, segments.length, segment, "fallback");
-        return { rows: fallbackRows, fallback: true };
+        return { rows: fallbackRows.map((row) => ({ ...row, source: fallbackSource })), fallback: true };
       }
     }));
 
@@ -2591,7 +2780,7 @@
       if (runAfter) updateForecastProgress("Retrieving date-matched weather inputs…");
       await yieldToBrowser();
 
-      const result = await fetchOpenMeteoRange(pin.lat, pin.lng, startDate, endDate);
+      const result = await fetchOpenMeteoRange(pin.lat, pin.lng, startDate, endDate, municipality.name);
       state.shortTerm.weatherRows = result.rows;
       state.shortTerm.weatherSource = result.source;
       renderShortTermWeatherCharts();
@@ -4289,9 +4478,63 @@
     return state.routes.streetNetworkPromise;
   }
 
+  function renderTacurongRouteSvgFallback() {
+    const container = qs("#tacurong-route-map");
+    if (!container) return;
+    container.classList.add("route-map-native-fallback");
+    clearElement(container);
+    const svg = svgElement("svg", { viewBox: "0 0 1000 640", preserveAspectRatio: "xMidYMid slice", role: "img", "aria-label": "Tacurong electricity distribution planning map fallback" });
+    const bounds = { minLat: 6.635, maxLat: 6.75, minLng: 124.635, maxLng: 124.73 };
+    const project = (point) => [
+      (Number(point[1]) - bounds.minLng) / (bounds.maxLng - bounds.minLng) * 1000,
+      (bounds.maxLat - Number(point[0])) / (bounds.maxLat - bounds.minLat) * 640,
+    ];
+    svg.appendChild(svgElement("rect", { x: 0, y: 0, width: 1000, height: 640, fill: "#101820" }));
+
+    // Faint local-road context remains visible even when Leaflet/CDN resources are blocked.
+    TACURONG_GRID_CORRIDORS.forEach((corridor) => {
+      const points = corridor.map(project).map((point) => point.join(",")).join(" ");
+      svg.appendChild(svgElement("polyline", { points, fill: "none", stroke: "#82909d", "stroke-opacity": .38, "stroke-width": 2.1, "stroke-linecap": "round", "stroke-linejoin": "round" }));
+    });
+
+    fallbackUtilitySegments().forEach((segment) => {
+      const style = UTILITY_TIER_STYLE[segment.tier] || UTILITY_TIER_STYLE.local;
+      const points = segment.path.map(project).map((point) => point.join(",")).join(" ");
+      svg.appendChild(svgElement("polyline", { points, fill: "none", stroke: "#02080d", "stroke-opacity": .85, "stroke-width": style.weight + 4, "stroke-linecap": "round", "stroke-linejoin": "round" }));
+      svg.appendChild(svgElement("polyline", { points, fill: "none", stroke: style.color, "stroke-opacity": 1, "stroke-width": style.weight + .8, "stroke-linecap": "round", "stroke-linejoin": "round" }));
+    });
+
+    const usage = routeEdgeUsage(routePlanningRows(), Number(state.routes.mapYear || state.planningData?.route_latest_year || 2025));
+    routePlanningRows().forEach((route) => {
+      const branch = routeTerminalBranchPath(route, usage);
+      const points = branch.map(project).map((point) => point.join(",")).join(" ");
+      const visible = svgElement("polyline", { points, fill: "none", stroke: routeColor(route), "stroke-opacity": .95, "stroke-width": 2.4, "stroke-linecap": "round", "stroke-linejoin": "round" });
+      const hit = svgElement("polyline", { points, fill: "none", stroke: "transparent", "stroke-width": 14, style: "cursor:pointer" });
+      hit.addEventListener("click", () => selectTacurongRoute(route.route_no, { focusMap: false }));
+      svg.append(visible, hit);
+    });
+    const selected = selectedTacurongRoute();
+    if (selected) {
+      const points = routeDisplayPath(selected).map(project).map((point) => point.join(",")).join(" ");
+      svg.appendChild(svgElement("polyline", { points, fill: "none", stroke: "#ffffff", "stroke-opacity": .96, "stroke-width": 10, "stroke-linecap": "round", "stroke-linejoin": "round" }));
+      svg.appendChild(svgElement("polyline", { points, fill: "none", stroke: routeColor(selected), "stroke-opacity": 1, "stroke-width": 6, "stroke-linecap": "round", "stroke-linejoin": "round" }));
+    }
+    const labelPoints = [["Tacurong", [6.6918,124.6774]],["San Emmanuel",[6.7205,124.6625]],["Baras",[6.6575,124.704]],["New Lagao",[6.681,124.7135]],["Calean",[6.65,124.667]]];
+    labelPoints.forEach(([name, coord]) => {
+      const [x,y] = project(coord);
+      const node = svgElement("text", { x: x + 7, y: y - 7, fill: "#dce6ef", "fill-opacity": .72, "font-size": 14, "font-weight": 600 });
+      node.textContent = name; svg.appendChild(node);
+    });
+    container.appendChild(svg);
+    const status = qs("#route-road-status");
+    if (status) status.textContent = selected ? `Route ${selected.route_no} highlighted` : "Built-in Tacurong utility map · select a route";
+  }
+
   function initializeTacurongRouteMap() {
     if (!window.L || state.routes.map || !qs("#tacurong-route-map")) return;
     const container = qs("#tacurong-route-map");
+    container?.classList.remove("route-map-native-fallback");
+    clearElement(container);
     const map = window.L.map("tacurong-route-map", { zoomControl: true, preferCanvas: false }).setView(TACURONG_ROUTE_MAP_VIEW.center, TACURONG_ROUTE_MAP_VIEW.zoom);
     container?.classList.add("route-map-osm-primary");
     const baseTiles = window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -4390,7 +4633,7 @@
   function renderRouteMap() {
     initializeTacurongRouteMap();
     const map = state.routes.map;
-    if (!map) return;
+    if (!map) { renderTacurongRouteSvgFallback(); return; }
     state.routes.layers.forEach((layer) => { try { map.removeLayer(layer); } catch (_) {} });
     state.routes.layers = [];
     const year = Number(state.routes.mapYear || state.planningData?.route_latest_year || 2025);
@@ -4639,7 +4882,13 @@
   }
 
   function renderTacurongRoutes() {
-    if (!qs("#route-select") || !routePlanningRows().length) return;
+    if (!qs("#route-select")) return;
+    if (!routePlanningRows().length) {
+      const status = qs("#route-road-status");
+      if (status) status.textContent = "Route planning data unavailable — reload after deployment finishes";
+      if (!window.L) renderTacurongRouteSvgFallback();
+      return;
+    }
     populateRouteControls();
     renderRouteSummary();
     renderTacurongRouteInspector();

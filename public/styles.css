@@ -1745,7 +1745,7 @@ body {
 
 
 /* ================================================================
-   WATTZAN v16.2.7 — visible darkened OSM basemap + seasonal planning polish
+   WATTZAN v16.2.8 — visible darkened OSM basemap + seasonal planning polish
    ================================================================ */
 .tacurong-route-map.route-map-osm-primary .leaflet-tile-pane {
   filter: grayscale(.68) brightness(.52) contrast(1.08) saturate(.38);
@@ -1758,3 +1758,13 @@ body {
 .leaflet-interactive.utility-grid-segment { opacity: 1; }
 .leaflet-interactive.utility-tier-primary { filter: drop-shadow(0 0 3px rgba(255,209,102,.92)) drop-shadow(0 0 8px rgba(255,209,102,.42)); }
 .leaflet-interactive.utility-tier-feeder { filter: drop-shadow(0 0 3px rgba(255,159,122,.78)) drop-shadow(0 0 6px rgba(255,159,122,.32)); }
+
+
+/* v16.2.8 deployment-safe visualization fallbacks */
+.native-chart-fallback{width:100%;height:100%;min-height:220px;display:flex;flex-direction:column;gap:6px;align-items:stretch;justify-content:stretch}
+.native-chart-fallback svg{width:100%;height:100%;min-height:200px;display:block;overflow:visible}
+.native-chart-legend{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:center;color:var(--muted,#667382);font-size:11px;padding:0 8px 4px}
+.native-chart-legend span{display:inline-flex;align-items:center;gap:6px}
+.native-chart-legend i{width:14px;height:3px;border-radius:999px;display:inline-block}
+.tacurong-route-map.route-map-native-fallback{background:#101820!important;overflow:hidden}
+.tacurong-route-map.route-map-native-fallback svg{width:100%;height:100%;display:block}

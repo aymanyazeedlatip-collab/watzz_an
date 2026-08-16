@@ -1,4 +1,4 @@
-WATTZAN v16.2.7 - LOCAL START
+WATTZAN v16.2.8 - LOCAL START
 
 1. Extract this ZIP completely.
 2. Double-click CLICK_TO_RUN_WATTZAN.bat.

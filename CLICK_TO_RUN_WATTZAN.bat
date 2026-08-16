@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions
 chcp 65001 >nul 2>nul
-title WATTZAN v16.2.7 - One-Click Local Launcher
+title WATTZAN v16.2.8 - One-Click Local Launcher
 color 0A
 
 cd /d "%~dp0"
@@ -15,7 +15,7 @@ set "URL=http://127.0.0.1:8000"
 
 cls
 echo ================================================================
-echo                  WATTZAN v16.2.7 LOCAL
+echo                  WATTZAN v16.2.8 LOCAL
 echo                  Python 3.14 One-Click Start
 echo ================================================================
 echo.
@@ -107,7 +107,7 @@ if not exist "%STAMP%" (
     if errorlevel 1 goto :pip_failure
     "%VENV_PY%" -m pip install --disable-pip-version-check --prefer-binary -r "%REQ%"
     if errorlevel 1 goto :pip_failure
-    >"%STAMP%" echo WATTZAN v16.2.7 Python 3.14 dependencies installed
+    >"%STAMP%" echo WATTZAN v16.2.8 Python 3.14 dependencies installed
 ) else (
     echo [3/6] WATTZAN packages already installed.
 )
