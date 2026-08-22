@@ -64,6 +64,29 @@
     });
   }
 
+  async function ensureMobileCss() {
+    const url = "/mobile.css?v=16.3.1-mobile-1";
+
+    // Do not load the optional mobile layer on desktop-sized viewports.
+    // This keeps the desktop presentation exactly on the existing stylesheet.
+    if (!window.matchMedia("(max-width: 820px)").matches) {
+      mark("Mobile responsive CSS", "skipped", "desktop-viewport");
+      return true;
+    }
+
+    try {
+      await loadStylesheet(url);
+      mark("Mobile responsive CSS", "ready", "same-origin");
+      return true;
+    } catch (error) {
+      // Mobile styling is intentionally non-critical. If this optional layer
+      // fails, the existing desktop/tablet interface and all functions still run.
+      mark("Mobile responsive CSS", "failed-optional", null, error);
+      console.warn("[WATTZAN] Optional mobile responsive stylesheet unavailable", error);
+      return false;
+    }
+  }
+
   async function ensureScript({ name, primary, fallback, test, required = false }) {
     if (test()) {
       mark(name, "ready", "preloaded");
@@ -115,6 +138,7 @@
     // Independent browser libraries are loaded concurrently. This avoids a deployment
     // waiting through a long chain of CDN timeouts before app.js is even allowed to start.
     await Promise.allSettled([
+      ensureMobileCss(),
       ensureLeafletCss(),
       ensureScript({
         name: "Chart.js", primary: "/vendor/chart.umd.min.js",

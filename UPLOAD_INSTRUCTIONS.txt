@@ -1,0 +1,20 @@
+WATTZAN MOBILE RESPONSIVE UPDATE
+================================
+
+Upload/replace these exact GitHub paths:
+
+1. public/mobile.css                  (NEW)
+2. public/dependency-loader.js        (REPLACE)
+3. frontend/mobile.css                (NEW)
+4. frontend/dependency-loader.js      (REPLACE)
+
+No changes are required to app.js, index.html, styles.css, backend code, models,
+API routes, or forecasting logic.
+
+The mobile layer is scoped to viewports <= 820px. Desktop styling remains
+controlled by the existing styles.css.
+
+After uploading:
+- Let Vercel redeploy from the commit.
+- Open the stable production URL on a phone.
+- Hard-refresh once if the old layout is cached.
