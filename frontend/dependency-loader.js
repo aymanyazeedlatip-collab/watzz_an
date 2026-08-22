@@ -119,6 +119,22 @@
     }
   }
 
+  async function ensureRuntimeFixes() {
+    const url = "/runtime-fixes.js?v=16.3.1-runtime-1";
+    try {
+      await loadScript(url, 6000);
+      if (window.WATTZAN_RUNTIME_FIXES?.installed) {
+        mark("Runtime reliability fixes", "ready", "same-origin");
+        return true;
+      }
+      throw new Error("Runtime fix script loaded without installing its guard.");
+    } catch (error) {
+      mark("Runtime reliability fixes", "failed-optional", null, error);
+      console.warn("[WATTZAN] Optional runtime reliability fixes unavailable", error);
+      return false;
+    }
+  }
+
   async function ensureLeafletCss() {
     try {
       await loadStylesheet("/vendor/leaflet.css");
@@ -138,6 +154,7 @@
     // Independent browser libraries are loaded concurrently. This avoids a deployment
     // waiting through a long chain of CDN timeouts before app.js is even allowed to start.
     await Promise.allSettled([
+      ensureRuntimeFixes(),
       ensureMobileCss(),
       ensureLeafletCss(),
       ensureScript({

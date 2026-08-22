@@ -1,26 +1,28 @@
-WATTZAN MOBILE PORTRAIT FIX V2
-=============================
+WATTZAN TOUCH + CHAT RELIABILITY FIX V3
+======================================
 
-This fixes:
-- Navigation drawer being covered by the backdrop on phones
-- Full-screen blur when the drawer opens
-- Portrait spacing and panel/card boundaries
-- Mobile form/control overflow
-- Map/chart/table fitting on narrow portrait displays
+UPLOAD THESE EXACT PATHS:
 
-UPLOAD / REPLACE THESE EXACT PATHS:
+1. public/runtime-fixes.js             NEW
+2. public/dependency-loader.js         REPLACE
+3. frontend/runtime-fixes.js           NEW
+4. frontend/dependency-loader.js       REPLACE
 
-1. public/mobile.css                  REPLACE
-2. public/dependency-loader.js        REPLACE
-3. frontend/mobile.css                REPLACE
-4. frontend/dependency-loader.js      REPLACE
+WHAT THIS FIXES
+- Mobile 3D overview map: a real short touch tap now bridges to the map's existing
+  click/raycast selection, so municipality details open reliably. Dragging/rotating
+  the 3D map is not converted into a click.
+- Chatbot reliability: transient 408/425/429/500/502/503/504 and network failures
+  are retried automatically instead of forcing the user to resend the question.
+- Backend warmup: /api/health is called silently after page load and when the
+  assistant is opened, reducing free-backend cold-start failures.
 
-No app.js, index.html, styles.css, backend, API, model, or forecasting logic is changed.
+NOT CHANGED
+- app.js forecasting/model/map logic
+- styles.css or mobile.css
+- backend Python/API/model files
+- desktop layout
+- forecast calculations or stored data
 
-The loader now requests:
-  /mobile.css?v=16.3.1-mobile-2
-to avoid a phone/browser serving the previous cached mobile CSS.
-
-Desktop behavior:
-- mobile.css is still skipped on desktop-sized viewports.
-- Existing desktop styles remain unchanged.
+The new runtime file is optional/fail-safe: if it cannot load, WATTZAN still starts
+with the existing application exactly as before.
