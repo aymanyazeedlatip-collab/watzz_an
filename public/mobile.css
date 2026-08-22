@@ -918,3 +918,522 @@
     height: 300px;
   }
 }
+/* ================================================================
+   WATTZAN Mobile Portrait Refinement v2
+   Fixes drawer stacking/clickability and tighter portrait fitting.
+   ================================================================ */
+@media (max-width: 820px) {
+  :root {
+    --mobile-sidebar-width: min(82vw, 308px);
+    --mobile-gutter: 10px;
+  }
+
+  /*
+    IMPORTANT STACKING FIX:
+    styles.css gives .app-shell z-index:1, while #sidebar-backdrop is
+    a body-level sibling with z-index:25. That made the backdrop sit
+    above the entire app shell, including the drawer. Remove that
+    stacking context on mobile so the sidebar can sit above the overlay.
+  */
+  .app-shell {
+    position: relative !important;
+    z-index: auto !important;
+    isolation: auto !important;
+  }
+
+  .sidebar {
+    width: var(--mobile-sidebar-width) !important;
+    max-width: 308px !important;
+    z-index: 60 !important;
+    pointer-events: auto !important;
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: 12px 0 28px rgba(10, 37, 64, .20) !important;
+  }
+
+  .sidebar.open {
+    transform: translateX(0) !important;
+    visibility: visible;
+  }
+
+  /*
+    Keep the close area only OUTSIDE the drawer. No blur is used.
+    This guarantees the overlay cannot cover or intercept drawer taps.
+  */
+  .sidebar-backdrop {
+    inset: 0 0 0 var(--mobile-sidebar-width) !important;
+    z-index: 50 !important;
+    background: rgba(11, 46, 79, .24) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    pointer-events: auto !important;
+    touch-action: manipulation;
+  }
+
+  .sidebar-backdrop[hidden] {
+    display: none !important;
+  }
+
+  /* Keep every major portrait container inside the phone viewport. */
+  .workspace,
+  .main-content,
+  .page-section,
+  .page-section > *,
+  .dashboard-grid,
+  .dashboard-grid > *,
+  .forecast-layout,
+  .forecast-layout > *,
+  .long-term-layout,
+  .long-term-layout > *,
+  .route-map-layout,
+  .route-map-layout > *,
+  .shortterm-location-grid,
+  .shortterm-location-grid > *,
+  .recommendation-highlight-grid,
+  .recommendation-highlight-grid > *,
+  .about-hero,
+  .about-hero > *,
+  .about-mlr-layout,
+  .about-mlr-layout > *,
+  .panel,
+  .panel > *,
+  .metric-card,
+  .notice-box,
+  .weather-chart-card {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .main-content {
+    width: 100%;
+    padding:
+      12px
+      calc(var(--mobile-gutter) + env(safe-area-inset-right))
+      calc(82px + env(safe-area-inset-bottom))
+      calc(var(--mobile-gutter) + env(safe-area-inset-left));
+  }
+
+  .page-section {
+    gap: 10px;
+  }
+
+  .page-heading-row,
+  .page-heading-row.route-page-heading,
+  .about-heading-row {
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .page-heading-row h2,
+  .panel-header h3,
+  .section-divider-heading h3,
+  .about-hero h3,
+  .location-summary-heading h4 {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .page-description,
+  .panel-description,
+  .metric-footnote,
+  .notice-box,
+  .projection-method-box,
+  .route-method-note,
+  .route-forecast-status,
+  .assistant-panel-description {
+    overflow-wrap: anywhere;
+  }
+
+  .panel,
+  .metric-card {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 11px;
+    border-radius: 10px;
+  }
+
+  .panel-header {
+    gap: 7px;
+    margin-bottom: 9px;
+  }
+
+  .dashboard-grid,
+  .metric-grid,
+  .validation-metrics,
+  .forecast-result-metrics,
+  .long-term-metrics,
+  .route-summary-metrics,
+  .weather-chart-grid,
+  .guided-workflow,
+  .notice-grid,
+  .definition-grid,
+  .location-definition-grid,
+  .about-stat-strip,
+  .about-process-horizontal {
+    gap: 9px;
+  }
+
+  .metric-card {
+    min-height: 104px;
+  }
+
+  .metric-value,
+  .long-term-metrics .metric-value {
+    margin-top: 9px;
+  }
+
+  /* Inputs must never cross card boundaries. */
+  input,
+  select,
+  textarea,
+  .field input,
+  .field select,
+  .compact-control select,
+  .route-select-field select {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .field,
+  .compact-control,
+  .route-select-field {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .page-heading-actions,
+  .route-source-badges,
+  .form-actions,
+  .filter-actions {
+    max-width: 100%;
+  }
+
+  /* Responsive media / charts stay inside their cards. */
+  img,
+  canvas {
+    max-width: 100% !important;
+  }
+
+  canvas {
+    width: 100% !important;
+  }
+
+  pre {
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  /* More compact map boundaries for portrait screens. */
+  .overview-map-stage {
+    min-height: 585px;
+  }
+
+  .overview-consumption-map {
+    max-width: 100%;
+  }
+
+  .overview-consumption-map.overview-consumption-map-3d {
+    height: 330px;
+  }
+
+  .map-canvas,
+  .shortterm-map {
+    height: 315px;
+  }
+
+  .tacurong-route-map-shell {
+    min-height: 365px;
+    width: 100%;
+  }
+
+  .route-map-panel,
+  .overview-map-panel,
+  .shortterm-location-panel {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .route-map-legend,
+  .about-chip-row,
+  .tag-list,
+  .assistant-quick-prompts {
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+
+  /* Tables remain usable without making the whole page wider. */
+  .table-wrapper,
+  .seven-day-table-wrapper {
+    max-width: 100%;
+    border-radius: 8px;
+  }
+
+  .data-table {
+    min-width: 620px;
+  }
+
+  /* Slightly lighter decorative layer on phones for clarity/performance. */
+  .ambient-orbits {
+    opacity: .10;
+  }
+}
+
+@media (max-width: 600px) and (orientation: portrait) {
+  :root {
+    --mobile-gutter: 9px;
+    --mobile-sidebar-width: min(84vw, 294px);
+  }
+
+  body {
+    font-size: 13.5px;
+  }
+
+  .topbar {
+    height: 60px;
+    min-height: 60px;
+    padding-left: calc(8px + env(safe-area-inset-left));
+    padding-right: calc(8px + env(safe-area-inset-right));
+  }
+
+  .mobile-menu-button {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+  }
+
+  .topbar h1 {
+    font-size: 16px;
+  }
+
+  .main-content {
+    padding-top: 10px;
+  }
+
+  .page-heading-row h2 {
+    font-size: 20px;
+  }
+
+  .page-description {
+    font-size: 12.5px;
+    line-height: 1.48;
+  }
+
+  .section-kicker,
+  .panel-label {
+    font-size: 9px;
+  }
+
+  .panel,
+  .metric-card,
+  .weather-chart-card {
+    padding: 10px;
+  }
+
+  .panel-header h3,
+  .section-divider-heading h3 {
+    font-size: 15px;
+    line-height: 1.25;
+  }
+
+  /*
+    On portrait phones, control toolbars stack instead of creating
+    narrow horizontal rows that push panel boundaries outward.
+  */
+  .panel-header > .chart-toolbar,
+  .overview-map-toolbar {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    width: 100%;
+    overflow: visible;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .compact-control {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 7px;
+    width: 100%;
+  }
+
+  .compact-control select {
+    min-width: 0;
+  }
+
+  .page-heading-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .page-heading-actions > .button,
+  .page-heading-actions > .button.secondary {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .button {
+    min-height: 42px;
+  }
+
+  .button.small {
+    min-height: 38px;
+  }
+
+  .metric-card {
+    min-height: 96px;
+  }
+
+  .metric-value,
+  .long-term-metrics .metric-value {
+    font-size: 22px;
+  }
+
+  .metric-value.compact {
+    font-size: 15px;
+  }
+
+  .chart-container,
+  .chart-container.large {
+    height: 235px;
+    min-height: 215px;
+  }
+
+  .weather-chart-card .chart-container {
+    min-height: 215px;
+  }
+
+  .overview-map-stage {
+    min-height: 555px;
+  }
+
+  .overview-consumption-map.overview-consumption-map-3d {
+    height: 305px;
+  }
+
+  .overview-map-popup {
+    right: 7px;
+    bottom: 7px;
+    left: 7px;
+    max-height: 220px;
+    padding: 10px;
+  }
+
+  .overview-map-legend {
+    left: 7px;
+    bottom: 235px;
+    width: min(190px, calc(100% - 14px));
+  }
+
+  .map-canvas,
+  .shortterm-map {
+    height: 290px;
+  }
+
+  .tacurong-route-map-shell {
+    min-height: 340px;
+  }
+
+  .route-network-key {
+    top: 54px;
+    left: 6px;
+    width: 126px;
+    padding: 7px;
+  }
+
+  .route-map-hud {
+    top: 6px;
+    right: 6px;
+  }
+
+  .route-map-hud span {
+    max-width: 140px;
+  }
+
+  .stability-hero-card {
+    padding: 13px;
+  }
+
+  .stability-donut-large {
+    width: 124px;
+    height: 124px;
+  }
+
+  .stability-donut-large strong {
+    font-size: 35px;
+  }
+
+  .about-hero {
+    padding: 12px;
+  }
+
+  .about-project-lockup h3,
+  .about-identity h3 {
+    font-size: 23px;
+  }
+
+  .about-energy-visual {
+    width: 160px;
+    height: 160px;
+  }
+
+  .assistant-popover {
+    right: max(6px, env(safe-area-inset-right));
+    left: max(6px, env(safe-area-inset-left));
+    bottom: calc(68px + env(safe-area-inset-bottom));
+    width: auto;
+    height: calc(100dvh - 82px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+
+  .modal {
+    width: calc(100vw - 12px);
+    max-height: calc(100dvh - 12px);
+  }
+
+  .toast-region {
+    right: calc(6px + env(safe-area-inset-right));
+    left: calc(6px + env(safe-area-inset-left));
+  }
+}
+
+@media (max-width: 380px) and (orientation: portrait) {
+  :root {
+    --mobile-gutter: 7px;
+  }
+
+  .panel,
+  .metric-card,
+  .weather-chart-card {
+    padding: 9px;
+  }
+
+  .page-heading-row h2 {
+    font-size: 19px;
+  }
+
+  .chart-container,
+  .chart-container.large {
+    height: 220px;
+    min-height: 205px;
+  }
+
+  .overview-consumption-map.overview-consumption-map-3d {
+    height: 290px;
+  }
+
+  .map-canvas,
+  .shortterm-map {
+    height: 275px;
+  }
+
+  .tacurong-route-map-shell {
+    min-height: 320px;
+  }
+}

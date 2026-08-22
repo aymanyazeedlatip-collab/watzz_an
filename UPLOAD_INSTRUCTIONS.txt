@@ -1,20 +1,26 @@
-WATTZAN MOBILE RESPONSIVE UPDATE
-================================
+WATTZAN MOBILE PORTRAIT FIX V2
+=============================
 
-Upload/replace these exact GitHub paths:
+This fixes:
+- Navigation drawer being covered by the backdrop on phones
+- Full-screen blur when the drawer opens
+- Portrait spacing and panel/card boundaries
+- Mobile form/control overflow
+- Map/chart/table fitting on narrow portrait displays
 
-1. public/mobile.css                  (NEW)
-2. public/dependency-loader.js        (REPLACE)
-3. frontend/mobile.css                (NEW)
-4. frontend/dependency-loader.js      (REPLACE)
+UPLOAD / REPLACE THESE EXACT PATHS:
 
-No changes are required to app.js, index.html, styles.css, backend code, models,
-API routes, or forecasting logic.
+1. public/mobile.css                  REPLACE
+2. public/dependency-loader.js        REPLACE
+3. frontend/mobile.css                REPLACE
+4. frontend/dependency-loader.js      REPLACE
 
-The mobile layer is scoped to viewports <= 820px. Desktop styling remains
-controlled by the existing styles.css.
+No app.js, index.html, styles.css, backend, API, model, or forecasting logic is changed.
 
-After uploading:
-- Let Vercel redeploy from the commit.
-- Open the stable production URL on a phone.
-- Hard-refresh once if the old layout is cached.
+The loader now requests:
+  /mobile.css?v=16.3.1-mobile-2
+to avoid a phone/browser serving the previous cached mobile CSS.
+
+Desktop behavior:
+- mobile.css is still skipped on desktop-sized viewports.
+- Existing desktop styles remain unchanged.

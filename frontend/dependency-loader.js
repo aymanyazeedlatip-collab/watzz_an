@@ -65,7 +65,7 @@
   }
 
   async function ensureMobileCss() {
-    const url = "/mobile.css?v=16.3.1-mobile-1";
+    const url = "/mobile.css?v=16.3.1-mobile-2";
 
     // Do not load the optional mobile layer on desktop-sized viewports.
     // This keeps the desktop presentation exactly on the existing stylesheet.
