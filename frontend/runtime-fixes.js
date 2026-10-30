@@ -147,6 +147,13 @@
 
     const name = String(titleNode.textContent || "").trim();
     const year = String(yearSelect?.value || popupYear?.textContent || "").trim();
+
+    // Keep the visible population label aligned with the 3D map year.
+    const populationLabel = populationNode.previousElementSibling;
+    if (populationLabel?.tagName === "DT" && year) {
+      populationLabel.textContent = `${year} population`;
+    }
+
     const population = populationForOverviewYear(name, year);
     if (!Number.isFinite(population) || population <= 0) return;
 
