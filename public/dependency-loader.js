@@ -120,7 +120,7 @@
   }
 
   async function ensureRuntimeFixes() {
-    const url = "/runtime-fixes.js?v=16.3.1-runtime-1";
+    const url = "/runtime-fixes.js?v=16.3.1-runtime-2";
     try {
       await loadScript(url, 6000);
       if (window.WATTZAN_RUNTIME_FIXES?.installed) {

@@ -186,10 +186,27 @@ def build_data_summary(frame: pd.DataFrame, municipality: str | None = None) -> 
     levels = data["demand_level"].value_counts().to_dict() if "demand_level" in data else {}
 
     annual_by_municipality = {}
+    annual_population_by_municipality = {}
     if normalized is None:
         pivot = data.groupby(["municipality", "year"])["consumption_kwh"].sum()
         for (location, year), value in pivot.items():
             annual_by_municipality.setdefault(str(location), {})[str(year)] = round(float(value), 2)
+
+        # Population is stored on each daily municipality row. Keep the final
+        # value from each year so the 3D overview can display the population
+        # that corresponds to the map's selected year instead of always using
+        # the latest (2024) municipality profile value.
+        if "population" in data.columns:
+            population_pivot = (
+                data.sort_values(["municipality", "date"])
+                .groupby(["municipality", "year"])["population"]
+                .last()
+            )
+            for (location, year), value in population_pivot.items():
+                if pd.notna(value) and float(value) > 0:
+                    annual_population_by_municipality.setdefault(str(location), {})[
+                        str(year)
+                    ] = int(round(float(value)))
 
     return {
         "municipality": normalized,
@@ -197,6 +214,7 @@ def build_data_summary(frame: pd.DataFrame, municipality: str | None = None) -> 
         "annual_consumption_kwh": {str(key): float(value) for key, value in annual.items()},
         "monthly_consumption_kwh": {str(key): float(value) for key, value in monthly.items()},
         "annual_consumption_by_municipality_kwh": annual_by_municipality,
+        "annual_population_by_municipality": annual_population_by_municipality,
         "daily_average_consumption_kwh": round(float(daily_energy["consumption_kwh"].mean()), 2),
         "max_daily_consumption_kwh": round(float(daily_energy["consumption_kwh"].max()), 2),
         "min_daily_consumption_kwh": round(float(daily_energy["consumption_kwh"].min()), 2),

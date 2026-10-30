@@ -14,7 +14,7 @@
 
   const runtime = window.WATTZAN_RUNTIME_FIXES = {
     installed: true,
-    version: "16.3.1-runtime-1",
+    version: "16.3.1-runtime-2",
     installedAt: new Date().toISOString(),
     chatbotRetries: 0,
     backendWarmups: 0,
@@ -79,13 +79,144 @@
   }
 
   /*
+    3D overview population synchronization.
+    The normal municipality profile contains only the latest population value.
+    The data-summary endpoint now also supplies year-end population by
+    municipality for the observed dataset years. For overview years outside
+    that observed range, extend the municipality's own observed population
+    trend so backcast/forecast map years do not incorrectly show 2024 values.
+  */
+  let annualPopulationByMunicipality = {};
+  let populationSyncFrame = 0;
+
+  function captureAnnualPopulationSummary(payload) {
+    const annual = payload?.annual_population_by_municipality;
+    if (!annual || typeof annual !== "object" || !Object.keys(annual).length) return;
+    annualPopulationByMunicipality = annual;
+    scheduleOverviewPopulationSync();
+  }
+
+  function populationForOverviewYear(name, year) {
+    const targetYear = Number(year);
+    const annual = annualPopulationByMunicipality?.[name];
+    if (!annual || !Number.isFinite(targetYear)) return null;
+
+    const direct = Number(annual[String(targetYear)]);
+    if (Number.isFinite(direct) && direct > 0) return direct;
+
+    const points = Object.entries(annual)
+      .map(([entryYear, value]) => ({ year: Number(entryYear), value: Number(value) }))
+      .filter((point) => Number.isFinite(point.year) && Number.isFinite(point.value) && point.value > 0)
+      .sort((a, b) => a.year - b.year);
+
+    if (!points.length) return null;
+    if (points.length === 1) return points[0].value;
+
+    // Interpolate a missing year inside the observed period.
+    const lower = [...points].reverse().find((point) => point.year < targetYear);
+    const upper = points.find((point) => point.year > targetYear);
+    if (lower && upper && upper.year !== lower.year) {
+      const ratio = (targetYear - lower.year) / (upper.year - lower.year);
+      return lower.value + (upper.value - lower.value) * ratio;
+    }
+
+    // Backcast/forecast outside the observed population period using the
+    // municipality's compound annual population trend from the available data.
+    const first = points[0];
+    const last = points[points.length - 1];
+    const span = last.year - first.year;
+    if (span <= 0 || first.value <= 0 || last.value <= 0) return last.value;
+
+    const annualGrowth = Math.pow(last.value / first.value, 1 / span) - 1;
+    if (!Number.isFinite(annualGrowth) || annualGrowth <= -1) {
+      return targetYear < first.year ? first.value : last.value;
+    }
+
+    const anchor = targetYear < first.year ? first : last;
+    return anchor.value * Math.pow(1 + annualGrowth, targetYear - anchor.year);
+  }
+
+  function syncOverviewPopulation() {
+    const popup = document.querySelector("#overview-map-popup");
+    const populationNode = document.querySelector("#overview-map-popup-population");
+    const titleNode = document.querySelector("#overview-map-popup-title");
+    const yearSelect = document.querySelector("#overview-map-year");
+    const popupYear = document.querySelector("#overview-map-popup-year");
+
+    if (!popup || popup.hidden || !populationNode || !titleNode) return;
+
+    const name = String(titleNode.textContent || "").trim();
+    const year = String(yearSelect?.value || popupYear?.textContent || "").trim();
+    const population = populationForOverviewYear(name, year);
+    if (!Number.isFinite(population) || population <= 0) return;
+
+    const formatted = new Intl.NumberFormat("en-US", {
+      maximumFractionDigits: 0,
+    }).format(Math.round(population));
+
+    if (populationNode.textContent !== formatted) {
+      populationNode.textContent = formatted;
+      populationNode.dataset.populationYear = year;
+      runtime.populationYearSyncs = (runtime.populationYearSyncs || 0) + 1;
+    }
+  }
+
+  function scheduleOverviewPopulationSync() {
+    if (populationSyncFrame) return;
+    populationSyncFrame = window.requestAnimationFrame(() => {
+      populationSyncFrame = 0;
+      syncOverviewPopulation();
+    });
+  }
+
+  function installOverviewPopulationSync() {
+    const popup = document.querySelector("#overview-map-popup");
+    if (popup) {
+      const observer = new MutationObserver(scheduleOverviewPopulationSync);
+      observer.observe(popup, {
+        attributes: true,
+        attributeFilter: ["hidden"],
+        childList: true,
+        characterData: true,
+        subtree: true,
+      });
+    }
+
+    document.addEventListener("change", (event) => {
+      if (event.target?.matches?.("#overview-map-year")) {
+        window.setTimeout(scheduleOverviewPopulationSync, 0);
+      }
+    }, true);
+
+    scheduleOverviewPopulationSync();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", installOverviewPopulationSync, { once: true });
+  } else {
+    installOverviewPopulationSync();
+  }
+
+  /*
     Chat reliability layer.
     The existing WATTZAN request remains unchanged; only transient connection,
     rate-limit, and gateway/server failures are retried automatically. Normal
     4xx validation/configuration errors are returned immediately.
   */
   window.fetch = async function wattzanReliableFetch(input, init = {}) {
-    if (!isChatRequest(input)) return nativeFetch(input, init);
+    if (!isChatRequest(input)) {
+      const response = await nativeFetch(input, init);
+
+      // Reuse the application's normal /api/data/summary request. Parsing a
+      // cloned response does not consume or change the response app.js receives.
+      if (requestPath(input) === "/api/data/summary" && response.ok) {
+        response.clone().json()
+          .then(captureAnnualPopulationSummary)
+          .catch(() => {});
+      }
+
+      return response;
+    }
 
     const attempts = maxAttemptsFor(input);
     let lastError = null;
